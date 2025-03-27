@@ -1,4 +1,4 @@
-# FundsRadar
+# 📊 FundsRadar
 
 Welcome to the frontend codebase of **FundsRadar.io**, a platform that helps you discover and track investors or companies using powerful filters, web data, and AI-based search.
 

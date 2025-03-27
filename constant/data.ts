@@ -53,3 +53,41 @@ export const investorsData = [
         "website": "https://www.epsilonfunds.com"
     }
 ]
+
+export const companiesData = [
+    {
+        name: "Acme Corp",
+        location: "New York, USA",
+        industry: "Technology",
+        employees: "500+",
+        website: "https://www.acmecorp.com",
+    },
+    {
+        name: "Globex Industries",
+        location: "London, UK",
+        industry: "Manufacturing",
+        employees: "1,200+",
+        website: "https://www.globexindustries.co.uk",
+    },
+    {
+        name: "Initech",
+        location: "San Francisco, USA",
+        industry: "Software",
+        employees: "300",
+        website: "https://www.initech.com",
+    },
+    {
+        name: "Umbrella Corporation",
+        location: "Tokyo, Japan",
+        industry: "Biotech",
+        employees: "3,500",
+        website: "https://www.umbrellacorp.jp",
+    },
+    {
+        name: "Stark Enterprises",
+        location: "Berlin, Germany",
+        industry: "Defense Tech",
+        employees: "5,000+",
+        website: "https://www.starkenterprises.com",
+    },
+];

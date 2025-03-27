@@ -1,66 +1,54 @@
 interface IInvestor {
-    // id: string
-    logo?: null | undefined
-    name: string
-    type: string
-    location: string
-    average_dea_size_eur_m: string
-    industry_focus: string[]
-    description: string
-    website: null | string
+  id: string;
+  name: string;
+  description: string;
+  logo: string;
+  website: string;
+  investment_focus: any[];
+  investment_regions: any[];
+  investment_countries: any[];
+  pe_investment_strategy: any[];
+  pe_industry_focus: any[];
+  vc_technology_themes: any[];
+  re_sub_focus: any[];
+  investor_type: string | null;
+  min_deal_size_meur: number | null;
+  max_deal_size_meur: number | null;
+  min_ebitda_meur: number | null;
+  max_ebitda_meur: number | null;
+  min_ticket_meur: number | null;
+  max_ticket_meur: number | null;
+  hq_country: string | null;
+  hq_city: string | null;
+  hq_zip: string | null;
+  hq_address: string | null;
+  address: string | null;
+  email: string | null;
+  telephone: string | null;
+  created_at: string;
+  companies: Company[];
+}
 
-    // id: string
-    // created_at: string
-    // checked_by_human: null | undefined
-    // name: string
-    // logo: string
-    // description: string
-    // website: null | string
-    // investment_focus: string[]
-    // investment_regions: string[]
-    // investment_countries: string[]
-    // pe_investment_strategy: string[]
-    // pe_industry_focus: string[]
-    // vc_technology_themes: string[]
-    // re_sub_focus: string[]
-    // investor_type: string
-    // min_deal_size_meur: null | undefined
-    // max_deal_size_meur: null | undefined
-    // min_ebitda_meur: null | undefined
-    // max_ebitda_meur: null | undefined
-    // min_ticket_meur: null | undefined
-    // max_ticket_meur: null | undefined
-    // hq_country: string
-    // hq_city: null | undefined
-    // hq_zip: null | undefined
-    // hq_address: null | undefined
-    // address: string
-    // email: string
-    // telephone: null | undefined
-    // companies: Company[]
-  }
-  
-  interface Company {
-    id: string
-    logo: null | undefined
-    name: string
-    description: string
-  }
-  
-  interface ICompany {
-    id: string
-    logo: null | undefined
-    name: string
-    description: string
-    website: null | string
-    current_investor: string
-    status: string
-    sector: string
-    sales_in_eurm: string
-    ebitda_in_eurm: number
-    marge: string
-    year_finacials: string
-    entry_year: string
-    created_at: string
-  }
-  
+interface Company {
+  id: string;
+  logo: null | undefined;
+  name: string;
+  description: string;
+}
+
+interface ICompany {
+  id: string;
+  name: string;
+  description: string;
+  current_investor: string | null;
+  status: string;
+  sector: string;
+  created_at: string; // ISO 8601 date string
+  website: string | null;
+  sales_in_eurm: number;
+  ebitda_in_eurm: number | null;
+  marge: number;
+  year_finacials: any | null;
+  entry_year: number | null;
+  logo: string | null;
+}

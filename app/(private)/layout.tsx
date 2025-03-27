@@ -1,12 +1,12 @@
-import React from 'react';
-import Header from '@/components/Header';
-import Filters from '@/components/Filters';
+import React from "react";
+import Header from "@/components/Header";
+import Filters from "@/components/Filters";
 const layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="h-dvh bg-white overflow-hidden">
+    <div className="h-dvh w-full grid grid-rows-[44px_1fr] overflow-hidden">
       <Header />
-      <Filters />
-      <div className="flex-1 overflow-hidden p-4">{children}</div>
+      {/* <Filters /> */}
+      {children}
     </div>
   );
 };
