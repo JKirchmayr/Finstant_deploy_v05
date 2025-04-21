@@ -1,11 +1,10 @@
-"use client";
-import { useQuery } from "@tanstack/react-query";
-import { getAllCompanies } from "@/services/company";
+"use client"
+import { useQuery } from "@tanstack/react-query"
+import { getCompanies } from "@/services/company"
 
-export const useCompanies = (prompt?: string) => {
+export const useGetAllCompaniesQuery = () => {
   return useQuery({
-    queryKey: ["companies", prompt],
-    queryFn: () => getAllCompanies(prompt),
-    enabled: prompt !== undefined,
-  });
-};
+    queryKey: ["companies"],
+    queryFn: () => getCompanies(),
+  })
+}

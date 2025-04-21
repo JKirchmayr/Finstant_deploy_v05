@@ -1,8 +1,9 @@
-import axios from "axios";
+import axios from "axios"
+import qs from "query-string"
 
-export const getAllCompanies = async (prompt?: string): Promise<any[]> => {
-  const res = await axios.get("/api/companies", {
-    params: prompt ? { prompt } : {},
-  });
-  return res.data.data; // standardized in your API
-};
+export const getCompanies = async (filters: any = {}) => {
+  const query = qs.stringify(filters, { skipEmptyString: true, skipNull: true })
+  const url = query ? `/api/companies?${query}` : "/api/companies"
+  const { data } = await axios.get(url)
+  return data.data
+}

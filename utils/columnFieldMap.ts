@@ -1,0 +1,15 @@
+export const columnFieldMap: Record<string, string> = {
+  "Company Name": "name",
+  Description: "description",
+  Sector: "sector",
+  Website: "website",
+  Revenue: "sales_in_eurm",
+  "Sales (€M)": "sales_in_eurm",
+  "EBITDA (€M)": "ebitda_in_eurm",
+  EBITDA: "ebitda_in_eurm",
+  Margin: "marge",
+  Status: "status",
+  "Entry Year": "entry_year",
+  "Year Financials": "year_finacials",
+  Logo: "logo",
+}

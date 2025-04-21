@@ -1,3 +1,4 @@
+// import CompanySheet from "@/components/CompanySheet"
 import CompanySheet from "@/components/CompanySheet"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnDef } from "@tanstack/react-table"
@@ -15,6 +16,7 @@ export const columns: ColumnDef<ICompany>[] = [
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
+        className="mr-4"
       />
     ),
     cell: ({ row }) => (
@@ -22,6 +24,7 @@ export const columns: ColumnDef<ICompany>[] = [
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
+        className="mr-4"
       />
     ),
     enableSorting: false,
@@ -92,17 +95,17 @@ export const columns: ColumnDef<ICompany>[] = [
   },
 
   {
-    accessorKey: "sales_in_eurm",
+    accessorKey: "sales_in_meur",
     header: () => <div className="text-left min-w-[110px]">Sales in EURm</div>,
     cell: ({ row }) => (
-      <div>{row.original.sales_in_eurm !== null || "" ? row.original.sales_in_eurm : "-"}</div>
+      <div>{row.original.sales_in_meur !== null || "" ? row.original.sales_in_meur : "-"}</div>
     ),
   },
   {
-    accessorKey: "ebitda_in_eurm",
+    accessorKey: "ebitda_in_meur",
     header: () => <div className="text-left min-w-[110px]">EBITDA in EURm</div>,
     cell: ({ row }) => (
-      <div>{row.original.ebitda_in_eurm !== null || "" ? row.original.ebitda_in_eurm : "-"}</div>
+      <div>{row.original.ebitda_in_meur !== null || "" ? row.original.ebitda_in_meur : "-"}</div>
     ),
   },
   {
@@ -118,6 +121,13 @@ export const columns: ColumnDef<ICompany>[] = [
       </div>
     ),
     cell: ({ row }) => <div>-</div>,
+  },
+  {
+    accessorKey: "hq_country",
+    header: () => <div className="text-left min-w-[110px]">HQ Country</div>,
+    cell: ({ row }) => (
+      <div>{row.original.hq_country !== null || "" ? row.original.hq_country : "-"}</div>
+    ),
   },
   {
     accessorKey: "year_finacials",

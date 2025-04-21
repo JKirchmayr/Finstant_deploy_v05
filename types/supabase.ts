@@ -11,184 +11,232 @@ export type Database = {
     Tables: {
       companies: {
         Row: {
-          created_at: string | null
-          current_investor: string | null
+          company_id: string
+          company_name: string | null
+          company_website: string | null
           description: string | null
-          ebitda_in_eurm: number | null
           embedding: string | null
-          entry_year: string | null
-          id: string
-          logo: string | null
-          marge: number | null
-          name: string
-          sales_in_eurm: number | null
-          sector: string | null
-          status: string | null
-          website: string | null
-          year_finacials: string | null
+          investor_id: string
         }
         Insert: {
-          created_at?: string | null
-          current_investor?: string | null
+          company_id?: string
+          company_name?: string | null
+          company_website?: string | null
           description?: string | null
-          ebitda_in_eurm?: number | null
           embedding?: string | null
-          entry_year?: string | null
-          id?: string
-          logo?: string | null
-          marge?: number | null
-          name: string
-          sales_in_eurm?: number | null
-          sector?: string | null
-          status?: string | null
-          website?: string | null
-          year_finacials?: string | null
+          investor_id: string
         }
         Update: {
-          created_at?: string | null
-          current_investor?: string | null
+          company_id?: string
+          company_name?: string | null
+          company_website?: string | null
           description?: string | null
-          ebitda_in_eurm?: number | null
           embedding?: string | null
-          entry_year?: string | null
-          id?: string
-          logo?: string | null
-          marge?: number | null
-          name?: string
-          sales_in_eurm?: number | null
-          sector?: string | null
-          status?: string | null
-          website?: string | null
-          year_finacials?: string | null
-        }
-        Relationships: []
-      }
-      investor_companies: {
-        Row: {
-          company_id: string | null
-          created_at: string | null
-          id: string
-          investor_id: string | null
-          status: string | null
-        }
-        Insert: {
-          company_id?: string | null
-          created_at?: string | null
-          id?: string
-          investor_id?: string | null
-          status?: string | null
-        }
-        Update: {
-          company_id?: string | null
-          created_at?: string | null
-          id?: string
-          investor_id?: string | null
-          status?: string | null
+          investor_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "investor_companies_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "investor_companies_investor_id_fkey"
+            foreignKeyName: "Companies_investor_id_fkey"
             columns: ["investor_id"]
             isOneToOne: false
             referencedRelation: "investors"
-            referencedColumns: ["id"]
+            referencedColumns: ["investor_id"]
+          },
+        ]
+      }
+      companies_llm: {
+        Row: {
+          company_name: string
+          company_website: string
+          created_at: string | null
+          description: string | null
+          id: number
+          investor_id: string | null
+          linkedin_page: string | null
+        }
+        Insert: {
+          company_name: string
+          company_website: string
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          investor_id?: string | null
+          linkedin_page?: string | null
+        }
+        Update: {
+          company_name?: string
+          company_website?: string
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          investor_id?: string | null
+          linkedin_page?: string | null
+        }
+        Relationships: []
+      }
+      company_linkedin: {
+        Row: {
+          company_size: string | null
+          created_at: string | null
+          description: string | null
+          founded: string | null
+          headquarters: string | null
+          id: number
+          industry: string | null
+          name: string
+          organization_type: string | null
+          updated_at: string | null
+          website: string | null
+        }
+        Insert: {
+          company_size?: string | null
+          created_at?: string | null
+          description?: string | null
+          founded?: string | null
+          headquarters?: string | null
+          id?: number
+          industry?: string | null
+          name: string
+          organization_type?: string | null
+          updated_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          company_size?: string | null
+          created_at?: string | null
+          description?: string | null
+          founded?: string | null
+          headquarters?: string | null
+          id?: number
+          industry?: string | null
+          name?: string
+          organization_type?: string | null
+          updated_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
+      conversations: {
+        Row: {
+          created_at: string
+          message_id: string
+          prompt: string | null
+          response: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          message_id?: string
+          prompt?: string | null
+          response?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          message_id?: string
+          prompt?: string | null
+          response?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["session_id"]
           },
         ]
       }
       investors: {
         Row: {
-          address: string | null
-          created_at: string | null
-          description: string | null
-          email: string | null
-          hq_address: string | null
-          hq_city: string | null
-          hq_country: string | null
-          hq_zip: string | null
-          id: string
-          investment_countries: string[] | null
-          investment_focus: string[] | null
-          investment_regions: string[] | null
-          investor_type: string | null
-          logo: string | null
-          max_deal_size_meur: number | null
-          max_ebitda_meur: number | null
-          max_ticket_meur: number | null
-          min_deal_size_meur: number | null
-          min_ebitda_meur: number | null
-          min_ticket_meur: number | null
-          name: string
-          pe_industry_focus: string[] | null
-          pe_investment_strategy: string[] | null
-          re_sub_focus: string[] | null
-          telephone: string | null
-          vc_technology_themes: string[] | null
-          website: string | null
+          investor_id: string
+          investor_name: string | null
+          investor_website: string | null
         }
         Insert: {
-          address?: string | null
-          created_at?: string | null
-          description?: string | null
-          email?: string | null
-          hq_address?: string | null
-          hq_city?: string | null
-          hq_country?: string | null
-          hq_zip?: string | null
-          id?: string
-          investment_countries?: string[] | null
-          investment_focus?: string[] | null
-          investment_regions?: string[] | null
-          investor_type?: string | null
-          logo?: string | null
-          max_deal_size_meur?: number | null
-          max_ebitda_meur?: number | null
-          max_ticket_meur?: number | null
-          min_deal_size_meur?: number | null
-          min_ebitda_meur?: number | null
-          min_ticket_meur?: number | null
-          name: string
-          pe_industry_focus?: string[] | null
-          pe_investment_strategy?: string[] | null
-          re_sub_focus?: string[] | null
-          telephone?: string | null
-          vc_technology_themes?: string[] | null
-          website?: string | null
+          investor_id: string
+          investor_name?: string | null
+          investor_website?: string | null
         }
         Update: {
-          address?: string | null
+          investor_id?: string
+          investor_name?: string | null
+          investor_website?: string | null
+        }
+        Relationships: []
+      }
+      posts: {
+        Row: {
+          author: string | null
+          company_id: number | null
+          created_at: string | null
+          date_published: string | null
+          headline: string | null
+          id: number
+          text: string | null
+          type: string | null
+          updated_at: string | null
+          url: string | null
+        }
+        Insert: {
+          author?: string | null
+          company_id?: number | null
           created_at?: string | null
-          description?: string | null
-          email?: string | null
-          hq_address?: string | null
-          hq_city?: string | null
-          hq_country?: string | null
-          hq_zip?: string | null
-          id?: string
-          investment_countries?: string[] | null
-          investment_focus?: string[] | null
-          investment_regions?: string[] | null
-          investor_type?: string | null
-          logo?: string | null
-          max_deal_size_meur?: number | null
-          max_ebitda_meur?: number | null
-          max_ticket_meur?: number | null
-          min_deal_size_meur?: number | null
-          min_ebitda_meur?: number | null
-          min_ticket_meur?: number | null
-          name?: string
-          pe_industry_focus?: string[] | null
-          pe_investment_strategy?: string[] | null
-          re_sub_focus?: string[] | null
-          telephone?: string | null
-          vc_technology_themes?: string[] | null
-          website?: string | null
+          date_published?: string | null
+          headline?: string | null
+          id?: number
+          text?: string | null
+          type?: string | null
+          updated_at?: string | null
+          url?: string | null
+        }
+        Update: {
+          author?: string | null
+          company_id?: number | null
+          created_at?: string | null
+          date_published?: string | null
+          headline?: string | null
+          id?: number
+          text?: string | null
+          type?: string | null
+          updated_at?: string | null
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_linkedin"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sessions: {
+        Row: {
+          created_at: string | null
+          is_active: boolean | null
+          last_active: string | null
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          is_active?: boolean | null
+          last_active?: string | null
+          session_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string | null
+          is_active?: boolean | null
+          last_active?: string | null
+          session_id?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -224,236 +272,116 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      binary_quantize:
-        | {
-            Args: {
-              "": string
-            }
-            Returns: unknown
-          }
-        | {
-            Args: {
-              "": unknown
-            }
-            Returns: unknown
-          }
-      generate_embedding: {
-        Args: {
-          input_text: string
-        }
-        Returns: string
+      binary_quantize: {
+        Args: { "": string } | { "": unknown }
+        Returns: unknown
+      }
+      execute_sql: {
+        Args: { sql: string }
+        Returns: Record<string, unknown>[]
       }
       halfvec_avg: {
-        Args: {
-          "": number[]
-        }
+        Args: { "": number[] }
         Returns: unknown
       }
       halfvec_out: {
-        Args: {
-          "": unknown
-        }
+        Args: { "": unknown }
         Returns: unknown
       }
       halfvec_send: {
-        Args: {
-          "": unknown
-        }
+        Args: { "": unknown }
         Returns: string
       }
       halfvec_typmod_in: {
-        Args: {
-          "": unknown[]
-        }
+        Args: { "": unknown[] }
         Returns: number
       }
       hnsw_bit_support: {
-        Args: {
-          "": unknown
-        }
+        Args: { "": unknown }
         Returns: unknown
       }
       hnsw_halfvec_support: {
-        Args: {
-          "": unknown
-        }
+        Args: { "": unknown }
         Returns: unknown
       }
       hnsw_sparsevec_support: {
-        Args: {
-          "": unknown
-        }
+        Args: { "": unknown }
         Returns: unknown
       }
       hnswhandler: {
-        Args: {
-          "": unknown
-        }
+        Args: { "": unknown }
         Returns: unknown
       }
       ivfflat_bit_support: {
-        Args: {
-          "": unknown
-        }
+        Args: { "": unknown }
         Returns: unknown
       }
       ivfflat_halfvec_support: {
-        Args: {
-          "": unknown
-        }
+        Args: { "": unknown }
         Returns: unknown
       }
       ivfflathandler: {
-        Args: {
-          "": unknown
-        }
+        Args: { "": unknown }
         Returns: unknown
       }
-      l2_norm:
-        | {
-            Args: {
-              "": unknown
-            }
-            Returns: number
-          }
-        | {
-            Args: {
-              "": unknown
-            }
-            Returns: number
-          }
-      l2_normalize:
-        | {
-            Args: {
-              "": string
-            }
-            Returns: string
-          }
-        | {
-            Args: {
-              "": unknown
-            }
-            Returns: unknown
-          }
-        | {
-            Args: {
-              "": unknown
-            }
-            Returns: unknown
-          }
+      l2_norm: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: number
+      }
+      l2_normalize: {
+        Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: string
+      }
       match_companies: {
-        Args: {
-          query_embedding: string
-          match_threshold?: number
-          match_count?: number
-        }
+        Args:
+          | { query_embedding: string; match_count?: number }
+          | {
+              query_embedding: string
+              match_threshold: number
+              match_count: number
+            }
         Returns: {
-          id: string
-          name: string
+          company_id: string
+          company_name: string
+          company_website: string
           description: string
-          current_investor: string
-          status: string
-          sector: string
-          created_at: string
-          website: string
-          sales_in_eurm: number
-          ebitda_in_eurm: number
-          marge: number
-          year_finacials: string
-          entry_year: string
-          logo: string
           similarity: number
         }[]
       }
-      search_companies:
-        | {
-            Args: {
-              search_embedding: string
-              match_count: number
-            }
-            Returns: {
-              id: string
-              name: string
-              description: string
-              industry: string
-              country: string
-              similarity: number
-            }[]
-          }
-        | {
-            Args: {
-              search_embedding: string
-              match_count: number
-              min_similarity: number
-            }
-            Returns: {
-              id: string
-              name: string
-              description: string
-              industry: string
-              country: string
-              similarity: number
-            }[]
-          }
       sparsevec_out: {
-        Args: {
-          "": unknown
-        }
+        Args: { "": unknown }
         Returns: unknown
       }
       sparsevec_send: {
-        Args: {
-          "": unknown
-        }
+        Args: { "": unknown }
         Returns: string
       }
       sparsevec_typmod_in: {
-        Args: {
-          "": unknown[]
-        }
+        Args: { "": unknown[] }
         Returns: number
       }
       vector_avg: {
-        Args: {
-          "": number[]
-        }
+        Args: { "": number[] }
         Returns: string
       }
-      vector_dims:
-        | {
-            Args: {
-              "": string
-            }
-            Returns: number
-          }
-        | {
-            Args: {
-              "": unknown
-            }
-            Returns: number
-          }
+      vector_dims: {
+        Args: { "": string } | { "": unknown }
+        Returns: number
+      }
       vector_norm: {
-        Args: {
-          "": string
-        }
+        Args: { "": string }
         Returns: number
       }
       vector_out: {
-        Args: {
-          "": string
-        }
+        Args: { "": string }
         Returns: unknown
       }
       vector_send: {
-        Args: {
-          "": string
-        }
+        Args: { "": string }
         Returns: string
       }
       vector_typmod_in: {
-        Args: {
-          "": unknown[]
-        }
+        Args: { "": unknown[] }
         Returns: number
       }
     }
@@ -466,27 +394,29 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database[Extract<keyof Database, "public">]
+type DefaultSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
-  PublicTableNameOrOptions extends
-    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-        Database[PublicTableNameOrOptions["schema"]]["Views"])
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
-        PublicSchema["Views"])
-    ? (PublicSchema["Tables"] &
-        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -494,20 +424,22 @@ export type Tables<
     : never
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -515,20 +447,22 @@ export type TablesInsert<
     : never
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -536,21 +470,23 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  PublicEnumNameOrOptions extends
-    | keyof PublicSchema["Enums"]
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof Database },
-  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof PublicSchema["CompositeTypes"]
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof Database },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof Database
@@ -559,6 +495,12 @@ export type CompositeTypes<
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
   ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
-    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const

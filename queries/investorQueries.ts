@@ -1,9 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { getAllInvestor } from "@/services/investor";
+import { useQuery } from "@tanstack/react-query"
+import { getInvestor } from "@/services/investor"
 
-export const useGetAllInvestor = () => {
+export const useGetAllInvestorQuery = () => {
   return useQuery({
     queryKey: ["investor"],
-    queryFn: getAllInvestor,
-  });
-};
+    queryFn: getInvestor,
+  })
+}

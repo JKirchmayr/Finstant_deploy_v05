@@ -1,13 +1,12 @@
-import InvestorSheet from "@/components/InvestorSheet"
+// import InvestorSheet from "@/components/InvestorSheet"
 import { Checkbox } from "@/components/ui/checkbox"
-import useFilterStore from "@/store/filterStore"
 import { ColumnDef } from "@tanstack/react-table"
 import { ExternalLink } from "lucide-react"
 import Link from "next/link"
 
 const formatCellValue = (value: any) => (value === null || value === "" ? "-" : value)
 
-export const columns: ColumnDef<IInvestor>[] = [
+export const columns: ColumnDef<any>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -18,6 +17,7 @@ export const columns: ColumnDef<IInvestor>[] = [
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
+        className="mr-4"
       />
     ),
     cell: ({ row }) => (
@@ -25,6 +25,7 @@ export const columns: ColumnDef<IInvestor>[] = [
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
+        className="mr-4"
       />
     ),
     enableSorting: false,
@@ -50,7 +51,7 @@ export const columns: ColumnDef<IInvestor>[] = [
     accessorKey: "name",
     header: () => <div className="text-left min-w-[110px]">Firm Name</div>,
     cell: ({ row }) => {
-      return <InvestorSheet investor={row.original}>{row.original.name}</InvestorSheet>
+      return {row.original.name}
     },
   },
   {
@@ -88,8 +89,7 @@ export const columns: ColumnDef<IInvestor>[] = [
     accessorKey: "companies",
     header: () => <div className="text-left min-w-[260px]">Portpolio companies</div>,
     cell: ({ row }) => {
-      const { setCompanyNameSearch, setActiveTab } = useFilterStore()
-      const companies = row.getValue("companies") as Company[]
+      const companies = row.getValue("companies") as any[]
       return (
         <div className="inline-flex gap-1.5 w-[260px] overflow-auto no-scrollbar">
           {companies.length === 0 && "-"}

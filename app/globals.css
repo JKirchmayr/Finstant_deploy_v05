@@ -1,5 +1,5 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@import "tailwindcss";
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -123,4 +123,77 @@
 
 body {
   font-size: 12px;
+}
+
+.btn {
+  @apply inline-flex text-xs bg-white border border-gray-300 px-2 py-1 items-center justify-start rounded-md text-gray-700 gap-2 transition-all duration-200 cursor-pointer;
+}
+
+.btn:hover {
+  @apply bg-gray-100 border-gray-400 text-gray-800;
+}
+
+.noscroll::-webkit-scrollbar {
+  width: 0; /* Remove scrollbar space */
+  background: transparent; /* Optional: just make scrollbar invisible */
+}
+/* Optional: show position indicator in red */
+.noscroll::-webkit-scrollbar-thumb {
+  background: #ff0000;
+}
+
+.loader {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: block;
+  margin: 15px auto;
+  position: relative;
+  color: #3174ee;
+  box-sizing: border-box;
+  animation: animloader 1s linear infinite alternate;
+}
+
+@keyframes animloader {
+  0% {
+    box-shadow: -38px -12px, -14px 0, 14px 0, 38px 0;
+  }
+  33% {
+    box-shadow: -38px 0px, -14px -12px, 14px 0, 38px 0;
+  }
+  66% {
+    box-shadow: -38px 0px, -14px 0, 14px -12px, 38px 0;
+  }
+  100% {
+    box-shadow: -38px 0, -14px 0, 14px 0, 38px -12px;
+  }
+}
+
+.dots {
+  width: 40px;
+  height: 19.2px;
+  background: radial-gradient(circle closest-side, #3174ee 90%, #0000) 0% 50%,
+    radial-gradient(circle closest-side, #3174ee 90%, #0000) 50% 50%,
+    radial-gradient(circle closest-side, #3174ee 90%, #0000) 100% 50%;
+  background-size: calc(100% / 4) 9.6px;
+  background-repeat: no-repeat;
+  animation: dots-7ar3yq 0.8s infinite linear;
+}
+
+@keyframes dots-7ar3yq {
+  20% {
+    background-position: 0% 0%, 50% 50%, 100% 50%;
+  }
+
+  40% {
+    background-position: 0% 100%, 50% 0%, 100% 50%;
+  }
+
+  60% {
+    background-position: 0% 50%, 50% 100%, 100% 0%;
+  }
+
+  80% {
+    background-position: 0% 50%, 50% 50%, 100% 100%;
+  }
 }

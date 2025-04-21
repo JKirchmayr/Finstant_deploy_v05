@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import TanstackProvider from "@/context/TanstackProvider"
-import { Toaster } from "sonner"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +14,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Funds Radar",
+  title: "PmRadar - Copilot",
   description: "-",
 }
 
@@ -28,9 +27,8 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        suppressHydrationWarning={true}
+        suppressHydrationWarning
       >
-        <Toaster />
         <TanstackProvider>{children}</TanstackProvider>
       </body>
     </html>

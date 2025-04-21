@@ -1,34 +1,16 @@
+"use client"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { getUserProfile, login, signup, updateUserProfile } from "./action"
+import { useEffect, useState } from "react"
+import { useAuthStore } from "@/store/authStore"
+import { createClient } from "@/lib/supabase/client"
 
 // Types for authentication inputs
 interface AuthCredentials {
   email: string
   password: string
-}
-
-interface ProfileData {
-  fname: string
-  lname: string
-}
-
-// Hook for signing up a user
-export const useSignupUser = () => {
-  const router = useRouter()
-
-  return useMutation({
-    mutationFn: async ({ email, password }: AuthCredentials) => signup({ email, password }),
-    onSuccess: () => {
-      toast.success("Account created successfully!")
-      router.replace("/dashboard")
-    },
-    onError: (error: Error) => {
-      console.error("Signup Error:", error.message)
-      toast.error(error.message)
-    },
-  })
 }
 
 // Hook for logging in a user
@@ -39,34 +21,36 @@ export const useLoginUser = () => {
     mutationFn: async ({ email, password }: AuthCredentials) => login({ email, password }),
     onSuccess: () => {
       toast.success("Logged in successfully!")
-      router.replace("/companies")
+      router.replace("/copilot")
     },
     onError: (error: Error) => {
-      console.error("Login Error:", error.message)
       toast.error(error.message)
     },
   })
 }
 
-// Hook for fetching user profile
-export const useUserProfile = () => {
-  return useQuery({
-    queryKey: ["userProfile"],
-    queryFn: getUserProfile,
-    staleTime: 1000 * 60 * 10, // Cache data for 10 minutes
-  })
-}
+export const useAuth = () => {
+  const user = useAuthStore((s) => s.user)
+  const setUser = useAuthStore((s) => s.setUser)
+  const [loading, setLoading] = useState(false)
 
-// Hook for updating user profile
-export const useUpdateUserProfile = () => {
-  return useMutation({
-    mutationFn: async (profileData: ProfileData) => updateUserProfile(profileData),
-    onSuccess: () => {
-      toast.success("Profile updated successfully!")
-    },
-    onError: (error: Error) => {
-      console.error("Profile Update Error:", error.message)
-      toast.error(error.message)
-    },
-  })
+  useEffect(() => {
+    const init = async () => {
+      if (!user) {
+        const supabase = await createClient()
+        setLoading(true)
+        const { data, error } = await supabase.auth.getUser()
+        if (data?.user) {
+          setUser(data.user)
+        } else {
+          setUser(null)
+        }
+        setLoading(false)
+      }
+    }
+
+    init()
+  }, [user, setUser])
+
+  return { user, loading }
 }
