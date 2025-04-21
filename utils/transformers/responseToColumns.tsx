@@ -9,7 +9,7 @@ export function normalizeKey(label: string) {
 }
 
 // Generic row type: each row is a Record of string keys and any values
-export function responseToColumns(columnLabels: string[]): ColumnDef<Record<string, any>>[] {
+export function responseToColumns(columnLabels?: string[]): ColumnDef<Record<string, any>>[] {
   const baseColumns: ColumnDef<Record<string, any>>[] = [
     {
       id: "select",
@@ -34,21 +34,39 @@ export function responseToColumns(columnLabels: string[]): ColumnDef<Record<stri
 
       size: 108,
     },
-  ]
-
-  const dynamicColumns: ColumnDef<Record<string, any>>[] = columnLabels.map((label) => {
-    const accessorKey = normalizeKey(label)
-
-    return {
-      accessorKey,
-      header: label,
+    {
+      accessorKey: "company_name",
+      header: "Company name",
       enableColumnFilter: true,
       cell: ({ row }) => {
-        const value = row.original[label] // use raw label to access original key
+        const value = row.original.company_name
         return value ?? "-"
       },
-    }
-  })
+    },
+    {
+      accessorKey: "description",
+      header: "Description",
+      enableColumnFilter: true,
+      cell: ({ row }) => {
+        const value = row.original.description
+        return value ?? "-"
+      },
+    },
+  ]
 
-  return [...baseColumns, ...dynamicColumns]
+  // const dynamicColumns: ColumnDef<Record<string, any>>[] = columnLabels.map((label) => {
+  //   const accessorKey = normalizeKey(label)
+
+  //   return {
+  //     accessorKey,
+  //     header: label,
+  //     enableColumnFilter: true,
+  //     cell: ({ row }) => {
+  //       const value = row.original[label] // use raw label to access original key
+  //       return value ?? "-"
+  //     },
+  //   }
+  // })
+
+  return [...baseColumns]
 }

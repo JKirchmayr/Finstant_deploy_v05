@@ -1,11 +1,11 @@
 // import CompanySheet from "@/components/CompanySheet"
-import CompanySheet from "@/components/CompanySheet"
+// import CompanySheet from "@/components/CompanySheet"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnDef } from "@tanstack/react-table"
 import { ExternalLink } from "lucide-react"
 import Link from "next/link"
 
-export const columns: ColumnDef<ICompany>[] = [
+export const columns: ColumnDef<any>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -46,9 +46,6 @@ export const columns: ColumnDef<ICompany>[] = [
   {
     accessorKey: "name",
     header: () => <div className="text-left min-w-[110px]">Firm Name</div>,
-    cell: ({ row }) => {
-      return <CompanySheet company={row.original}>{row.original.name}</CompanySheet>
-    },
   },
   {
     accessorKey: "description",

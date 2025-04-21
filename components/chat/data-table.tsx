@@ -144,7 +144,7 @@ const DataTable = <T extends any>({
           </div>
         </div> */}
       </div>
-      <div className="flex-1 bg-white border-t border-b border-gray-300 overflow-auto">
+      <div className="flex-1 bg-white border-t border-b border-gray-300 overflow-auto mt-4">
         <Table className="relative border-b border-gray-300">
           <TableHeader className="bg-[#F3F5FF] md:bg-white h-8 sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (

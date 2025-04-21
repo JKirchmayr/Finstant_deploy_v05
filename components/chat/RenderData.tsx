@@ -5,7 +5,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { ArrowRightToLine, ExternalLink } from "lucide-react"
 import Link from "next/link"
 import { useCoPilotStore } from "@/store/copilotStore"
-import { responseToColumns } from "@/lib/orchestrator/transformers/responseToColumns"
+import { responseToColumns } from "@/utils/transformers/responseToColumns"
 import { useChatLayoutStore } from "@/store/chatLayout"
 
 const RenderData = () => {

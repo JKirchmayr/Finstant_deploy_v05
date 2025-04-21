@@ -50,9 +50,6 @@ export const columns: ColumnDef<any>[] = [
   {
     accessorKey: "name",
     header: () => <div className="text-left min-w-[110px]">Firm Name</div>,
-    cell: ({ row }) => {
-      return {row.original.name}
-    },
   },
   {
     accessorKey: "description",
