@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog"
-
+import { AddNewColumn } from "./AddNewColumn"
 interface IDataTableProps<T extends any> {
   data: T[]
   columns: ColumnDef<T>[]
@@ -204,6 +204,7 @@ const DataTable = <T extends any>({
           </TableBody>
         </Table>
       </div>
+      <AddNewColumn />
     </div>
   )
 }

@@ -1,13 +1,11 @@
-import React from "react"
+"use client"
 import Page from "@/components/layout/Page"
-import ChatBox from "@/components/chat/ChatBox"
+import Chat from "./chat"
 
-const page = () => {
+export default function CoPilotChat() {
   return (
-    <Page title="Co-Pilot">
-      <ChatBox />
+    <Page title="Copilot Test">
+      <Chat />
     </Page>
   )
 }
-
-export default page

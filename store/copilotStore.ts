@@ -7,19 +7,46 @@ type GridResult = {
   user_id: string
 }
 
-type ChatResult = {
-  type: "chat"
-  message: string
-}
-
 type CoPilotStore = {
-  result: GridResult | null
+  result: GridResult
   setResult: (data: GridResult) => void
+  addCompany: (company: Record<string, any>) => void
+  addInvestor: (investor: Record<string, any>) => void
   clearResult: () => void
 }
 
 export const useCoPilotStore = create<CoPilotStore>((set) => ({
-  result: null,
+  result: {
+    companies: [],
+    investors: [],
+    response: "",
+    user_id: "",
+  },
   setResult: (data) => set({ result: data }),
-  clearResult: () => set({ result: null }),
+
+  addCompany: (company) =>
+    set((state) => ({
+      result: {
+        ...state.result,
+        companies: [...state.result.companies, company],
+      },
+    })),
+
+  addInvestor: (investor) =>
+    set((state) => ({
+      result: {
+        ...state.result,
+        investors: [...state.result.investors, investor],
+      },
+    })),
+
+  clearResult: () =>
+    set({
+      result: {
+        companies: [],
+        investors: [],
+        response: "",
+        user_id: "",
+      },
+    }),
 }))

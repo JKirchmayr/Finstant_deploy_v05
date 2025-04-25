@@ -1,191 +1,140 @@
-import React from "react"
+"use client"
+
+import React, { createContext, useContext, useEffect, useState } from "react"
 import DataTable from "@/components/chat/data-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowRightToLine, ExternalLink } from "lucide-react"
+import { ExternalLink } from "lucide-react"
 import Link from "next/link"
 import { useCoPilotStore } from "@/store/copilotStore"
 import { responseToColumns } from "@/utils/transformers/responseToColumns"
-import { useChatLayoutStore } from "@/store/chatLayout"
+import { useWSStore } from "@/store/wsStore"
+
+interface AddColumnContextType {
+  query: string
+  setQuery: (query: string) => void
+  selectedTool: string
+  setSelectedTool: (tool: string) => void
+  format: string
+  setFormat: (format: string) => void
+  contextColumn: string
+  setContextColumn: (column: string) => void
+  handleSearch: () => void
+  isOpen: boolean
+  setIsOpen: (isOpen: boolean) => void
+}
+
+const AddColumnContext = createContext<AddColumnContextType | undefined>(undefined)
+
+export const useAddColumn = () => {
+  const context = useContext(AddColumnContext)
+  if (!context) {
+    throw new Error("useAddColumn must be used within an AddColumnProvider")
+  }
+  return context
+}
 
 const RenderData = () => {
   const { result } = useCoPilotStore()
-  const { setLayout } = useChatLayoutStore()
+  const [query, setQuery] = useState("")
+  const [selectedTool, setSelectedTool] = useState("web")
+  const [format, setFormat] = useState("auto")
+  const [contextColumn, setContextColumn] = useState("")
+  const [dynamicColumns, setDynamicColumns] = useState<ColumnDef<ICompany>[]>([])
+  const [isOpen, setIsOpen] = useState(false)
+  const [searching, setSearching] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const { companies } = useWSStore()
 
-  console.log("result: ", result)
+  const handleSearch = () => {
+    if (!query) return
 
-  if (!result || !result) {
-    return <div className="text-gray-400 p-4">No data yet.</div>
+    const columnKey = query.toLowerCase().replace(/\s+/g, "_")
+
+    setQuery("")
+
+    const columnExists = allColumns.some((col) => (col as any).accessorKey === columnKey)
+    if (columnExists) {
+      return alert("Column already exists")
+    }
+
+    setIsOpen(false)
+    setSearching(true)
+
+    setSelectedTool("web")
+    setFormat("auto")
+    setContextColumn("")
+
+    const newColumn: ColumnDef<ICompany> = {
+      accessorKey: columnKey,
+      header: query,
+      enableColumnFilter: true,
+      cell: ({ row }) => {
+        if (isLoading) {
+          return (
+            <div className="w-[100px] h-[20px] bg-gray-300 rounded-md animate-pulse">
+              Loading...
+            </div>
+          )
+        }
+        const value = row.original[query as keyof ICompany] as string
+        return <div>{value ?? "-"}</div>
+      },
+    }
+
+    setDynamicColumns((prev) => [...prev, newColumn])
   }
 
-  const columns = responseToColumns()
-  const rows = result.companies.length ? result.companies : result?.investors
+  useEffect(() => {
+    if (searching) {
+      setIsLoading(true)
+
+      const timeout = setTimeout(() => {
+        setIsLoading(false)
+        setSearching(false) // ✅ Moved here
+      }, 10000)
+
+      return () => clearTimeout(timeout)
+    }
+  }, [searching])
+
+  console.log(isLoading)
+
+  const contextValue = {
+    query,
+    setQuery,
+    selectedTool,
+    setSelectedTool,
+    format,
+    setFormat,
+    contextColumn,
+    setContextColumn,
+    handleSearch,
+    isOpen,
+    setIsOpen,
+  }
+
+  // if (!result || result.type !== "grid") {
+  //   return <div className="text-gray-400 p-4">No data yet.</div>
+  // }
+
+  const baseColumns = responseToColumns()
+  const allColumns = [...baseColumns, ...dynamicColumns]
+  const rows = companies
 
   return (
-    <div className="bg-white overflow-hidden relative">
-      <button
-        onClick={() => setLayout("chat")}
-        className="p-1 border border-r border-t border-b hover:text-gray-800 text-gray-500 cursor-pointer border-gray-200 rounded-r-sm absolute -left-0 top-1"
-      >
-        <ArrowRightToLine size={16} />
-      </button>
-      <DataTable
-        columns={columns}
-        data={rows ? rows : []}
-        isLoading={false}
-        loadMoreData={() => console.log("")}
-        hasMoreData
-      />
-    </div>
-  )
-}
-
-interface ICompany {
-  id: string
-  name: string
-  description: string
-  current_investor: string | null
-  status: string
-  sector: string
-  created_at: string // ISO 8601 date string
-  website: string | null
-  sales_in_eurm: number
-  ebitda_in_eurm: number | null
-  marge: number
-  year_finacials: any | null
-  entry_year: number | null
-  logo: string | null
-}
-
-export const columns: ColumnDef<ICompany>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "logo",
-    header: "Logo",
-    cell: ({ row }) => (
-      <div className="w-[70px] h-[40px] flex items-center justify-center overflow-hidden rounded-md">
-        <img
-          src={row.getValue("logo") !== null ? row.getValue("logo") : "/images/no-logo.png"}
-          alt="logo"
-          className="h-full object-contain"
+    <AddColumnContext.Provider value={contextValue}>
+      <div className="bg-white overflow-hidden border-l border-gray-300">
+        <DataTable
+          columns={allColumns as ColumnDef<Record<string, any>>[]}
+          data={rows ? rows : []}
+          isLoading={false}
+          loadMoreData={() => console.log("")}
+          hasMoreData
         />
       </div>
-    ),
-  },
-  {
-    accessorKey: "name",
-    header: () => <div className="text-left min-w-[110px]">Firm Name</div>,
-    cell: ({ row }) => {
-      return <p>{row.original.name}</p>
-    },
-  },
-  {
-    accessorKey: "description",
-    header: () => (
-      <div className="text-left overflow-hidden w-[300px]  line-clamp-2">Description</div>
-    ),
-    cell: ({ row }) => {
-      return (
-        <p className="w-full text-ellipsis overflow-hidden line-clamp-2">
-          {row.getValue("description")}
-        </p>
-      )
-    },
-  },
-  {
-    accessorKey: "website",
-    header: () => <div className="text-left">Website</div>,
-    cell: ({ row }) => {
-      return (
-        <Link
-          href={row.original.website !== null ? row.original.website : "/"}
-          className="hover:underline hover:text-primary transition-all inline-flex gap-1 items-center w-[100px] overflow-hidden"
-        >
-          {row.original.website === null && "-"}
-          {row.original.website !== null && (
-            <div className="size-3">
-              <ExternalLink size={12} className="size-3" />
-            </div>
-          )}
-          <p className="truncate">{row.getValue("website")}</p>
-        </Link>
-      )
-    },
-  },
-  {
-    accessorKey: "status",
-    header: () => <div className="text-left min-w-[100px]">Status</div>,
-    cell: ({ row }) => <div>{row.original.status !== null || "" ? row.original.status : "-"}</div>,
-  },
-  {
-    accessorKey: "sector",
-    header: () => <div className="text-left min-w-[100px]">Sector</div>,
-    cell: ({ row }) => <div>{row.original.sector !== null || "" ? row.original.sector : "-"}</div>,
-  },
-
-  {
-    accessorKey: "sales_in_eurm",
-    header: () => <div className="text-left min-w-[110px]">Sales in EURm</div>,
-    cell: ({ row }) => (
-      <div>{row.original.sales_in_eurm !== null || "" ? row.original.sales_in_eurm : "-"}</div>
-    ),
-  },
-  {
-    accessorKey: "ebitda_in_eurm",
-    header: () => <div className="text-left min-w-[110px]">EBITDA in EURm</div>,
-    cell: ({ row }) => (
-      <div>{row.original.ebitda_in_eurm !== null || "" ? row.original.ebitda_in_eurm : "-"}</div>
-    ),
-  },
-  {
-    accessorKey: "marge",
-    header: () => <div className="text-left min-w-[110px]">Marge</div>,
-    cell: ({ row }) => <div>{row.original.marge !== null || "" ? row.original.marge : "-"}</div>,
-  },
-  {
-    accessorKey: "min_ticket_meur",
-    header: () => (
-      <div className="text-left min-w-[110px]">
-        Min Ticket <span className="text-[10px]">(mEUR)</span>
-      </div>
-    ),
-    cell: ({ row }) => <div>-</div>,
-  },
-  {
-    accessorKey: "year_finacials",
-    header: () => <div className="text-left min-w-[110px]">Year Finacials</div>,
-    cell: ({ row }) => (
-      <div>{row.original.year_finacials !== null || "" ? row.original.year_finacials : "-"}</div>
-    ),
-  },
-  {
-    accessorKey: "entry_year",
-    header: () => <div className="text-left min-w-[110px]">Entry Year</div>,
-    cell: ({ row }) => (
-      <div>{row.original.entry_year !== null || "" ? row.original.entry_year : "-"}</div>
-    ),
-  },
-]
+    </AddColumnContext.Provider>
+  )
+}
 
 export default RenderData
