@@ -274,7 +274,11 @@ const PromptField = ({
   return (
     <div className="h-full w-full px-2">
       {!messages.length && (
-        <h1 className="text-gray-800 font-bold mb-4 text-center text-2xl">How can I help?</h1>
+        <div className="flex justify-center items-center">
+          <h1 className="text-2xl sm:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-blue-500 to-purple-500 font-bold mb-4 text-center">
+            How can I help?
+          </h1>
+        </div>
       )}
       <GradientBorderBox
         className={cn(

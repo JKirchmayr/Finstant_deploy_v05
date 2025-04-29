@@ -19,7 +19,7 @@ const GradientBorderBox: React.FC<GradientBorderBoxProps> = ({
       className={cn(
         "relative",
         borderRadius,
-        "bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 p-px"
+        "bg-gradient-to-r from-blue-500 via-pink-500 to-purple-500 p-px"
       )}
     >
       <div className={cn("bg-white dark:bg-black w-full h-full", borderRadius, padding, className)}>
