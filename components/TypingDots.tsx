@@ -1,12 +1,14 @@
 const TypingDots = () => {
   return (
-    <div className="px-4 py-2 text-sm text-gray-600 flex gap-1 items-center">
-      <span>Sure, generating a list</span>
-      <span className="dot">.</span>
-      <span className="dot">.</span>
-      <span className="dot">.</span>
+    <div className="py-2 text-sm text-gray-600 flex gap-1 items-center">
+      <span className="bg-clip-text text-base font-normal bg-gradient-to-r from-blue-800 via-[#dd6aba] to-blue-400 text-transparent">
+        Sure, generating a list
+      </span>
+      <span className="animate-bounce delay-0 text-red-500 text-xl font-bold">.</span>
+      <span className="animate-bounce delay-150 text-blue-500 text-xl font-bold">.</span>
+      <span className="animate-bounce delay-300 text-green-500 text-xl font-bold">.</span>
 
-      <style jsx>{`
+      {/* <style jsx>{`
         .dot {
           animation: blink 1.4s infinite;
           font-size: 1.25rem;
@@ -32,7 +34,7 @@ const TypingDots = () => {
             opacity: 1;
           }
         }
-      `}</style>
+      `}</style> */}
     </div>
   )
 }
