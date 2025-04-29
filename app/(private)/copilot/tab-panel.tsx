@@ -4,6 +4,7 @@ import { X } from "lucide-react"
 import React, { useEffect } from "react"
 import { useChatLayoutStore } from "@/store/chatLayout"
 import ListBuilder from "@/components/ListBuilder"
+import CompaniesData from "./companies-table"
 
 export const TabPanel = () => {
   const { addTab, closeTab, tabList, activeTabId, setActiveTabId } = useTabPanelStore()
@@ -11,10 +12,10 @@ export const TabPanel = () => {
 
   // Adding tabs when layout becomes "list"
   // useEffect(() => {
-  //   if (layout === "list" && tabList.length === 0) {
-  //     addTab("company-list", "Company List", <ListBuilder />)
+  //   if (tabList.length > 0) {
+  //     addTab("company-list", "Company List", <CompaniesData />)
   //   }
-  // }, [layout])
+  // }, [tabList])
 
   // Set first tab as active when tabs change
   useEffect(() => {

@@ -11,16 +11,16 @@ import { useWSStore } from "@/store/wsStore"
 
 const MainPanel = () => {
   const { layout, setLayout } = useChatLayoutStore()
-  const { companies } = useWSStore()
+  const { tabList } = useTabPanelStore()
 
-  console.log(companies)
+  console.log(tabList)
 
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-1">
       <ResizablePanel defaultSize={35} minSize={22}>
         <Chat />
       </ResizablePanel>
-      {companies.length > 0 && (
+      {tabList.length > 0 && (
         <>
           <ResizableHandle withHandle />
           <ResizablePanel
@@ -31,11 +31,11 @@ const MainPanel = () => {
               }
             }}
           >
-            {/* <TabPanel /> */}
+            <TabPanel />
 
-            <div className="border-l">
+            {/* <div className="border-l">
               <ListBuilder />
-            </div>
+            </div> */}
           </ResizablePanel>
         </>
       )}

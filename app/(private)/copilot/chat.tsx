@@ -13,6 +13,8 @@ import axios from "axios"
 import { Markdown } from "@/components/markdown"
 import GradientBorderBox from "@/components/ui/gradient-border"
 import Image from "next/image"
+import { useTabPanelStore } from "@/store/tabStore"
+import CompaniesData from "./companies-table"
 
 type Company = {
   company_name: string
@@ -38,6 +40,7 @@ const Chat = () => {
   const lastPromptRef = useRef<string | null>(null)
   const hasSentPromptRef = useRef<boolean>(false)
   const bottomRef = useRef<undefined>(undefined)
+  const { addTab } = useTabPanelStore()
 
   const endRef = useRef<HTMLDivElement>(null)
 
@@ -108,6 +111,7 @@ const Chat = () => {
 
         const rawChunk = decoder.decode(value, { stream: true })
         const events = rawChunk.split("\n\n")
+        let companiesData = []
 
         for (const event of events) {
           if (!event.trim()) continue
@@ -147,11 +151,15 @@ const Chat = () => {
                     company_description: companyData.company_description,
                     similarity_score: companyData.similarity_score,
                   }
-                  addCompany(company)
+                  companiesData.push(company)
                   // Scroll after adding company
                   scrollToBottom()
                 }
               }
+              if (companiesData && companiesData.length > 0) {
+                addTab("Companies", "Comp 1", <CompaniesData companies={companiesData} />)
+              }
+              console.log("companiesData", companiesData)
 
               if (parsed?.type === "done") {
                 setIsStreaming(false)
@@ -166,7 +174,7 @@ const Chat = () => {
         }
       }
 
-      console.log("Full JSON chunks received:", accumulatedJSONChunks)
+      // console.log("Full JSON chunks received:", accumulatedJSONChunks)
     } catch (error) {
       console.error("Error during streaming:", error)
       setIsStreaming(false)
