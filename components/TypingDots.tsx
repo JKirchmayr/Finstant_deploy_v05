@@ -1,7 +1,7 @@
 const TypingDots = () => {
   return (
     <div className="py-2 text-sm text-gray-600 flex gap-1 items-center">
-      <span className="bg-clip-text text-base font-normal bg-gradient-to-r from-blue-800 via-[#dd6aba] to-blue-400 text-transparent">
+      <span className="bg-clip-text font-normal italic bg-gradient-to-r from-blue-800 via-[#dd6aba] to-blue-400 text-transparent">
         Sure, generating a list
       </span>
       <span className="animate-bounce delay-0 text-red-500 text-xl font-bold">.</span>

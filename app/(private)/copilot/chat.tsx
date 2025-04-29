@@ -12,6 +12,7 @@ import RenderData from "@/components/chat/RenderData"
 import axios from "axios"
 import { Markdown } from "@/components/markdown"
 import GradientBorderBox from "@/components/ui/gradient-border"
+import Image from "next/image"
 
 type Company = {
   company_name: string
@@ -188,10 +189,21 @@ const Chat = () => {
                   "justify-start": isAssistant,
                 })}
               >
+                {m.role === "assistant" && (
+                  <Image
+                    src="/images/bot.png"
+                    width={20}
+                    height={20}
+                    alt="ai"
+                    className="h-6 w-6 mr-2"
+                  />
+                )}
+
                 <div
                   className={cn("max-w-full text-sm leading-relaxed px-3 py-1 rounded-xl", {
                     "ml-auto border-blue-200 bg-blue-50 border [font_weight:400]": isUser,
-                    "text-gray-800 mr-auto border-purple-200 bg-purple-50 border": isAssistant,
+                    "text-gray-800 mr-auto border-purple-200 bg-purple-50 border rounded-md":
+                      isAssistant,
                   })}
                 >
                   <Markdown>{m.content}</Markdown>
