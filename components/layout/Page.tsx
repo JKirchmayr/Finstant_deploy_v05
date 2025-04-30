@@ -20,9 +20,12 @@ const Page = ({
       <Header title={title} />
 
       <div
-        className={cn("relative grid", {
-          "grid-col-[276px_1fr]": investors || companies,
-        })}>
+        className={cn(
+          `flex-1 grid transition-all ease-in-out duration-300 overflow-y-auto`,
+          {
+            "grid-cols-[276px_1fr]": investors || companies,
+          }
+        )}>
         <div>{investors || companies ? <Filters /> : null}</div>
         <main className="w-full h-full overflow-hidden">{children}</main>
       </div>

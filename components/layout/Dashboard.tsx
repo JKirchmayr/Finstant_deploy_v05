@@ -11,7 +11,7 @@ const Dashboard = ({ children }: { children: React.ReactNode }) => {
   return (
     <div
       className={cn(
-        `w-full h-dvh grid transition-all ease-in-out duration-300`,
+        `flex-1 grid grid-cols-[56px_1fr] transition-all ease-in-out duration-300`,
         {
           "grid-cols-[276px_1fr]": investors || companies,
         }

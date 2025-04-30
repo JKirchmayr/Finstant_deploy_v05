@@ -10,7 +10,7 @@ const Header = ({ title }: { title: string }) => {
   const pathname = usePathname()
 
   return (
-    <header className="sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4 h-14 ">
+    <header className="sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4 h-14 z-50">
       <h1 className="text-gray-800 text-sm font-medium">{title}</h1>
       {pathname === "/copilot" && (
         <div className="div ml-auto flex items-center gap-1 mr-2">
