@@ -7,7 +7,11 @@ export const metadata = {
 }
 
 const page = () => {
-  return <h1>Work in progress</h1>
+  return (
+    <Page title="Companies">
+      <Data />
+    </Page>
+  )
 }
 
 export default page

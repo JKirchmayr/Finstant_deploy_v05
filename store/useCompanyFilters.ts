@@ -8,6 +8,8 @@ interface FilterPayload {
   ebitdaMax?: string
   industry?: string[]
   hqCountry?: string[]
+  from?: number
+  to?: number
 }
 
 interface CompanyFilterState {
@@ -16,10 +18,10 @@ interface CompanyFilterState {
   resetFilters: () => void
 }
 
-export const useCompanyFilters = create<CompanyFilterState>((set) => ({
+export const useCompanyFilters = create<CompanyFilterState>(set => ({
   appliedFilters: null,
 
-  applyFilters: (filters) => {
+  applyFilters: filters => {
     set({ appliedFilters: { ...filters } })
   },
 

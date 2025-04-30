@@ -4,7 +4,11 @@ import { cn } from "@/lib/utils"
 import { useChatLayoutStore } from "@/store/chatLayout"
 import { TabPanel } from "./tab-panel"
 import { useTabPanelStore } from "@/store/tabStore"
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable"
 import Chat from "./chat"
 import ListBuilder from "@/components/ListBuilder"
 import { useWSStore } from "@/store/wsStore"
@@ -17,20 +21,19 @@ const MainPanel = () => {
 
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-1">
-      <ResizablePanel defaultSize={50} minSize={50}>
+      <ResizablePanel defaultSize={50} minSize={35}>
         <Chat />
       </ResizablePanel>
       {tabList.length > 0 && (
         <>
           <ResizableHandle withHandle />
           <ResizablePanel
-            defaultSize={50}
-            onResize={(size) => {
+            defaultSize={75}
+            onResize={size => {
               if (size < 20) {
                 setLayout("chat")
               }
-            }}
-          >
+            }}>
             <TabPanel />
 
             {/* <div className="border-l">

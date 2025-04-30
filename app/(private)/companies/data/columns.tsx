@@ -5,16 +5,25 @@ import { ColumnDef } from "@tanstack/react-table"
 import { ExternalLink } from "lucide-react"
 import Link from "next/link"
 
-export const columns: ColumnDef<any>[] = [
+const allColumns: ColumnDef<any>[] = [
+  {
+    id: "index",
+    header: "#",
+    maxSize: 50,
+    cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     id: "select",
+    maxSize: 50,
     header: ({ table }) => (
       <Checkbox
         checked={
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
         className="mr-4"
       />
@@ -22,7 +31,7 @@ export const columns: ColumnDef<any>[] = [
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onCheckedChange={value => row.toggleSelected(!!value)}
         aria-label="Select row"
         className="mr-4"
       />
@@ -30,52 +39,63 @@ export const columns: ColumnDef<any>[] = [
     enableSorting: false,
     enableHiding: false,
   },
+  // {
+  //   accessorKey: "logo",
+  //   header: "Logo",
+  //   cell: ({ row }) => (
+  //     <div className="w-[70px] h-[40px] flex items-center justify-center overflow-hidden rounded-md">
+  //       <img
+  //         src={
+  //           row.getValue("logo") !== null
+  //             ? row.getValue("logo")
+  //             : "/images/no-logo.png"
+  //         }
+  //         alt="logo"
+  //         className="h-full object-contain"
+  //       />
+  //     </div>
+  //   ),
+  // },
   {
-    accessorKey: "logo",
-    header: "Logo",
-    cell: ({ row }) => (
-      <div className="w-[70px] h-[40px] flex items-center justify-center overflow-hidden rounded-md">
-        <img
-          src={row.getValue("logo") !== null ? row.getValue("logo") : "/images/no-logo.png"}
-          alt="logo"
-          className="h-full object-contain"
-        />
-      </div>
-    ),
-  },
-  {
-    accessorKey: "name",
+    accessorKey: "company_name",
     header: () => <div className="text-left min-w-[110px]">Firm Name</div>,
   },
   {
-    accessorKey: "description",
+    accessorKey: "company_description",
+    size: 600, // Set the desired width for the description column in p
     header: () => (
-      <div className="text-left overflow-hidden w-[300px]  line-clamp-2">Description</div>
+      <div className="text-left overflow-hidden w-[300px]  line-clamp-2">
+        Description
+      </div>
     ),
     cell: ({ row }) => {
       return (
-        <p className="w-full text-ellipsis overflow-hidden line-clamp-2">
-          {row.getValue("description")}
+        <p className="w-full text-ellipsis overflow-scroll line-clamp-2 noscroll">
+          {row.getValue("company_description")}
         </p>
       )
     },
   },
   {
-    accessorKey: "website",
+    accessorKey: "company_website",
     header: () => <div className="text-left">Website</div>,
     cell: ({ row }) => {
       return (
         <Link
-          href={row.original.website !== null ? row.original.website : "/"}
-          className="hover:underline hover:text-primary transition-all inline-flex gap-1 items-center w-[100px] overflow-hidden"
-        >
-          {row.original.website === null && "-"}
-          {row.original.website !== null && (
-            <div className="size-3">
-              <ExternalLink size={12} className="size-3" />
+          target="_blank"
+          href={
+            row.original.company_website !== null
+              ? row.original.company_website
+              : "/"
+          }
+          className="text-xs bg-blue-50 hover:bg-blue-500 border border-blue-200 rounded px-2 text-blue-600 hover:text-white transition-all inline-flex gap-1 items-center p-0.5 overflow-hidden">
+          {row.original.company_website === null && "-"}
+          {row.original.company_website !== null && (
+            <div className="flex space-x-1">
+              visit
+              <ExternalLink size={12} className="size-3 ml-1" />
             </div>
           )}
-          <p className="truncate">{row.getValue("website")}</p>
         </Link>
       )
     },
@@ -83,32 +103,49 @@ export const columns: ColumnDef<any>[] = [
   {
     accessorKey: "status",
     header: () => <div className="text-left min-w-[100px]">Status</div>,
-    cell: ({ row }) => <div>{row.original.status !== null || "" ? row.original.status : "-"}</div>,
+    cell: ({ row }) => (
+      <div>
+        {row.original.status !== null || "" ? row.original.status : "-"}
+      </div>
+    ),
   },
   {
     accessorKey: "sector",
     header: () => <div className="text-left min-w-[100px]">Sector</div>,
-    cell: ({ row }) => <div>{row.original.sector !== null || "" ? row.original.sector : "-"}</div>,
+    cell: ({ row }) => (
+      <div>
+        {row.original.sector !== null || "" ? row.original.sector : "-"}
+      </div>
+    ),
   },
-
   {
     accessorKey: "sales_in_meur",
     header: () => <div className="text-left min-w-[110px]">Sales in EURm</div>,
     cell: ({ row }) => (
-      <div>{row.original.sales_in_meur !== null || "" ? row.original.sales_in_meur : "-"}</div>
+      <div>
+        {row.original.sales_in_meur !== null || ""
+          ? row.original.sales_in_meur
+          : "-"}
+      </div>
     ),
   },
   {
     accessorKey: "ebitda_in_meur",
     header: () => <div className="text-left min-w-[110px]">EBITDA in EURm</div>,
     cell: ({ row }) => (
-      <div>{row.original.ebitda_in_meur !== null || "" ? row.original.ebitda_in_meur : "-"}</div>
+      <div>
+        {row.original.ebitda_in_meur !== null || ""
+          ? row.original.ebitda_in_meur
+          : "-"}
+      </div>
     ),
   },
   {
     accessorKey: "marge",
     header: () => <div className="text-left min-w-[110px]">Marge</div>,
-    cell: ({ row }) => <div>{row.original.marge !== null || "" ? row.original.marge : "-"}</div>,
+    cell: ({ row }) => (
+      <div>{row.original.marge !== null || "" ? row.original.marge : "-"}</div>
+    ),
   },
   {
     accessorKey: "min_ticket_meur",
@@ -123,21 +160,40 @@ export const columns: ColumnDef<any>[] = [
     accessorKey: "hq_country",
     header: () => <div className="text-left min-w-[110px]">HQ Country</div>,
     cell: ({ row }) => (
-      <div>{row.original.hq_country !== null || "" ? row.original.hq_country : "-"}</div>
+      <div>
+        {row.original.hq_country !== null || "" ? row.original.hq_country : "-"}
+      </div>
     ),
   },
   {
     accessorKey: "year_finacials",
     header: () => <div className="text-left min-w-[110px]">Year Finacials</div>,
     cell: ({ row }) => (
-      <div>{row.original.year_finacials !== null || "" ? row.original.year_finacials : "-"}</div>
+      <div>
+        {row.original.year_finacials !== null || ""
+          ? row.original.year_finacials
+          : "-"}
+      </div>
     ),
   },
   {
     accessorKey: "entry_year",
     header: () => <div className="text-left min-w-[110px]">Entry Year</div>,
     cell: ({ row }) => (
-      <div>{row.original.entry_year !== null || "" ? row.original.entry_year : "-"}</div>
+      <div>
+        {row.original.entry_year !== null || "" ? row.original.entry_year : "-"}
+      </div>
     ),
   },
 ]
+
+export function getColumnsForData(data: any[]): ColumnDef<any>[] {
+  if (!data || data.length === 0) return allColumns
+  const dataKeys = Object.keys(data[0])
+  return allColumns.filter(
+    col =>
+      col.id === "select" ||
+      col.id === "index" ||
+      ("accessorKey" in col && dataKeys.includes(col.accessorKey as string))
+  )
+}
