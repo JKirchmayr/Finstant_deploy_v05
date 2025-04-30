@@ -23,8 +23,14 @@ type Company = {
 }
 
 const Chat = () => {
-  const { setResponse, addCompany, setCompanies, companies, resetStore, clearPlaceholders } =
-    useWSStore()
+  const {
+    setResponse,
+    addCompany,
+    setCompanies,
+    companies,
+    resetStore,
+    clearPlaceholders,
+  } = useWSStore()
 
   const userId = "aa227293-c91c-4b03-91db-0d2048ee73e7"
   const socketUrl = `wss://ai-agents-backend-zwa0.onrender.com/chat`
@@ -76,16 +82,19 @@ const Chat = () => {
     setIsStreaming(true)
 
     try {
-      const response = await fetch("https://ai-agents-backend-zwa0.onrender.com/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt: promptToSend,
-          user_id: userId,
-        }),
-      })
+      const response = await fetch(
+        "https://ai-agents-backend-zwa0.onrender.com/chat",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            prompt: promptToSend,
+            user_id: userId,
+          }),
+        }
+      )
 
       if (!response.ok) {
         throw new Error("Network response was not ok")
@@ -100,12 +109,18 @@ const Chat = () => {
       let accumulatedJSONChunks: any[] = []
 
       while (true) {
-        console.log("%cStarted reading stream!", "color: green; font-weight: bold")
+        console.log(
+          "%cStarted reading stream!",
+          "color: green; font-weight: bold"
+        )
         const { done, value } = await reader.read()
 
         if (done) {
           setIsStreaming(false)
-          console.log("%cFinished reading stream!", "color: red; font-weight: bold")
+          console.log(
+            "%cFinished reading stream!",
+            "color: red; font-weight: bold"
+          )
           break
         }
 
@@ -133,7 +148,9 @@ const Chat = () => {
                   // Scroll after appending assistant message
                   scrollToBottom()
                 }
-                const placeholders: WSCompany[] = Array.from({ length: 10 }).map((_, i) => ({
+                const placeholders: WSCompany[] = Array.from({
+                  length: 10,
+                }).map((_, i) => ({
                   company_id: `placeholder-${i}`,
                   company_name: "Generating company...",
                   company_description: "Analyzing semantic vectors...",
@@ -157,7 +174,11 @@ const Chat = () => {
                 }
               }
               if (companiesData && companiesData.length > 0) {
-                addTab("Companies", "Comp 1", <CompaniesData companies={companiesData} />)
+                addTab(
+                  "Companies",
+                  "Comp 1",
+                  <CompaniesData companies={companiesData} />
+                )
               }
               console.log("companiesData", companiesData)
 
@@ -182,8 +203,8 @@ const Chat = () => {
   }
 
   return (
-    <div className="flex-1 bg-gray-100">
-      <div className="max-w-3xl mx-auto h-[100dvh] flex flex-col relative overflow-hidden">
+    <div className="flex-1 bg-gray-100 h-full">
+      <div className="max-w-3xl mx-auto h-full flex flex-col relative overflow-hidden">
         <div className="flex-1 overflow-y-auto px-4 pt-4 m space-y-4 noscroll">
           {messages.map((m, i) => {
             const isUser = m.role === "user"
@@ -195,14 +216,17 @@ const Chat = () => {
                 className={cn("flex", {
                   "justify-end": isUser,
                   "justify-start": isAssistant,
-                })}
-              >
+                })}>
                 <div
-                  className={cn("max-w-full text-sm leading-relaxed px-3 py-1 rounded-md", {
-                    "ml-auto border-gray-300 border bg-white [font_weight:400]": isUser,
-                    "text-gray-800 mr-auto border-none rounded-md": isAssistant,
-                  })}
-                >
+                  className={cn(
+                    "max-w-full text-sm leading-relaxed px-3 py-1 rounded-md",
+                    {
+                      "ml-auto border-gray-300 border bg-white [font_weight:400]":
+                        isUser,
+                      "text-gray-800 mr-auto border-none rounded-md":
+                        isAssistant,
+                    }
+                  )}>
                   <Markdown>{m.content}</Markdown>
                 </div>
               </div>
@@ -223,7 +247,10 @@ const Chat = () => {
               <button className="underline text-blue-500 ml-2">Retry</button>
             </div>
           )}
-          <div className={cn("h-5 opacity-0", { "h-10": messages.length > 1 })} ref={endRef} />
+          <div
+            className={cn("h-5 opacity-0", { "h-10": messages.length > 1 })}
+            ref={endRef}
+          />
         </div>
         <div className={cn("h-[300px]", { "h-[150px]": messages.length > 0 })}>
           <PromptField
@@ -292,9 +319,10 @@ const PromptField = ({
       <div
         className={cn(
           `bg-white border-2 py-3 px-2 flex flex-col border-gray-300 rounded-xl shadow-lg`
-        )}
-      >
-        <form onSubmit={internalHandleSend} className="flex items-center gap-2 px-2">
+        )}>
+        <form
+          onSubmit={internalHandleSend}
+          className="flex items-center gap-2 px-2">
           <input
             ref={textareaRef}
             value={input}
@@ -310,8 +338,7 @@ const PromptField = ({
                 " bg-gray-50 border border-gray-300 text-white": isLoading,
               }
             )}
-            disabled={isLoading}
-          >
+            disabled={isLoading}>
             {isLoading ? (
               <Loader2 className="animate-spin w-5 h-5 text-black" />
             ) : (
@@ -329,12 +356,13 @@ const PromptField = ({
             "Indian healthtech companies",
             "Fintech companies with recent funding",
             "German deep tech startups",
-          ].map((suggestion) => (
+          ].map(suggestion => (
             <button
               key={suggestion}
-              onClick={() => handleInputChange({ target: { value: suggestion } })}
-              className="text-[13px] font-medium bg-gray-50 hover:bg-gray-200 px-3 py-2 rounded-md border border-gray-300 transition cursor-pointer"
-            >
+              onClick={() =>
+                handleInputChange({ target: { value: suggestion } })
+              }
+              className="text-[13px] font-medium bg-gray-50 hover:bg-gray-200 px-3 py-2 rounded-md border border-gray-300 transition cursor-pointer">
               {suggestion}
             </button>
           ))}

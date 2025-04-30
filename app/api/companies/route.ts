@@ -4,10 +4,15 @@ import { createClient } from "@/lib/supabase/server"
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient()
-    let { data: companies, error } = await supabase.from("companies").select("*")
+    let { data: companies, error } = await supabase
+      .from("companies")
+      .select("*")
     if (error) {
       console.error("❌ Supabase error:", error.message)
-      return NextResponse.json({ error: "Failed to fetch companies" }, { status: 500 })
+      return NextResponse.json(
+        { error: "Failed to fetch companies" },
+        { status: 500 }
+      )
     }
 
     return NextResponse.json({
@@ -20,3 +25,5 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Something went wrong" }, { status: 500 })
   }
 }
+
+export const dynamic = "force-dynamic"

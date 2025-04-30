@@ -16,7 +16,7 @@ const Page = ({
   const investors = pathname === "/investors"
   const companies = pathname === "/companies"
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full flex flex-col">
       <Header title={title} />
 
       <div
@@ -26,8 +26,8 @@ const Page = ({
             "grid-cols-[276px_1fr]": investors || companies,
           }
         )}>
-        <div>{investors || companies ? <Filters /> : null}</div>
-        <main className="w-full h-full overflow-hidden">{children}</main>
+        {investors || companies ? <Filters /> : null}
+        <main className="flex-1 overflow-auto h-full">{children}</main>
       </div>
     </div>
   )
