@@ -2,7 +2,7 @@
 import TypingDots from "@/components/TypingDots"
 import { cn } from "@/lib/utils"
 import { useChat } from "ai/react"
-import { ArrowUp, CircleSmall } from "lucide-react"
+import { ArrowUp, CircleSmall, Loader2, Loader2Icon } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import { useWSStore, WSCompany } from "@/store/wsStore"
@@ -197,21 +197,10 @@ const Chat = () => {
                   "justify-start": isAssistant,
                 })}
               >
-                {m.role === "assistant" && (
-                  <Image
-                    src="/images/bot.png"
-                    width={20}
-                    height={20}
-                    alt="ai"
-                    className="h-6 w-6 mr-2"
-                  />
-                )}
-
                 <div
-                  className={cn("max-w-full text-sm leading-relaxed px-3 py-1 rounded-xl", {
-                    "ml-auto border-blue-200 bg-blue-50 border [font_weight:400]": isUser,
-                    "text-gray-800 mr-auto border-purple-200 bg-purple-50 border rounded-md":
-                      isAssistant,
+                  className={cn("max-w-full text-sm leading-relaxed px-3 py-1 rounded-md", {
+                    "ml-auto border-gray-300 border bg-white [font_weight:400]": isUser,
+                    "text-gray-800 mr-auto border-none rounded-md": isAssistant,
                   })}
                 >
                   <Markdown>{m.content}</Markdown>
@@ -295,14 +284,14 @@ const PromptField = ({
     <div className="h-full w-full px-2">
       {!messages.length && (
         <div className="flex justify-center items-center">
-          <h1 className="text-2xl sm:text-4xl bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-blue-500 to-purple-500 font-bold mb-4 text-center">
+          <h1 className="text-2xl sm:text-4xl text-balck font-bold mb-4 text-center">
             How can I help?
           </h1>
         </div>
       )}
-      <GradientBorderBox
+      <div
         className={cn(
-          `bg-white border py-3 px-2 flex flex-col border-gray-300 rounded-2xl  shadow-lg`
+          `bg-white border-2 py-3 px-2 flex flex-col border-gray-300 rounded-xl shadow-lg`
         )}
       >
         <form onSubmit={internalHandleSend} className="flex items-center gap-2 px-2">
@@ -311,28 +300,28 @@ const PromptField = ({
             value={input}
             onChange={handleInputChange}
             placeholder="Enter your prompt here..."
-            className="flex-1 w-full text-sm resize-none overflow-hidden px-3 outline-0 text-gray-700"
+            className="flex-1 w-full text-sm resize-none overflow-hidden px-3 outline-0 text-black font-medium"
           />
           <button
             type="submit"
             className={cn(
-              `text-sm ml-auto opacity-100 disabled:cursor-not-allowed transition-all p-2 mt-auto cursor-pointer bg-gradient-to-r from-blue-600 to-purple-600 disabled:from-gray-200 hover:opacity-80 disabled:to-gray-300 disabled:text-gray-500 text-white rounded-full flex items-center`,
+              `text-sm ml-auto opacity-100 disabled:cursor-not-allowed transition-all h-9 w-9  mt-auto cursor-pointer bg-gray-800 disabled:from-gray-200 hover:opacity-80 disabled:to-gray-300 disabled:text-gray-500 text-white rounded-full flex items-center justify-center`,
               {
-                "from-gray-100 to-gray-200 border border-gray-300 text-black": isLoading,
+                " bg-gray-200 border border-gray-300 text-white": isLoading,
               }
             )}
             disabled={isLoading}
           >
             {isLoading ? (
-              <CircleSmall size={18} fill="black" className="animate-pulse " />
+              <Loader2 className="animate-spin w-5 h-5 text-black" />
             ) : (
               <ArrowUp size={20} />
             )}
           </button>
         </form>
-      </GradientBorderBox>
+      </div>
       {showSuggestions && (
-        <div className="mt-3 px-2 flex flex-wrap gap-2 justify-between">
+        <div className="mt-3 flex flex-wrap gap-2 justify-around ">
           {[
             "Show me AI companies in Germany",
             "List biotech startups in the US",
@@ -344,7 +333,7 @@ const PromptField = ({
             <button
               key={suggestion}
               onClick={() => handleInputChange({ target: { value: suggestion } })}
-              className="text-xs bg-gradient-to-r from-blue-200 to-purple-200 hover:from-blue-600 hover:to-purple-600 text-black hover:text-white px-3 py-2 rounded-full border border-blue-300 transition cursor-pointer"
+              className="text-[13px] font-medium bg-gray-50 hover:bg-gray-200 px-3 py-2 rounded-md border border-gray-300 transition cursor-pointer"
             >
               {suggestion}
             </button>

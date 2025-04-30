@@ -17,14 +17,14 @@ const MainPanel = () => {
 
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-1">
-      <ResizablePanel defaultSize={35} minSize={22}>
+      <ResizablePanel defaultSize={50} minSize={50}>
         <Chat />
       </ResizablePanel>
       {tabList.length > 0 && (
         <>
           <ResizableHandle withHandle />
           <ResizablePanel
-            defaultSize={75}
+            defaultSize={50}
             onResize={(size) => {
               if (size < 20) {
                 setLayout("chat")
