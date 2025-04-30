@@ -48,13 +48,13 @@ export const TabPanel = () => {
 
   return (
     <div className="flex-1 flex flex-col h-full w-full">
-      <div className="bg-gray-300 p-1 pb-0 h-10 flex gap-2">
+      <div className="bg-gray-100 p-1 pb-0 h-10 flex gap-2 border border-gray-200">
         {tabList.map((tab) => (
           <div
             key={tab.id} // 👈 using numeric id now
             onClick={() => setActiveTabId(tab.tabId)}
             className={cn(
-              "flex font-medium justify-between items-center cursor-pointer select-none min-w-[100px] max-w-[150px] px-2 py-1 mb-1 rounded-md bg-gray-100 hover:bg-gray-200",
+              "flex font-medium border-l border-t border-r border-gray-200   justify-between items-center cursor-pointer select-none min-w-[100px] max-w-[150px] px-2 py-1 mb-1 rounded-md bg-gray-100 hover:bg-gray-200",
               "transition-all duration-150 group",
               {
                 "bg-white pb-2 mb-0 rounded-t-md rounded-b-none hover:bg-gray-100":
@@ -77,7 +77,7 @@ export const TabPanel = () => {
         ))}
       </div>
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden w-full">
         {tabList.find((tab) => tab.tabId === activeTabId)?.tabComponent}
       </div>
     </div>

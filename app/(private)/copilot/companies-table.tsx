@@ -12,6 +12,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import PinnableDataTable from "@/components/table/pinnable-data-table"
+import { Checkbox } from "@/components/ui/checkbox"
 
 export type Company = {
   company_id: string
@@ -22,6 +24,33 @@ export type Company = {
 
 export default function CompaniesData({ companies }: { companies: Company[] }) {
   const columns: ColumnDef<Company>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+          className="mr-4"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+          className="mr-4"
+        />
+      ),
+      size: 40,
+      minSize: 40,
+      maxSize: 40,
+      enableSorting: false,
+      enableHiding: false,
+    },
     {
       header: "#",
       cell: ({ row }) => row.index + 1,
@@ -55,9 +84,16 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold cursor-pointer">Result</h2>
       </div>
+      <PinnableDataTable
+        data={companies ? companies : []}
+        columns={columns}
+        isLoading={false}
+        hasMoreData={false}
+        loadMoreData={() => console.log("loadmore")}
+      />
 
       {/* Table */}
-      <ScrollArea className="h-full border rounded-lg w-full">
+      {/* <ScrollArea className="h-full border rounded-lg w-full">
         <Table className="w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -83,7 +119,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
             ))}
           </TableBody>
         </Table>
-      </ScrollArea>
+      </ScrollArea> */}
     </div>
   )
 }
