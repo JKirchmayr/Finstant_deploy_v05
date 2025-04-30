@@ -10,7 +10,6 @@ const page = () => {
   return (
     <Page title="Investor">
       <h1>Work in progress</h1>
-      {/* <Data /> */}
     </Page>
   )
 }

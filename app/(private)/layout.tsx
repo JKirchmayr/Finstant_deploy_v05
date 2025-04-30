@@ -1,8 +1,14 @@
-import Dashboard from "@/components/layout/Dashboard"
-import React from "react"
+import React, { ReactNode } from "react"
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/side-bar/Sidebar"
 
-const layout = ({ children }: { children: React.ReactNode }) => {
-  return <Dashboard>{children}</Dashboard>
+export default function layout({ children }: { children: ReactNode }) {
+  return (
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <main className="h-dvh overflow-auto">{children}</main>
+      </SidebarInset>
+    </SidebarProvider>
+  )
 }
-
-export default layout

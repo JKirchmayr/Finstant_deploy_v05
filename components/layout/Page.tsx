@@ -1,11 +1,31 @@
+"use client"
 import React from "react"
 import Header from "../shared/Header"
+import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
+import Filters from "../Filters"
 
-const Page = ({ children, title }: { children: React.ReactNode; title: string }) => {
+const Page = ({
+  children,
+  title,
+}: {
+  children: React.ReactNode
+  title: string
+}) => {
+  const pathname = usePathname()
+  const investors = pathname === "/investors"
+  const companies = pathname === "/companies"
   return (
-    <div className="w-full h-full grid grid-rows-[40px_1fr] overflow-hidden">
+    <div className="w-full h-full">
       <Header title={title} />
-      <main className="w-full h-full overflow-hidden">{children}</main>
+
+      <div
+        className={cn("relative grid", {
+          "grid-col-[276px_1fr]": investors || companies,
+        })}>
+        <div>{investors || companies ? <Filters /> : null}</div>
+        <main className="w-full h-full overflow-hidden">{children}</main>
+      </div>
     </div>
   )
 }

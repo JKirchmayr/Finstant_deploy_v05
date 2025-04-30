@@ -1,0 +1,160 @@
+"use client"
+
+import React from "react"
+import {
+  Building2,
+  HandCoins,
+  LifeBuoy,
+  MessagesSquare,
+  Newspaper,
+  Podcast,
+  Receipt,
+  Rss,
+  Settings,
+  Sparkles,
+  Store,
+  WandSparkles,
+  Workflow,
+} from "lucide-react"
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+  SidebarTrigger,
+  useSidebar,
+} from "@/components/ui/sidebar"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
+import UserMenu from "./UserMenu"
+import { Separator } from "../ui/separator"
+import Image from "next/image"
+import IMAGES from "@/constant/images"
+
+const data = {
+  projects: [
+    {
+      name: "Chat",
+      url: "/copilot",
+      icon: MessagesSquare,
+    },
+    {
+      name: "Investors",
+      url: "/investors",
+      icon: HandCoins,
+    },
+    {
+      name: "Companies",
+      url: "/companies",
+      icon: Building2,
+    },
+  ],
+  footer: [
+    {
+      name: "Support",
+      url: "/support",
+      icon: LifeBuoy,
+    },
+    {
+      name: "Settings",
+      url: "/settings",
+      icon: Settings,
+    },
+  ],
+}
+
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const pathname = usePathname()
+  const { state } = useSidebar()
+
+  const isCollapsed = state === "collapsed"
+  return (
+    <Sidebar collapsible="icon" {...props}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem className="ml-1">
+            <SidebarMenuButton
+              tooltip="Lexicon AI"
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent py-2 gap-4">
+              <div className="flex aspect-square size-8 text-2xl items-center justify-center">
+                <Image src={IMAGES.icon} alt="logo" width={32} height={32} />
+              </div>
+              <div className="grid flex-1 text-left text-xl leading-tight">
+                <span className="truncate font-semibold">PM Radar</span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <Separator className="my-2" />
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {data.projects.map(item => (
+                <SidebarMenuItem key={item.name} className=" rounded-md">
+                  <SidebarMenuButton tooltip={item.name} asChild>
+                    <Link
+                      href={item.url}
+                      className={cn({
+                        "text-blue-700 bg-gray-100 [&>svg]:scale-110":
+                          pathname === item.url,
+                      })}>
+                      <item.icon className="!size-5" />
+                      <span>{item.name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup className="mt-auto">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {isCollapsed && (
+                <SidebarMenuItem className="cursor-pointer">
+                  <SidebarMenuButton
+                    tooltip="Expand"
+                    asChild
+                    className="[&>svg]:scale-110 cursor-pointer">
+                    <SidebarTrigger className="mx-auto ml-[2px]" />
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+
+              {data.footer.map(item => (
+                <SidebarMenuItem key={item.name}>
+                  <SidebarMenuButton tooltip={item.name} asChild>
+                    <Link
+                      href={item.url}
+                      className={cn({
+                        "text-blue-700 bg-gray-100 [&>svg]:scale-110":
+                          pathname === item.url,
+                      })}>
+                      <item.icon className="!size-5" />
+                      <span>{item.name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+
+              <SidebarMenuItem>
+                <UserMenu />
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarRail />
+    </Sidebar>
+  )
+}

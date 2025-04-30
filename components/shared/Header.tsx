@@ -10,15 +10,14 @@ const Header = ({ title }: { title: string }) => {
   const pathname = usePathname()
 
   return (
-    <header className="w-full h-full flex items-center justify-between px-4 border-b border-gray-300">
+    <header className="sticky top-0 flex shrink-0 items-center gap-2 border-b bg-background p-4 h-14 ">
       <h1 className="text-gray-800 text-sm font-medium">{title}</h1>
       {pathname === "/copilot" && (
         <div className="div ml-auto flex items-center gap-1 mr-2">
           <button
             className={cn(
               `p-1 rounded-sm border border-gray-100 hover:border-gray-300 text-gray-600 hover:text-gray-800 cursor-pointer transition-all ease-in-out duration-300`
-            )}
-          >
+            )}>
             <SquarePen size={20} />
           </button>
           <button
@@ -27,8 +26,7 @@ const Header = ({ title }: { title: string }) => {
               {
                 // "text-blue-600 hover:text-blue-600": layout === "chat",
               }
-            )}
-          >
+            )}>
             <PanelBottom size={20} />
           </button>
           <button

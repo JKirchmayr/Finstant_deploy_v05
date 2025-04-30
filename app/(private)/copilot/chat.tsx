@@ -307,7 +307,7 @@ const PromptField = ({
             className={cn(
               `text-sm ml-auto opacity-100 disabled:cursor-not-allowed transition-all h-9 w-9  mt-auto cursor-pointer bg-gray-800 disabled:from-gray-200 hover:opacity-80 disabled:to-gray-300 disabled:text-gray-500 text-white rounded-full flex items-center justify-center`,
               {
-                " bg-gray-200 border border-gray-300 text-white": isLoading,
+                " bg-gray-50 border border-gray-300 text-white": isLoading,
               }
             )}
             disabled={isLoading}

@@ -11,12 +11,11 @@ const Dashboard = ({ children }: { children: React.ReactNode }) => {
   return (
     <div
       className={cn(
-        `w-full h-dvh grid grid-cols-[56px_1fr] transition-all ease-in-out duration-300`,
+        `w-full h-dvh grid transition-all ease-in-out duration-300`,
         {
           "grid-cols-[276px_1fr]": investors || companies,
         }
-      )}
-    >
+      )}>
       <Sidebar />
       {children}
     </div>
