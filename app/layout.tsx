@@ -9,6 +9,16 @@ export const viewport = {
   maximumScale: 1, // Disable auto-zoom on ios devices
 }
 
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+})
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+})
+
 export const metadata: Metadata = {
   title: "PmRadar - Copilot",
   description: "-",
@@ -21,7 +31,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`} suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning>
         <TanstackProvider>{children}</TanstackProvider>
       </body>
     </html>
