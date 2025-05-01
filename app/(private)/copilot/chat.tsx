@@ -175,8 +175,8 @@ const Chat = () => {
               }
               if (companiesData && companiesData.length > 0) {
                 addTab(
+                  `companies-tab${new Date().getTime()}`,
                   "Companies",
-                  "Comp 1",
                   <CompaniesData companies={companiesData} />
                 )
               }
@@ -252,7 +252,7 @@ const Chat = () => {
             ref={endRef}
           />
         </div>
-        <div className={cn("h-[300px]", { "h-[150px]": messages.length > 0 })}>
+        <div className={cn("h-[300px]", { "h-[100px]": messages.length > 0 })}>
           <PromptField
             handleSend={handleSend}
             input={input}

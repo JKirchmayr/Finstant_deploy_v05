@@ -1,24 +1,58 @@
 "use client"
 import DataTable from "@/components/table/data-table"
 import React from "react"
-import { columns } from "./columns"
+import { getColumnsForData } from "./columns"
 import { useInvestors } from "@/hooks/useInvestors"
 import { useInvestorFilters } from "@/store/useInvestorFilters"
-const Data = () => {
+import PinnableDataTable from "@/components/table/pinnable-data-table"
+const InvestorData = () => {
   const { appliedFilters } = useInvestorFilters()
-  const { data, isPending } = useInvestors(appliedFilters)
+  const [from, setFrom] = React.useState(1)
+  const [to, setTo] = React.useState(30)
+
+  const { data, isPending } = useInvestors({
+    ...(appliedFilters || {}),
+    from,
+    to,
+  })
+
+  const [moreData, setMoreData] = React.useState<any[]>([])
+  const [hasMoreData, setHasMoreData] = React.useState(false)
+
+  React.useEffect(() => {
+    if (data && from === 1) {
+      setMoreData(data)
+    } else if (data && from > 1) {
+      setMoreData(prev => [...prev, ...data])
+    }
+    if (data && data.length < to - from + 1) {
+      setHasMoreData(false)
+    } else if (data && data.length === to - from + 1) {
+      setHasMoreData(true)
+    }
+  }, [data, from, to])
+
+  const loadMoreData = () => {
+    if (!isPending && hasMoreData) {
+      setFrom(prev => prev + (to - from + 1))
+      setTo(prev => prev + (to - from + 1))
+    }
+  }
+
+  console.log(moreData)
 
   return (
     <div className="h-full bg-gray-100 w-full overflow-x-auto p-4">
-      <DataTable
-        data={data ? data : []}
-        columns={columns}
+      <PinnableDataTable
+        data={moreData ?? []}
+        columns={getColumnsForData(data)}
         isLoading={isPending}
-        hasMoreData={false}
-        loadMoreData={() => console.log("loadmore")}
+        hasMoreData={hasMoreData}
+        loadMoreData={loadMoreData}
+        filterBy="investor_name"
       />
     </div>
   )
 }
 
-export default Data
+export default InvestorData

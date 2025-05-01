@@ -45,7 +45,6 @@ const Data = () => {
         columns={getColumnsForData(data)}
         isLoading={isPending}
         hasMoreData={hasMoreData}
-        setHasMoreData={setHasMoreData}
         loadMoreData={loadMoreData}
         filterBy="company_name"
       />

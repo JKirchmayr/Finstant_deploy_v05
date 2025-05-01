@@ -1,5 +1,6 @@
 // import CompanySheet from "@/components/CompanySheet"
 // import CompanySheet from "@/components/CompanySheet"
+import { ExpandableCell } from "@/components/table/epandable-cell"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnDef } from "@tanstack/react-table"
 import { ExternalLink } from "lucide-react"
@@ -58,7 +59,8 @@ const allColumns: ColumnDef<any>[] = [
   // },
   {
     accessorKey: "company_name",
-    header: () => <div className="text-left min-w-[110px]">Firm Name</div>,
+    size: 260,
+    header: () => <div className="text-left min-w-[110px]">Company Name</div>,
   },
   {
     accessorKey: "company_description",
@@ -70,9 +72,11 @@ const allColumns: ColumnDef<any>[] = [
     ),
     cell: ({ row }) => {
       return (
-        <p className="w-full text-ellipsis overflow-scroll line-clamp-2 noscroll">
+        <ExpandableCell
+          className="w-[600px]"
+          TriggerCell={<p>{row.getValue("company_description")}</p>}>
           {row.getValue("company_description")}
-        </p>
+        </ExpandableCell>
       )
     },
   },

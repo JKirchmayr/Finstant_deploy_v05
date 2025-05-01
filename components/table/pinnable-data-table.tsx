@@ -47,7 +47,6 @@ interface IPinnableDataTableProps<T extends any> {
   columns: ColumnDef<T>[]
   isLoading: boolean
   loadMoreData: () => void
-  setHasMoreData: (arg0: boolean) => void
   hasMoreData: boolean
   paginationOption?: boolean
   filterBy?: string
@@ -71,7 +70,6 @@ const PinnableDataTable = <T extends any>({
   isLoading,
   loadMoreData,
   hasMoreData,
-  setHasMoreData,
   paginationOption = true,
   filterBy = "name",
 }: IPinnableDataTableProps<T>) => {

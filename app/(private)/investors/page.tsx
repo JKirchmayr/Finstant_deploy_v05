@@ -1,6 +1,7 @@
 import React from "react"
 import Data from "./data"
 import Page from "@/components/layout/Page"
+import InvestorData from "./data"
 export const metadata = {
   title: "Investor",
   description: "List of investors",
@@ -9,7 +10,7 @@ export const metadata = {
 const page = () => {
   return (
     <Page title="Investor">
-      <h1>Work in progress</h1>
+      <InvestorData />
     </Page>
   )
 }
