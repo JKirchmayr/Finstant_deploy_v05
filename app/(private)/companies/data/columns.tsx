@@ -59,12 +59,12 @@ const allColumns: ColumnDef<any>[] = [
   // },
   {
     accessorKey: "company_name",
-    size: 260,
+    minSize: 260,
     header: () => <div className="text-left min-w-[110px]">Company Name</div>,
   },
   {
     accessorKey: "company_description",
-    size: 600, // Set the desired width for the description column in p
+    minSize: 600, // Set the desired width for the description column in p
     header: () => (
       <div className="text-left overflow-hidden w-[300px]  line-clamp-2">
         Description
@@ -104,91 +104,91 @@ const allColumns: ColumnDef<any>[] = [
       )
     },
   },
-  {
-    accessorKey: "status",
-    header: () => <div className="text-left min-w-[100px]">Status</div>,
-    cell: ({ row }) => (
-      <div>
-        {row.original.status !== null || "" ? row.original.status : "-"}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "sector",
-    header: () => <div className="text-left min-w-[100px]">Sector</div>,
-    cell: ({ row }) => (
-      <div>
-        {row.original.sector !== null || "" ? row.original.sector : "-"}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "sales_in_meur",
-    header: () => <div className="text-left min-w-[110px]">Sales in EURm</div>,
-    cell: ({ row }) => (
-      <div>
-        {row.original.sales_in_meur !== null || ""
-          ? row.original.sales_in_meur
-          : "-"}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "ebitda_in_meur",
-    header: () => <div className="text-left min-w-[110px]">EBITDA in EURm</div>,
-    cell: ({ row }) => (
-      <div>
-        {row.original.ebitda_in_meur !== null || ""
-          ? row.original.ebitda_in_meur
-          : "-"}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "marge",
-    header: () => <div className="text-left min-w-[110px]">Marge</div>,
-    cell: ({ row }) => (
-      <div>{row.original.marge !== null || "" ? row.original.marge : "-"}</div>
-    ),
-  },
-  {
-    accessorKey: "min_ticket_meur",
-    header: () => (
-      <div className="text-left min-w-[110px]">
-        Min Ticket <span className="text-[10px]">(mEUR)</span>
-      </div>
-    ),
-    cell: ({ row }) => <div>-</div>,
-  },
-  {
-    accessorKey: "hq_country",
-    header: () => <div className="text-left min-w-[110px]">HQ Country</div>,
-    cell: ({ row }) => (
-      <div>
-        {row.original.hq_country !== null || "" ? row.original.hq_country : "-"}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "year_finacials",
-    header: () => <div className="text-left min-w-[110px]">Year Finacials</div>,
-    cell: ({ row }) => (
-      <div>
-        {row.original.year_finacials !== null || ""
-          ? row.original.year_finacials
-          : "-"}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "entry_year",
-    header: () => <div className="text-left min-w-[110px]">Entry Year</div>,
-    cell: ({ row }) => (
-      <div>
-        {row.original.entry_year !== null || "" ? row.original.entry_year : "-"}
-      </div>
-    ),
-  },
+  // {
+  //   accessorKey: "status",
+  //   header: () => <div className="text-left min-w-[100px]">Status</div>,
+  //   cell: ({ row }) => (
+  //     <div>
+  //       {row.original.status !== null || "" ? row.original.status : "-"}
+  //     </div>
+  //   ),
+  // },
+  // {
+  //   accessorKey: "sector",
+  //   header: () => <div className="text-left min-w-[100px]">Sector</div>,
+  //   cell: ({ row }) => (
+  //     <div>
+  //       {row.original.sector !== null || "" ? row.original.sector : "-"}
+  //     </div>
+  //   ),
+  // },
+  // {
+  //   accessorKey: "sales_in_meur",
+  //   header: () => <div className="text-left min-w-[110px]">Sales in EURm</div>,
+  //   cell: ({ row }) => (
+  //     <div>
+  //       {row.original.sales_in_meur !== null || ""
+  //         ? row.original.sales_in_meur
+  //         : "-"}
+  //     </div>
+  //   ),
+  // },
+  // {
+  //   accessorKey: "ebitda_in_meur",
+  //   header: () => <div className="text-left min-w-[110px]">EBITDA in EURm</div>,
+  //   cell: ({ row }) => (
+  //     <div>
+  //       {row.original.ebitda_in_meur !== null || ""
+  //         ? row.original.ebitda_in_meur
+  //         : "-"}
+  //     </div>
+  //   ),
+  // },
+  // {
+  //   accessorKey: "marge",
+  //   header: () => <div className="text-left min-w-[110px]">Marge</div>,
+  //   cell: ({ row }) => (
+  //     <div>{row.original.marge !== null || "" ? row.original.marge : "-"}</div>
+  //   ),
+  // },
+  // {
+  //   accessorKey: "min_ticket_meur",
+  //   header: () => (
+  //     <div className="text-left min-w-[110px]">
+  //       Min Ticket <span className="text-[10px]">(mEUR)</span>
+  //     </div>
+  //   ),
+  //   cell: ({ row }) => <div>-</div>,
+  // },
+  // {
+  //   accessorKey: "hq_country",
+  //   header: () => <div className="text-left min-w-[110px]">HQ Country</div>,
+  //   cell: ({ row }) => (
+  //     <div>
+  //       {row.original.hq_country !== null || "" ? row.original.hq_country : "-"}
+  //     </div>
+  //   ),
+  // },
+  // {
+  //   accessorKey: "year_finacials",
+  //   header: () => <div className="text-left min-w-[110px]">Year Finacials</div>,
+  //   cell: ({ row }) => (
+  //     <div>
+  //       {row.original.year_finacials !== null || ""
+  //         ? row.original.year_finacials
+  //         : "-"}
+  //     </div>
+  //   ),
+  // },
+  // {
+  //   accessorKey: "entry_year",
+  //   header: () => <div className="text-left min-w-[110px]">Entry Year</div>,
+  //   cell: ({ row }) => (
+  //     <div>
+  //       {row.original.entry_year !== null || "" ? row.original.entry_year : "-"}
+  //     </div>
+  //   ),
+  // },
 ]
 
 export function getColumnsForData(data: any[]): ColumnDef<any>[] {

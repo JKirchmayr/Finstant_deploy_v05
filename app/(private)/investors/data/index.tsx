@@ -39,7 +39,7 @@ const InvestorData = () => {
     }
   }
 
-  console.log(moreData)
+  // console.log(moreData)
 
   return (
     <div className="h-full bg-gray-100 w-full overflow-x-auto p-4">

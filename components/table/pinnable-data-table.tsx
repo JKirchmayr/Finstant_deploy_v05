@@ -322,7 +322,7 @@ const PinnableDataTable = <T extends any>({
             ))}
           </TableHeader>
           <TableBody className="text-gray-600 max-h-[400px] overflow-auto">
-            {isLoading && data.length <= 0 ? (
+            {isLoading && !data.length ? (
               [...Array(20)].map((_, i) => (
                 <TableRow key={i} className="border-b border-gray-300">
                   {[...Array(columns.length)].map((_, j) => (

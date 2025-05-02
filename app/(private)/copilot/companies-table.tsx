@@ -1,7 +1,12 @@
 "use client"
 import { useWSStore } from "@/store/wsStore"
 import { useState, useMemo } from "react"
-import { ColumnDef, useReactTable, getCoreRowModel, flexRender } from "@tanstack/react-table"
+import {
+  ColumnDef,
+  useReactTable,
+  getCoreRowModel,
+  flexRender,
+} from "@tanstack/react-table"
 import { Pencil } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
@@ -32,7 +37,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
             table.getIsAllPageRowsSelected() ||
             (table.getIsSomePageRowsSelected() && "indeterminate")
           }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
           className="mr-4"
         />
@@ -40,18 +45,17 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          onCheckedChange={value => row.toggleSelected(!!value)}
           aria-label="Select row"
           className="mr-4"
         />
       ),
-      size: 40,
-      minSize: 40,
       maxSize: 40,
       enableSorting: false,
       enableHiding: false,
     },
     {
+      maxSize: 50,
       header: "#",
       cell: ({ row }) => row.index + 1,
     },
