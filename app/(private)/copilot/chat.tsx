@@ -24,14 +24,8 @@ type Company = {
 }
 
 const Chat = () => {
-  const {
-    setResponse,
-    addCompany,
-    setCompanies,
-    companies,
-    resetStore,
-    clearPlaceholders,
-  } = useWSStore()
+  const { setResponse, addCompany, setCompanies, companies, resetStore, clearPlaceholders } =
+    useWSStore()
 
   const userId = "aa227293-c91c-4b03-91db-0d2048ee73e7"
   const socketUrl = `wss://ai-agents-backend-zwa0.onrender.com/chat`
@@ -83,19 +77,16 @@ const Chat = () => {
     setIsStreaming(true)
 
     try {
-      const response = await fetch(
-        "https://ai-agents-backend-zwa0.onrender.com/chat",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            prompt: promptToSend,
-            user_id: userId,
-          }),
-        }
-      )
+      const response = await fetch("https://ai-agents-backend-zwa0.onrender.com/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: promptToSend,
+          user_id: userId,
+        }),
+      })
 
       if (!response.ok) {
         throw new Error("Network response was not ok")
@@ -110,18 +101,12 @@ const Chat = () => {
       let accumulatedJSONChunks: any[] = []
 
       while (true) {
-        console.log(
-          "%cStarted reading stream!",
-          "color: green; font-weight: bold"
-        )
+        console.log("%cStarted reading stream!", "color: green; font-weight: bold")
         const { done, value } = await reader.read()
 
         if (done) {
           setIsStreaming(false)
-          console.log(
-            "%cFinished reading stream!",
-            "color: red; font-weight: bold"
-          )
+          console.log("%cFinished reading stream!", "color: red; font-weight: bold")
           break
         }
 
@@ -204,12 +189,16 @@ const Chat = () => {
   }
 
   return (
-    <div className="flex-1 bg-gray-100 h-full">
-      <div className="max-w-3xl mx-auto h-full flex flex-col relative overflow-hidden">
-        <div
-          className={cn("overflow-y-auto px-4 pt-4 m space-y-4 noscroll", {
-            "flex-1 ": messages.length > 0,
-          })}>
+    <div className={cn(`bg-white h-full transition-all ease-in-out`)}>
+      <div
+        className={cn(
+          `max-w-3xl mx-auto h-full grid grid-rows-[20px_1fr] relative overflow-hidden transition-transform ease-in-out duration-300`,
+          {
+            "grid-rows-[1fr_100px]": messages.length,
+          }
+        )}
+      >
+        <div className={cn("overflow-y-auto px-4 pt-4 m space-y-4 noscroll")}>
           {messages.map((m, i) => {
             const isUser = m.role === "user"
             const isAssistant = m.role === "assistant"
@@ -220,17 +209,15 @@ const Chat = () => {
                 className={cn("flex", {
                   "justify-end": isUser,
                   "justify-start": isAssistant,
-                })}>
+                })}
+              >
                 <div
-                  className={cn(
-                    "max-w-full text-sm leading-relaxed px-3 py-1 rounded-md",
-                    {
-                      "ml-auto border-gray-300 border bg-white [font_weight:400]":
-                        isUser,
-                      "text-gray-800 mr-auto border-none rounded-md":
-                        isAssistant,
-                    }
-                  )}>
+                  className={cn("max-w-full text-sm leading-relaxed px-3 py-1 rounded-md", {
+                    "ml-auto text-gray-700 border border-gray-200 rounded-full bg-white [font_weight:400]":
+                      isUser,
+                    "text-gray-800 mr-auto border-none rounded-md": isAssistant,
+                  })}
+                >
                   <Markdown>{m.content}</Markdown>
                 </div>
               </div>
@@ -251,19 +238,15 @@ const Chat = () => {
               <button className="underline text-blue-500 ml-2">Retry</button>
             </div>
           )}
-          <div
-            className={cn("h-5 opacity-0", { "h-10": messages.length > 1 })}
-            ref={endRef}
-          />
+          <div className={cn("h-5 opacity-0", { "h-10": messages.length > 1 })} ref={endRef} />
         </div>
         <div
-          className={cn("flex-1 flex justify-center items-center", {
-            "h-[150px] flex-1 ": messages.length > 0,
-          })}
+          className={cn("flex justify-center items-center")}
           style={{
             // height: messages.length > 0 ? 100 : 0,
             transition: "all 0.3s",
-          }}>
+          }}
+        >
           <PromptField
             handleSend={handleSend}
             input={input}
@@ -322,10 +305,11 @@ const PromptField = ({
     <div
       className={cn("h-[300px] w-full px-2 ", {
         "h-[100px] mb-16": messages.length > 0,
-      })}>
+      })}
+    >
       {!messages.length && (
-        <div className="flex justify-center items-center">
-          <h1 className="font-heading text-pretty text-center text-[29px] font-semibold tracking-tighter text-gray-900 sm:text-[32px] md:text-[46px]">
+        <div className="flex justify-center items-center mb-3">
+          <h1 className="font-heading text-pretty text-center text-2xl font-semibold tracking-tighter text-gray-900 sm:text-[32px] md:text-[46px]">
             How can I help?
           </h1>
         </div>
@@ -333,15 +317,16 @@ const PromptField = ({
 
       <form
         onSubmit={internalHandleSend}
-        className="focus-within:border-alpha-600 bg-background-subtle border-alpha-400 relative rounded-xl border shadow-[0_2px_2px_rgba(0,0,0,0.04),0_8px_8px_-8px_rgba(0,0,0,0.04)] transition-shadow">
-        <div className="@container/textarea bg-background-subtle relative z-10 grid min-h-[100px] rounded-xl overflow-hidden">
+        className="focus-within:border-gray-300 bg-white border-gray-200 relative rounded-xl border shadow-[0_2px_2px_rgba(0,0,0,0.04),0_8px_8px_-8px_rgba(0,0,0,0.04)] transition-shadow"
+      >
+        <div className="@container/textarea bg-white relative z-10 grid min-h-[100px] rounded-xl overflow-hidden">
           <TextareaAutosize
             ref={textareaRef}
             value={input}
             onChange={handleInputChange}
             minRows={1}
             maxRows={5}
-            onKeyDown={e => {
+            onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault()
                 internalHandleSend(e)
@@ -351,19 +336,19 @@ const PromptField = ({
             data-enhancing="false"
             id="chat-main-textarea"
             name="content"
-            // style={{ height: "42px", minHeight: "42px", maxHeight: "384px" }}
             className={cn(
-              "resize-none max-h-[300px] overflow-auto  w-full flex-1 bg-transparent p-3 pb-1.5 text-sm outline-none ring-0 placeholder:text-gray-500",
+              "resize-none max-h-[300px] bg-white overflow-auto w-full flex-1 p-3 pb-1.5 text-sm outline-none ring-0 placeholder:text-gray-500",
               { "max-h-[150px]": messages.length > 0 }
             )}
           />
           <div className="flex items-center gap-2 p-3">
             <div className="ml-auto flex items-center gap-1">
               <button
-                className="focus-visible:ring-offset-background inline-flex shrink-0 cursor-pointer select-none items-center justify-center gap-1.5 whitespace-nowrap text-nowrap border font-medium outline-none ring-blue-600 transition-[background,border-color,color,transform,opacity,box-shadow] focus-visible:ring-2 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 disabled:ring-0 has-[:focus-visible]:ring-2 aria-disabled:cursor-not-allowed aria-disabled:bg-gray-100 aria-disabled:text-gray-400 aria-disabled:ring-0 [&>svg]:pointer-events-none [&>svg]:size-4 [&_svg]:shrink-0 disabled:border-alpha-400 text-background aria-disabled:border-alpha-400 border-gray-900 bg-gray-900 hover:border-gray-700 hover:bg-gray-700 focus:border-gray-700 focus:bg-gray-700 focus-visible:border-gray-700 focus-visible:bg-gray-700 px-3 text-sm has-[>kbd]:gap-2 has-[>svg]:px-2 has-[>kbd]:pr-[6px] ml-1 size-7 rounded-md"
+                className="focus-visible:ring-offset-background inline-flex shrink-0 cursor-pointer select-none items-center justify-center gap-1.5 whitespace-nowrap text-nowrap border font-medium outline-none ring-blue-600 transition-[background,border-color,color,transform,opacity,box-shadow] focus-visible:ring-2 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 disabled:ring-0 has-[:focus-visible]:ring-2 aria-disabled:cursor-not-allowed aria-disabled:bg-gray-100 aria-disabled:text-gray-400 aria-disabled:ring-0 [&>svg]:pointer-events-none [&>svg]:size-4 [&_svg]:shrink-0 disabled:border-alpha-400 text-background aria-disabled:border-alpha-400 bg-gray-900  hover:bg-gray-700 focus:border-gray-700 focus:bg-gray-700 focus-visible:border-gray-700 focus-visible:bg-gray-700 px-3 text-sm has-[>kbd]:gap-2 has-[>svg]:px-2 has-[>kbd]:pr-[6px] ml-1 size-7 rounded-md"
                 type="submit"
                 disabled={isLoading || !input.trim().length}
-                onClick={internalHandleSend}>
+                onClick={internalHandleSend}
+              >
                 {isLoading ? (
                   <Loader2 className="animate-spin w-5 h-5 text-black" />
                 ) : (
@@ -375,8 +360,8 @@ const PromptField = ({
         </div>
       </form>
 
-      {showSuggestions && (
-        <div className="mt-3 flex flex-wrap gap-2 justify-around ">
+      {!messages.length && showSuggestions && (
+        <div className="mt-3 flex flex-wrap gap-2 mx-4">
           {[
             "Show me AI companies in Germany",
             "List biotech startups in the US",
@@ -384,13 +369,12 @@ const PromptField = ({
             "Indian healthtech companies",
             "Fintech companies with recent funding",
             "German deep tech startups",
-          ].map(suggestion => (
+          ].map((suggestion) => (
             <button
               key={suggestion}
-              onClick={() =>
-                handleInputChange({ target: { value: suggestion } })
-              }
-              className="text-[13px] text-foreground/80 hover:text-foreground bg-gray-50 hover:bg-gray-200 px-3 py-1.5 rounded-md border border-gray-300 hover:border-gray-500 transition cursor-pointer">
+              onClick={() => handleInputChange({ target: { value: suggestion } })}
+              className="text-[13px] text-foreground/80 hover:text-foreground bg-white hover:bg-gray-100 px-3 py-1.5 rounded-md border border-gray-200 hover:border-gray-300 transition cursor-pointer"
+            >
               {suggestion}
             </button>
           ))}
