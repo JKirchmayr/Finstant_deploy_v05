@@ -175,7 +175,7 @@ const Filters = () => {
   }, [])
 
   return (
-    <div className="flex flex-col bg-[#fbfbfb] h-full overflow-hidden relative border-b transition-transform ease-in-out duration-300">
+    <div className="flex flex-col bg-[#fbfbfb] h-full overflow-hidden relative border-r border-gray-200 transition-transform ease-in-out duration-300">
       <div className="flex bg-white items-center gap-1 border-b border-gray-300 px-4 py-1 min-h-[40px]">
         <ListFilterPlus size={14} />
         <h1 className="text-sm font-medium text-gray-700">Filters</h1>
