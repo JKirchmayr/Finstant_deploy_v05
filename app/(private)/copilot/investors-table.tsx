@@ -20,25 +20,29 @@ import {
 import PinnableDataTable from "@/components/table/pinnable-data-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useTabPanelStore } from "@/store/tabStore"
-import CompanyProfile from "@/components/CompanyProfile"
+import InvestorProfile from "@/components/InvestorProfile"
 
-export type Company = {
-  company_id: string
-  company_name: string
-  company_description: string
-  similarity_score: number
+export type InvestorsProps = {
+  investor_id?: string
+  investor_name?: string
+  investor_description?: string
+  similarity_score?: number
 }
 
-export default function CompaniesData({ companies }: { companies: Company[] }) {
+export default function InvestorsResponseData({
+  investors,
+}: {
+  investors: InvestorsProps[]
+}) {
   const { addTab } = useTabPanelStore()
   const handleAddTab = (data: any) => {
     addTab(
       new Date().getTime().toString(),
-      data?.company_name || "Company",
-      <CompanyProfile data={data} />
+      data?.investor_name || "Company",
+      <InvestorProfile data={data} />
     )
   }
-  const columns: ColumnDef<Company>[] = [
+  const columns: ColumnDef<InvestorsProps>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -71,22 +75,22 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
       cell: ({ row }) => row.index + 1,
     },
     {
-      accessorKey: "company_name",
-      header: "Company",
+      accessorKey: "investor_name",
+      header: "investor",
       cell: ({ row }) => {
         return (
           <span
             onClick={() => handleAddTab(row.original)}
             className="underline hover:font-medium transition-all duration-200 cursor-pointer">
-            {row.original.company_name}
+            {row.original.investor_name}
           </span>
         )
       },
     },
     {
-      accessorKey: "company_description",
+      accessorKey: "investor_description",
       header: "Description",
-      cell: ({ row }) => row.original.company_description,
+      cell: ({ row }) => row.original.investor_description,
     },
     {
       accessorKey: "similarity_score",
@@ -95,46 +99,22 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
     },
   ]
 
-  console.log(companies)
+  console.log(investors)
+
   return (
     <div className="h-full flex flex-col bg-white w-full">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold cursor-pointer">Result</h2>
+      </div>
       <PinnableDataTable
-        data={companies ? companies : []}
+        data={investors ? investors : []}
         columns={columns}
         isLoading={false}
         hasMoreData={false}
         loadMoreData={() => console.log("loadmore")}
-        filterBy="company_name"
+        filterBy="investor_name"
       />
-
-      {/* Table */}
-      {/* <ScrollArea className="h-full border rounded-lg w-full">
-        <Table className="w-full">
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-
-          <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} className="odd:bg-gray-50 border-b border-gray-300">
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="py-3 text-gray-800 border-l border-gray-300">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </ScrollArea> */}
     </div>
   )
 }

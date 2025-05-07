@@ -10,21 +10,25 @@ type Tabs = {
 type ChatControlStore = {
   tabList: Tabs[]
   nextId: number
-  addTab: (tabId: string, tabTitle: string, tabComponent: React.ReactNode) => void
+  addTab: (
+    tabId: string,
+    tabTitle: string,
+    tabComponent: React.ReactNode
+  ) => void
   closeTab: (tabId: string) => void
   activeTabId: string
   setActiveTabId: (tabId: string) => void
   emptyTabList: () => void
 }
 
-export const useTabPanelStore = create<ChatControlStore>()((set) => ({
+export const useTabPanelStore = create<ChatControlStore>()(set => ({
   tabList: [],
   nextId: 0,
   activeTabId: "",
-  setActiveTabId: (tabId) => set({ activeTabId: tabId }),
+  setActiveTabId: tabId => set({ activeTabId: tabId }),
   addTab: (tabId, tabTitle, tabComponent) =>
-    set((state) => {
-      const existingTab = state.tabList.find((tab) => tab.tabId === tabId)
+    set(state => {
+      const existingTab = state.tabList.find(tab => tab.tabId === tabId)
 
       if (existingTab) {
         return { activeTabId: tabId }
@@ -43,9 +47,9 @@ export const useTabPanelStore = create<ChatControlStore>()((set) => ({
         activeTabId: tabId,
       }
     }),
-  closeTab: (tabId) =>
-    set((state) => ({
-      tabList: state.tabList.filter((tab) => tab.tabId !== tabId),
+  closeTab: tabId =>
+    set(state => ({
+      tabList: state.tabList.filter(tab => tab.tabId !== tabId),
     })),
   emptyTabList: () => set({ tabList: [], nextId: 0 }),
 }))

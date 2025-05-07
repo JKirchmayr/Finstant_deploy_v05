@@ -168,7 +168,6 @@ const PinnableDataTable = <T extends any>({
       ? exportToCSV(exportData, filename)
       : exportToExcel(exportData, filename)
   }
-
   return (
     <div className="w-full flex h-full flex-col gap-3">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between h-auto md:h-7 gap-2 w-full">
@@ -202,11 +201,11 @@ const PinnableDataTable = <T extends any>({
           </div>
         )}
       </div>
-      <div className="flex-1 flex flex-col w-full bg-white border-l border-b border-r border-gray-200 overflow-auto">
+      <div className=" flex flex-col w-full bg-white border rounded-md overflow-auto">
         <Table
-          className="w-full [&_td]:border-border [&_th]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_th]:border-b [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b"
-          style={{ width: table.getTotalSize() }}>
-          <TableHeader className="bg-white text-xs font-medium h-8 sticky top-0 z-10">
+          className="w-full bg-background [&_td]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_th]:border-b [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b [&_thead]:border-b-0"
+          style={{ minWidth: "100%", width: table.getTotalSize() }}>
+          <TableHeader className="bg-white text-[13px] font-medium h-8 sticky top-0 z-10">
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id} className="shadow-sm bg-muted/50">
                 {headerGroup.headers.map(header => {
@@ -220,7 +219,7 @@ const PinnableDataTable = <T extends any>({
                   return (
                     <TableHead
                       key={header.id}
-                      className="[&[data-pinned][data-last-col]]:border-border data-pinned:bg-muted/90 relative h-10 truncate border-t data-pinned:backdrop-blur-xs [&:not([data-pinned]):has(+[data-pinned])_div.cursor-col-resize:last-child]:opacity-0 [&[data-last-col=left]_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right]:last-child_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=right][data-last-col=right]]:border-l"
+                      className="text-foreground [&[data-pinned][data-last-col]]:border-border data-pinned:bg-muted/90 relative h-10 truncate  data-pinned:backdrop-blur-xs [&:not([data-pinned]):has(+[data-pinned])_div.cursor-col-resize:last-child]:opacity-0 [&[data-last-col=left]_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right]:last-child_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=right][data-last-col=right]]:border-l"
                       colSpan={header.colSpan}
                       style={{ ...getPinningStyles(column) }}
                       data-pinned={isPinned || undefined}
@@ -321,7 +320,7 @@ const PinnableDataTable = <T extends any>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className="text-gray-600 max-h-[400px] overflow-auto">
+          <TableBody className=" max-h-[400px] overflow-auto">
             {isLoading && !data.length ? (
               [...Array(20)].map((_, i) => (
                 <TableRow key={i} className="border-b border-gray-300">
@@ -344,7 +343,7 @@ const PinnableDataTable = <T extends any>({
                       <TableRow
                         ref={isLastRow ? lastRowRef : null}
                         key={row.id}
-                        className="min-h-6 border-b transition-colors odd:bg-[#fbfbfb] hover:bg-gray-100/50">
+                        className="min-h-6 border-b transition-colors hover:bg-gray-100/80">
                         {row.getVisibleCells().map((cell: any) => {
                           const { column } = cell
                           const isPinned = column.getIsPinned()
