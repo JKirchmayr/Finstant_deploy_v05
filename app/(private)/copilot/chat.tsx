@@ -23,6 +23,8 @@ type Company = {
   similarity_score: number
 }
 
+const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL! || ""
+
 const Chat = () => {
   const { setResponse, addCompany, setCompanies, companies, resetStore, clearPlaceholders } =
     useWSStore()
@@ -77,7 +79,7 @@ const Chat = () => {
     setIsStreaming(true)
 
     try {
-      const response = await fetch("https://ai-agents-backend-zwa0.onrender.com/chat", {
+      const response = await fetch(`${backendURL}/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
