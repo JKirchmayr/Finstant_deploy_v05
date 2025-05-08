@@ -37,7 +37,7 @@ export default function InvestorsResponseData({
   const { addTab } = useTabPanelStore()
   const handleAddTab = (data: any) => {
     addTab(
-      new Date().getTime().toString(),
+      data?.investor_id || new Date().getTime().toString(),
       data?.investor_name || "Company",
       <InvestorProfile data={data} />
     )
@@ -81,7 +81,7 @@ export default function InvestorsResponseData({
         return (
           <span
             onClick={() => handleAddTab(row.original)}
-            className="underline hover:font-medium transition-all duration-200 cursor-pointer">
+            className="hover:underline hover:font-medium transition-all duration-200 cursor-pointer">
             {row.original.investor_name}
           </span>
         )
@@ -99,14 +99,8 @@ export default function InvestorsResponseData({
     },
   ]
 
-  console.log(investors)
-
   return (
-    <div className="h-full flex flex-col bg-white w-full">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold cursor-pointer">Result</h2>
-      </div>
+    <div className="h-full flex flex-col bg-white w-full pt-1">
       <PinnableDataTable
         data={investors ? investors : []}
         columns={columns}
@@ -114,6 +108,7 @@ export default function InvestorsResponseData({
         hasMoreData={false}
         loadMoreData={() => console.log("loadmore")}
         filterBy="investor_name"
+        topbarClass="px-1"
       />
     </div>
   )

@@ -7,7 +7,8 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu"
 import { Button } from "../ui/button"
-import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal, Share2Icon } from "lucide-react"
+import Image from "next/image"
 
 type ExportOptionsProps = {
   children?: React.ReactNode
@@ -23,8 +24,17 @@ export function ExportOptions({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {children ?? (
-          <Button size="sm">
-            <MoreHorizontal />
+          <Button
+            size="icon"
+            className="h-6 px-1 hover:bg-accent-foreground/20"
+            variant="secondary">
+            <Image
+              src="/images/export-black.svg"
+              width={15}
+              height={15}
+              alt="Export"
+              className="text"
+            />
           </Button>
         )}
       </DropdownMenuTrigger>

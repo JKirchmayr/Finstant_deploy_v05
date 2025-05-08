@@ -15,7 +15,7 @@ type ChatControlStore = {
     tabTitle: string,
     tabComponent: React.ReactNode
   ) => void
-  closeTab: (tabId: string) => void
+  closeTab: (tabId: number) => void
   activeTabId: string
   setActiveTabId: (tabId: string) => void
   emptyTabList: () => void
@@ -29,7 +29,7 @@ export const useTabPanelStore = create<ChatControlStore>()(set => ({
   addTab: (tabId, tabTitle, tabComponent) =>
     set(state => {
       const existingTab = state.tabList.find(tab => tab.tabId === tabId)
-
+      console.log(tabId, tabTitle, existingTab)
       if (existingTab) {
         return { activeTabId: tabId }
       }
@@ -49,7 +49,7 @@ export const useTabPanelStore = create<ChatControlStore>()(set => ({
     }),
   closeTab: tabId =>
     set(state => ({
-      tabList: state.tabList.filter(tab => tab.tabId !== tabId),
+      tabList: state.tabList.filter(tab => tab.id !== tabId),
     })),
   emptyTabList: () => set({ tabList: [], nextId: 0 }),
 }))

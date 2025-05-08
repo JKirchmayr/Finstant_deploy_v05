@@ -41,6 +41,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { DataTablePagination } from "./Pagination"
 import { ExportOptions } from "./export-options"
+import { cn } from "@/lib/utils"
 
 interface IPinnableDataTableProps<T extends any> {
   data: T[]
@@ -50,6 +51,7 @@ interface IPinnableDataTableProps<T extends any> {
   hasMoreData: boolean
   paginationOption?: boolean
   filterBy?: string
+  topbarClass?: string
 }
 
 // Helper function to compute pinning styles for columns
@@ -71,6 +73,7 @@ const PinnableDataTable = <T extends any>({
   loadMoreData,
   hasMoreData,
   paginationOption = true,
+  topbarClass,
   filterBy = "name",
 }: IPinnableDataTableProps<T>) => {
   const [sorting, setSorting] = useState<SortingState>([])
@@ -170,8 +173,12 @@ const PinnableDataTable = <T extends any>({
   }
   return (
     <div className="w-full flex h-full flex-col gap-3">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between h-auto md:h-7 gap-2 w-full">
-        <div className="flex items-center gap-2 order-1 relative w-full md:w-auto">
+      <div
+        className={cn(
+          "flex flex-col md:flex-row md:items-center md:justify-between h-auto md:h-7 gap-2 w-full ",
+          topbarClass
+        )}>
+        <div className="flex items-center gap-2 order-1 relative w-full md:w-auto ">
           <Search size={14} className="absolute text-gray-400 left-2" />
           <Input
             placeholder="Search"
@@ -201,7 +208,7 @@ const PinnableDataTable = <T extends any>({
           </div>
         )}
       </div>
-      <div className=" flex flex-col w-full bg-white border rounded-md overflow-auto">
+      <div className="flex flex-col w-full bg-white border overflow-auto">
         <Table
           className="w-full bg-background [&_td]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_th]:border-b [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b [&_thead]:border-b-0"
           style={{ minWidth: "100%", width: table.getTotalSize() }}>

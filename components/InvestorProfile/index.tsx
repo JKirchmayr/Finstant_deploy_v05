@@ -12,9 +12,9 @@ interface CompanyData {
 }
 
 export default function InvestorProfile({ data }: { data: any }) {
-  console.log(data)
+  // console.log(data)
   return (
-    <div className="w-full h-full border-none pt-4">
+    <div className="w-full h-full border-none p-4">
       <div className="flex flex-col gap-4">
         {/* Top section: Logo and Company Info */}
         <div className="flex gap-4 items-start">
@@ -38,7 +38,7 @@ export default function InvestorProfile({ data }: { data: any }) {
         </div>
 
         {/* Industry */}
-        <div className="text-sm space-y-2 flex">
+        <div className="text-sm space-y-2 gap-1 flex">
           <span className="font-medium shrink-0">Investor Type:</span>
           <div className="flex flex-wrap gap-1">
             {[
@@ -50,16 +50,15 @@ export default function InvestorProfile({ data }: { data: any }) {
               "Individual ",
               "Corporate",
             ].map(inv => (
-              <Badge
-                key={inv}
-                className="ml-2 bg-muted-foreground/20 backdrop-blur-md text-foreground">
+              <Badge key={inv} variant="secondary">
+                {" "}
                 {inv}
               </Badge>
             ))}
           </div>
         </div>
         {/* Asset Classes: */}
-        <div className="text-sm space-y-2 flex">
+        <div className="text-sm space-y-2 gap-1 flex">
           <span className="font-medium shrink-0">Asset Classes:</span>
           <div className="flex flex-wrap gap-1">
             {[
@@ -69,9 +68,7 @@ export default function InvestorProfile({ data }: { data: any }) {
               "Real Estate",
               "Infrastructure",
             ].map(as => (
-              <Badge
-                key={as}
-                className="ml-2 bg-muted-foreground/20 backdrop-blur-md text-foreground">
+              <Badge key={as} variant="secondary">
                 {as}
               </Badge>
             ))}

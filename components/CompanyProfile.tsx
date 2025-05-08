@@ -11,9 +11,9 @@ interface CompanyData {
 }
 
 export default function CompanyProfile({ data }: { data: any }) {
-  console.log(data)
+  // console.log(data)
   return (
-    <div className="w-full h-full border-none pt-4">
+    <div className="w-full h-full border-none p-4">
       <div className="flex flex-col gap-4">
         {/* Top section: Logo and Company Info */}
         <div className="flex gap-4 items-start">
@@ -37,21 +37,22 @@ export default function CompanyProfile({ data }: { data: any }) {
         </div>
 
         {/* Industry */}
-        <div className="text-sm space-y-2">
+        <div className="text-sm flex space-y-2 gap-1">
           <span className="font-medium">Industry:</span>
-          {[
-            "Healthcare",
-            "Technology",
-            "Finance",
-            "Manufacturing",
-            "Retail",
-          ].map(industry => (
-            <Badge
-              key={industry}
-              className="ml-2 bg-muted-foreground/20 backdrop-blur-md text-foreground">
-              {industry}
-            </Badge>
-          ))}
+          <div className="flex flex-wrap gap-1">
+            {[
+              "Healthcare",
+              "Technology",
+              "Finance",
+              "Manufacturing",
+              "Retail",
+            ].map(industry => (
+              <Badge key={industry} variant="secondary">
+                {" "}
+                {industry}
+              </Badge>
+            ))}
+          </div>
         </div>
 
         {/* Description */}

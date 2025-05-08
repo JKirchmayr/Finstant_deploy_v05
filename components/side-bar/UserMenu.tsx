@@ -11,8 +11,9 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { cn } from "@/lib/utils"
 
-export default function UserMenu() {
+export default function UserMenu({ isCollapsed }: { isCollapsed: boolean }) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   // const handleLogout = async () => {
@@ -50,7 +51,11 @@ export default function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 hover:bg-gray-100 p-2 rounded-md transition justify-between w-full">
+        <button
+          className={cn(
+            "flex items-center gap-2 hover:bg-gray-100 px-1 rounded-md transition-all duration-300 justify-between w-full",
+            { "px-2.5": !isCollapsed }
+          )}>
           <span className="flex items-center gap-2">
             <Avatar>
               <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
@@ -65,8 +70,7 @@ export default function UserMenu() {
         <DropdownMenuItem
           disabled={loading}
           //   onClick={handleLogout}
-          className="text-red-500 hover:bg-red-500 hover:text-white cursor-pointer"
-        >
+          className="text-red-500 hover:bg-red-500 hover:text-white cursor-pointer">
           <LogOut className="w-4 h-4 mr-2" />
           {loading ? "Logging out..." : "Logout"}
         </DropdownMenuItem>

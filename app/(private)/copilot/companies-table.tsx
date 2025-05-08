@@ -33,7 +33,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
   const { addTab } = useTabPanelStore()
   const handleAddTab = (data: any) => {
     addTab(
-      new Date().getTime().toString(),
+      data?.compay_id || data?.company_name,
       data?.company_name || "Company",
       <CompanyProfile data={data} />
     )
@@ -77,7 +77,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
         return (
           <span
             onClick={() => handleAddTab(row.original)}
-            className="underline hover:font-medium transition-all duration-200 cursor-pointer">
+            className="hover:underline hover:font-medium transition-all duration-200 cursor-pointer">
             {row.original.company_name}
           </span>
         )
@@ -95,9 +95,8 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
     },
   ]
 
-  console.log(companies)
   return (
-    <div className="h-full flex flex-col bg-white w-full">
+    <div className="h-full flex flex-col bg-white w-full pt-1">
       <PinnableDataTable
         data={companies ? companies : []}
         columns={columns}
@@ -105,36 +104,8 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
         hasMoreData={false}
         loadMoreData={() => console.log("loadmore")}
         filterBy="company_name"
+        topbarClass="px-1"
       />
-
-      {/* Table */}
-      {/* <ScrollArea className="h-full border rounded-lg w-full">
-        <Table className="w-full">
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-
-          <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} className="odd:bg-gray-50 border-b border-gray-300">
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="py-3 text-gray-800 border-l border-gray-300">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </ScrollArea> */}
     </div>
   )
 }

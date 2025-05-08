@@ -17,8 +17,6 @@ const MainPanel = () => {
   const { layout, setLayout } = useChatLayoutStore()
   const { tabList } = useTabPanelStore()
 
-  console.log(tabList)
-
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-1">
       <ResizablePanel>

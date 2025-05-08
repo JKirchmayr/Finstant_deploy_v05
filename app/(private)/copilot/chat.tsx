@@ -180,19 +180,19 @@ const Chat = () => {
                   scrollToBottom()
                 }
               }
-              console.log(parsed)
               if (parsed?.type === "investor") {
                 const investorData = parsed?.data
                 if (investorData) {
                   const investor = {
                     investor_id:
-                      investorData.investor_id || new Date().getTime(),
+                      investorData.investor_id || investorData.investor_name,
                     investor_name: investorData.investor_name || "-",
                     investor_description:
                       investorData.investor_description || "-",
                     similarity_score: investorData.similarity_score || "-",
                   }
                   investorsData.push(investor)
+
                   scrollToBottom()
                 }
               }
@@ -227,7 +227,7 @@ const Chat = () => {
         }
       }
 
-      console.log("Full JSON chunks received:", accumulatedJSONChunks)
+      // console.log("Full JSON chunks received:", accumulatedJSONChunks)
     } catch (error) {
       append({
         role: "assistant",
@@ -370,7 +370,7 @@ const PromptField = ({
 
       <form
         onSubmit={internalHandleSend}
-        className="focus-within:border-gray-300 bg-white border-gray-300 relative rounded-xl border shadow-[0_2px_2px_rgba(0,0,0,0.04),0_8px_8px_-8px_rgba(0,0,0,0.04)] transition-shadow">
+        className="focus-within:border-gray-300 bg-white border-gray-300 relative rounded-xl border shadow-[0_2px_2px_rgba(0,0,0,0.04),0_8px_8px_-8px_rgba(0,0,0,0.04),0_0_8px_rgba(59,130,246,0.2)] transition-shadow">
         <div className="@container/textarea bg-white relative z-10 grid min-h-[100px] rounded-xl overflow-hidden">
           <TextareaAutosize
             ref={textareaRef}
@@ -396,7 +396,7 @@ const PromptField = ({
           <div className="flex items-center gap-2 pb-3 px-3">
             <div className="ml-auto flex items-center gap-1">
               <button
-                className="focus-visible:ring-offset-background inline-flex shrink-0 cursor-pointer select-none items-center justify-center gap-1.5 whitespace-nowrap text-nowrap border font-medium outline-none ring-blue-600 transition-[background,border-color,color,transform,opacity,box-shadow] focus-visible:ring-2 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 disabled:ring-0 has-[:focus-visible]:ring-2 aria-disabled:cursor-not-allowed aria-disabled:bg-gray-100 aria-disabled:text-gray-400 aria-disabled:ring-0 [&>svg]:pointer-events-none [&>svg]:size-4 [&_svg]:shrink-0 disabled:border-alpha-400 text-background aria-disabled:border-alpha-400 bg-gray-900  hover:bg-gray-700 focus:border-gray-700 focus:bg-gray-700 focus-visible:border-gray-700 focus-visible:bg-gray-700 px-3 text-sm has-[>kbd]:gap-2 has-[>svg]:px-2 has-[>kbd]:pr-[6px] ml-1 size-7 rounded-md"
+                className=" inline-flex shrink-0 cursor-pointer select-none items-center justify-center gap-1.5 whitespace-nowrap text-nowrap border-none font-medium outline-none transition-all disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400  [&>svg]:pointer-events-none [&>svg]:size-4 [&_svg]:shrink-0  text-background bg-foreground hover:bg-gray-700 px-3 text-sm has-[>kbd]:gap-2 has-[>svg]:px-2 has-[>kbd]:pr-[6px] ml-1 size-7 rounded-md"
                 type="submit"
                 disabled={isLoading || !input.trim().length}
                 onClick={internalHandleSend}>
@@ -416,7 +416,7 @@ const PromptField = ({
           {[
             "Show me AI companies in Germany",
             "List biotech startups in the US",
-            "Companies working on climate change",
+            "Top 10 investors in the tech industry",
             "Indian healthtech companies",
             "Fintech companies with recent funding",
             "German deep tech startups",
