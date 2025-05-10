@@ -4,7 +4,9 @@ type Tabs = {
   id: number
   tabId: string
   tabTitle: string
-  tabComponent: React.ReactNode
+  type: "companies" | "investors" | "investor-profile" | "company-profile"
+  data: any[]
+  profileId?: string
 }
 
 type ChatControlStore = {
@@ -13,8 +15,12 @@ type ChatControlStore = {
   addTab: (
     tabId: string,
     tabTitle: string,
-    tabComponent: React.ReactNode
+    type: "companies" | "investors" | "investor-profile" | "company-profile",
+    data?: any[],
+    profileId?: string
   ) => void
+
+  appendData: (tabId: string, data: any) => void
   closeTab: (tabId: number) => void
   activeTabId: string
   setActiveTabId: (tabId: string) => void
@@ -26,10 +32,10 @@ export const useTabPanelStore = create<ChatControlStore>()(set => ({
   nextId: 0,
   activeTabId: "",
   setActiveTabId: tabId => set({ activeTabId: tabId }),
-  addTab: (tabId, tabTitle, tabComponent) =>
+
+  addTab: (tabId, tabTitle, type, data = []) =>
     set(state => {
       const existingTab = state.tabList.find(tab => tab.tabId === tabId)
-      console.log(tabId, tabTitle, existingTab)
       if (existingTab) {
         return { activeTabId: tabId }
       }
@@ -38,7 +44,8 @@ export const useTabPanelStore = create<ChatControlStore>()(set => ({
         id: state.nextId,
         tabId,
         tabTitle,
-        tabComponent,
+        type,
+        data,
       }
 
       return {
@@ -47,9 +54,29 @@ export const useTabPanelStore = create<ChatControlStore>()(set => ({
         activeTabId: tabId,
       }
     }),
+
+  appendData: (tabId, newData) =>
+    set(state => {
+      const tab = state.tabList.find(tab => tab.tabId === tabId)
+      if (!tab) return state
+
+      const filteredData = tab.data.filter(
+        item =>
+          !(
+            item.company_id?.startsWith("placeholder") ||
+            item.investor_id?.startsWith("placeholder")
+          )
+      )
+
+      tab.data = [...filteredData, newData]
+
+      return { tabList: [...state.tabList] }
+    }),
+
   closeTab: tabId =>
     set(state => ({
       tabList: state.tabList.filter(tab => tab.id !== tabId),
     })),
+
   emptyTabList: () => set({ tabList: [], nextId: 0 }),
 }))

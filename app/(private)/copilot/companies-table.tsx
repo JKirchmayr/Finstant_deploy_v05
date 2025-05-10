@@ -1,26 +1,11 @@
 "use client"
-import { useWSStore } from "@/store/wsStore"
-import { useState, useMemo } from "react"
-import {
-  ColumnDef,
-  useReactTable,
-  getCoreRowModel,
-  flexRender,
-} from "@tanstack/react-table"
-import { Pencil } from "lucide-react"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+
+import { ColumnDef } from "@tanstack/react-table"
 import PinnableDataTable from "@/components/table/pinnable-data-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useTabPanelStore } from "@/store/tabStore"
 import CompanyProfile from "@/components/CompanyProfile"
+import { GenerateSkeleton } from "./generate-skeleton"
 
 export type Company = {
   company_id: string
@@ -31,11 +16,16 @@ export type Company = {
 
 export default function CompaniesData({ companies }: { companies: Company[] }) {
   const { addTab } = useTabPanelStore()
+
+  console.log(companies, "companies")
+
   const handleAddTab = (data: any) => {
     addTab(
       data?.compay_id || data?.company_name,
       data?.company_name || "Company",
-      <CompanyProfile data={data} />
+      "company-profile",
+      data,
+      data?.company_id
     )
   }
   const columns: ColumnDef<Company>[] = [
@@ -50,6 +40,9 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
           onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
           className="mr-4"
+          disabled={table
+            .getFilteredRowModel()
+            .rows.some(row => row.original.company_id.includes("placeholder"))}
         />
       ),
       cell: ({ row }) => (
@@ -58,6 +51,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
           onCheckedChange={value => row.toggleSelected(!!value)}
           aria-label="Select row"
           className="mr-4"
+          disabled={row.original.company_id.includes("placeholder")}
         />
       ),
       maxSize: 40,
@@ -68,30 +62,50 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
       maxSize: 50,
       header: "#",
       enablePinning: false,
-      cell: ({ row }) => row.index + 1,
+      cell: ({ row }) => (
+        <GenerateSkeleton
+          isPlaceholder={row.original.company_id.includes("placeholder")}
+          text={(row.index + 1).toString()}
+        />
+      ),
     },
     {
       accessorKey: "company_name",
       header: "Company",
       cell: ({ row }) => {
         return (
-          <span
+          <button
             onClick={() => handleAddTab(row.original)}
-            className="hover:underline hover:font-medium transition-all duration-200 cursor-pointer">
-            {row.original.company_name}
-          </span>
+            disabled={row.original.company_id.includes("placeholder")}
+            className="hover:underline hover:font-medium transition-all duration-200 text-left w-full"
+            type="button">
+            <GenerateSkeleton
+              isPlaceholder={row.original.company_id.includes("placeholder")}
+              text={row.original.company_name}
+            />
+          </button>
         )
       },
     },
     {
       accessorKey: "company_description",
       header: "Description",
-      cell: ({ row }) => row.original.company_description,
+      cell: ({ row }) => (
+        <GenerateSkeleton
+          isPlaceholder={row.original.company_id.includes("placeholder")}
+          text={row.original.company_description}
+        />
+      ),
     },
     {
       accessorKey: "similarity_score",
       header: "Similarity",
-      cell: ({ row }) => row.original.similarity_score,
+      cell: ({ row }) => (
+        <GenerateSkeleton
+          isPlaceholder={row.original.company_id.includes("placeholder")}
+          text={row.original.similarity_score.toString()}
+        />
+      ),
     },
   ]
 

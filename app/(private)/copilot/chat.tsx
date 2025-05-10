@@ -27,15 +27,6 @@ type Company = {
 const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL! || ""
 
 const Chat = () => {
-  const {
-    setResponse,
-    addCompany,
-    setCompanies,
-    companies,
-    resetStore,
-    clearPlaceholders,
-  } = useWSStore()
-
   const userId = "aa227293-c91c-4b03-91db-0d2048ee73e7"
   const socketUrl = `wss://ai-agents-backend-zwa0.onrender.com/chat`
 
@@ -50,7 +41,7 @@ const Chat = () => {
   const lastPromptRef = useRef<string | null>(null)
   const hasSentPromptRef = useRef<boolean>(false)
   const bottomRef = useRef<undefined>(undefined)
-  const { addTab } = useTabPanelStore()
+  const { addTab, appendData } = useTabPanelStore()
 
   const endRef = useRef<HTMLDivElement>(null)
 
@@ -84,11 +75,6 @@ const Chat = () => {
     setInput("")
     scrollToBottom()
     setIsStreaming(true)
-    // addTab(
-    //   `companies-tab${new Date().getTime()}`,
-    //   "Companies",
-    //   <CompaniesData companies={c} />
-    // )
 
     try {
       const response = await fetch(`${backendURL}/chat`, {
@@ -113,6 +99,7 @@ const Chat = () => {
 
       const decoder = new TextDecoder()
       let accumulatedJSONChunks: any[] = []
+      const initID = `tab-${new Date().getTime()}`
 
       while (true) {
         console.log(
@@ -145,6 +132,32 @@ const Chat = () => {
               const parsed = JSON.parse(cleaned)
               accumulatedJSONChunks.push(parsed)
 
+              if (parsed?.type === "meta") {
+                // ------------For company data-----------
+                // const cPlaceholders: any = Array.from({
+                //   length: 10,
+                // }).map((_, i) => ({
+                //   company_id: `placeholder-${i}`,
+                //   company_name: "Generating...",
+                //   company_description: "Analyzing semantic vectors...",
+                //   similarity_score: "generating...",
+                // }))
+                // console.log(initID, "initID")
+                // addTab(initID, "Loading", "companies", cPlaceholders)
+
+                // ---------For investor data------------------
+                const iPlaceholders: any = Array.from({
+                  length: 10,
+                }).map((_, i) => ({
+                  investor_id: `placeholder-${i}`,
+                  investor_name: "Generating...",
+                  investor_description: "Analyzing semantic vectors...",
+                  similarity_score: "generating...",
+                }))
+                console.log(initID, "initID")
+                addTab(initID, "Investors", "investors", iPlaceholders)
+              }
+
               if (parsed?.type === "response") {
                 const responseText = parsed?.data?.text
                 if (responseText) {
@@ -152,31 +165,20 @@ const Chat = () => {
                     role: "assistant",
                     content: responseText,
                   })
-                  // Scroll after appending assistant message
                   scrollToBottom()
                 }
-                const placeholders: WSCompany[] = Array.from({
-                  length: 10,
-                }).map((_, i) => ({
-                  company_id: `placeholder-${i}`,
-                  company_name: "Generating company...",
-                  company_description: "Analyzing semantic vectors...",
-                  similarity_score: "generating...",
-                }))
-                setCompanies(placeholders)
               }
 
               if (parsed?.type === "company") {
                 const companyData = parsed?.data
                 if (companyData) {
-                  const company = {
+                  const company: any = {
                     company_id: companyData.company_id,
                     company_name: companyData.company_name,
                     company_description: companyData.company_description,
                     similarity_score: companyData.similarity_score,
                   }
-                  companiesData.push(company)
-                  // Scroll after adding company
+                  appendData(initID, company)
                   scrollToBottom()
                 }
               }
@@ -185,38 +187,20 @@ const Chat = () => {
                 if (investorData) {
                   const investor = {
                     investor_id:
-                      investorData.investor_id || investorData.investor_name,
+                      investorData.investor_id ||
+                      `investor+${new Date().getTime()}`,
                     investor_name: investorData.investor_name || "-",
                     investor_description:
                       investorData.investor_description || "-",
                     similarity_score: investorData.similarity_score || "-",
                   }
-                  investorsData.push(investor)
-
+                  appendData(initID, investor)
                   scrollToBottom()
                 }
               }
 
               if (parsed?.type === "done") {
-                if (companiesData && companiesData.length > 0) {
-                  addTab(
-                    `companies-tab${new Date().getTime()}`,
-                    "Companies",
-                    <CompaniesData companies={companiesData} />
-                  )
-                }
-                console.log("companiesData", companiesData)
-
-                if (investorsData && investorsData.length > 0) {
-                  addTab(
-                    `investors-tab-${new Date().getTime()}`,
-                    "Investors",
-                    <InvestorsResponseData investors={investorsData} />
-                  )
-                }
-
                 setIsStreaming(false)
-                clearPlaceholders()
                 // Final scroll to bottom
                 scrollToBottom()
               }

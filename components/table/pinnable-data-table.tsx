@@ -19,6 +19,7 @@ import {
   ArrowLeftToLineIcon,
   ArrowRightToLineIcon,
   EllipsisIcon,
+  PinIcon,
   PinOffIcon,
   Search,
 } from "lucide-react"
@@ -212,7 +213,7 @@ const PinnableDataTable = <T extends any>({
         <Table
           className="w-full bg-background [&_td]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_th]:border-b [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b [&_thead]:border-b-0"
           style={{ minWidth: "100%", width: table.getTotalSize() }}>
-          <TableHeader className="bg-white text-[13px] font-medium h-8 sticky top-0 z-10">
+          <TableHeader className="bg-white text-[13px] h-8 sticky top-0 z-10">
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id} className="shadow-sm bg-muted/50">
                 {headerGroup.headers.map(header => {
@@ -226,7 +227,7 @@ const PinnableDataTable = <T extends any>({
                   return (
                     <TableHead
                       key={header.id}
-                      className="text-foreground [&[data-pinned][data-last-col]]:border-border data-pinned:bg-muted/90 relative h-10 truncate  data-pinned:backdrop-blur-xs [&:not([data-pinned]):has(+[data-pinned])_div.cursor-col-resize:last-child]:opacity-0 [&[data-last-col=left]_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right]:last-child_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=right][data-last-col=right]]:border-l"
+                      className="text-foreground/70 [&[data-pinned][data-last-col]]:border-border data-pinned:bg-muted/90 relative h-10 truncate  data-pinned:backdrop-blur-xs [&:not([data-pinned]):has(+[data-pinned])_div.cursor-col-resize:last-child]:opacity-0 [&[data-last-col=left]_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right]:last-child_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=right][data-last-col=right]]:border-l-0"
                       colSpan={header.colSpan}
                       style={{ ...getPinningStyles(column) }}
                       data-pinned={isPinned || undefined}
@@ -253,12 +254,9 @@ const PinnableDataTable = <T extends any>({
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="-mr-1 size-7 shadow-none"
+                              className="-mr-1 size-5 shadow-none"
                               onClick={() => header.column.pin(false)}
                               aria-label={`Unpin ${
-                                header.column.columnDef.header as string
-                              } column`}
-                              title={`Unpin ${
                                 header.column.columnDef.header as string
                               } column`}>
                               <PinOffIcon
@@ -268,46 +266,62 @@ const PinnableDataTable = <T extends any>({
                               />
                             </Button>
                           ) : (
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  className="-mr-1 size-7 shadow-none"
-                                  aria-label={`Pin options for ${
-                                    header.column.columnDef.header as string
-                                  } column`}
-                                  title={`Pin options for ${
-                                    header.column.columnDef.header as string
-                                  } column`}>
-                                  <EllipsisIcon
-                                    className="opacity-60"
-                                    size={16}
-                                    aria-hidden="true"
-                                  />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                  onClick={() => header.column.pin("left")}>
-                                  <ArrowLeftToLineIcon
-                                    size={16}
-                                    className="opacity-60"
-                                    aria-hidden="true"
-                                  />
-                                  Stick to left
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => header.column.pin("right")}>
-                                  <ArrowRightToLineIcon
-                                    size={16}
-                                    className="opacity-60"
-                                    aria-hidden="true"
-                                  />
-                                  Stick to right
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="-mr-1 size-5 shadow-none"
+                              onClick={() => header.column.pin("left")}
+                              aria-label={`Pin ${
+                                header.column.columnDef.header as string
+                              } column to left`}>
+                              <PinIcon
+                                className="opacity-60"
+                                size={16}
+                                aria-hidden="true"
+                              />
+                            </Button>
+                            // <DropdownMenu>
+                            //   <DropdownMenuTrigger asChild>
+                            //     <Button
+                            //       size="icon"
+                            //       variant="ghost"
+                            //       className="-mr-1 size-5 shadow-none"
+                            //       aria-label={`Pin options for ${
+                            //         header.column.columnDef.header as string
+                            //       } column`}
+                            //       title={`Pin options for ${
+                            //         header.column.columnDef.header as string
+                            //       } column`}>
+                            //       <EllipsisIcon
+                            //         className="opacity-60"
+                            //         size={16}
+                            //         aria-hidden="true"
+                            //       />
+                            //     </Button>
+                            //   </DropdownMenuTrigger>
+                            //   <DropdownMenuContent align="end">
+                            //     <DropdownMenuItem
+                            //       className="text-xs"
+                            //       onClick={() => header.column.pin("left")}>
+                            //       <ArrowLeftToLineIcon
+                            //         size={16}
+                            //         className="opacity-60"
+                            //         aria-hidden="true"
+                            //       />
+                            //       Stick to left
+                            //     </DropdownMenuItem>
+                            //     <DropdownMenuItem
+                            //       className="text-xs"
+                            //       onClick={() => header.column.pin("right")}>
+                            //       <ArrowRightToLineIcon
+                            //         size={16}
+                            //         className="opacity-60"
+                            //         aria-hidden="true"
+                            //       />
+                            //       Stick to right
+                            //     </DropdownMenuItem>
+                            //   </DropdownMenuContent>
+                            // </DropdownMenu>
                           ))}
                         {header.column.getCanResize() && (
                           <div
