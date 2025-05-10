@@ -1,7 +1,5 @@
 "use client"
 
-import { useWSStore } from "@/store/wsStore"
-import { useState, useMemo } from "react"
 import { ColumnDef } from "@tanstack/react-table"
 import PinnableDataTable from "@/components/table/pinnable-data-table"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -24,7 +22,7 @@ export default function InvestorsResponseData({
 
   const handleAddTab = (data: any) => {
     addTab(
-      data?.investor_id || new Date().getTime().toString(),
+      data?.investor_id || data?.investor_name,
       data?.investor_name || "Investor",
       "investor-profile",
       data,

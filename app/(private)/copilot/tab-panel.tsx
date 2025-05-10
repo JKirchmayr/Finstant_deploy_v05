@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Building2, Moon, Sun, X } from "lucide-react"
+import { Building2, CircleDollarSignIcon, Moon, Sun, X } from "lucide-react"
 import { useTabPanelStore } from "@/store/tabStore"
 import { useChatLayoutStore } from "@/store/chatLayout"
 import { cn } from "@/lib/utils"
@@ -13,6 +13,7 @@ import CompanyProfile from "@/components/CompanyProfile"
 import InvestorProfile from "@/components/InvestorProfile"
 import CompaniesData from "./companies-table"
 import InvestorsResponseData from "./investors-table"
+import Image from "next/image"
 
 interface TabData {
   tabId: string
@@ -101,7 +102,7 @@ export function TabPanel() {
           {tabList.map(tab => {
             return (
               <TabsTrigger
-                className="group bg-blue-700/10 hover:bg-blue-600/15 transition-all duration-300 ease-in-out cursor-pointer backdrop-blur-md overflow-hidden rounded-b-none border-x border-t py-1.5 data-[state=active]:z-10 data-[state=active]:shadow-none"
+                className="group font-medium bg-blue-700/10 hover:bg-blue-600/15 transition-all duration-300 ease-in-out cursor-pointer backdrop-blur-md overflow-hidden rounded-b-none border-x border-t py-1.5 data-[state=active]:z-10 data-[state=active]:shadow-none"
                 value={tab.tabId}
                 key={tab.tabId}
                 ref={el => {
@@ -110,7 +111,19 @@ export function TabPanel() {
                   }
                 }}
                 onClick={() => setActiveTabId(tab.tabId)}>
-                <Building2 />
+                {(tab.type === "company-profile" ||
+                  tab.type === "investor-profile") && (
+                  <Image
+                    src="/images/portfolio_company.png"
+                    className="-ms-0.5 "
+                    width={16}
+                    height={16}
+                    alt="logo"
+                  />
+                )}
+
+                {tab.type === "companies" && <Building2 />}
+                {tab.type === "investors" && <CircleDollarSignIcon />}
                 <span className="truncate"> {tab.tabTitle}</span>
                 <Badge
                   onClick={e => {

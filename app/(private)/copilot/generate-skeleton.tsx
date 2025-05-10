@@ -12,7 +12,7 @@ export const GenerateSkeleton = ({
           {text}
         </span>
       ) : (
-        <span>{text}</span>
+        <span className="truncate">{text}</span>
       )}
     </div>
   )

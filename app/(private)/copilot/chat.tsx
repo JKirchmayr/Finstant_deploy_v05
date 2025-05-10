@@ -41,7 +41,8 @@ const Chat = () => {
   const lastPromptRef = useRef<string | null>(null)
   const hasSentPromptRef = useRef<boolean>(false)
   const bottomRef = useRef<undefined>(undefined)
-  const { addTab, appendData } = useTabPanelStore()
+  const { addTab, appendData, closeTabByID, tabList, setActiveTabId } =
+    useTabPanelStore()
 
   const endRef = useRef<HTMLDivElement>(null)
 
@@ -187,8 +188,7 @@ const Chat = () => {
                 if (investorData) {
                   const investor = {
                     investor_id:
-                      investorData.investor_id ||
-                      `investor+${new Date().getTime()}`,
+                      investorData.investor_id || investorData.investor_name,
                     investor_name: investorData.investor_name || "-",
                     investor_description:
                       investorData.investor_description || "-",
@@ -200,6 +200,16 @@ const Chat = () => {
               }
 
               if (parsed?.type === "done") {
+                if (
+                  !parsed.data?.companies?.length &&
+                  !parsed.data?.investors?.length
+                ) {
+                  console.log("no dattttttttttta")
+                  closeTabByID(initID)
+                  setActiveTabId(
+                    tabList.length ? tabList[tabList.length - 1].tabId : ""
+                  )
+                }
                 setIsStreaming(false)
                 // Final scroll to bottom
                 scrollToBottom()
@@ -211,7 +221,7 @@ const Chat = () => {
         }
       }
 
-      // console.log("Full JSON chunks received:", accumulatedJSONChunks)
+      console.log("Full JSON chunks received:", accumulatedJSONChunks)
     } catch (error) {
       append({
         role: "assistant",

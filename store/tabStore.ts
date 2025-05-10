@@ -22,6 +22,7 @@ type ChatControlStore = {
 
   appendData: (tabId: string, data: any) => void
   closeTab: (tabId: number) => void
+  closeTabByID: (tabId: string) => void
   activeTabId: string
   setActiveTabId: (tabId: string) => void
   emptyTabList: () => void
@@ -76,6 +77,10 @@ export const useTabPanelStore = create<ChatControlStore>()(set => ({
   closeTab: tabId =>
     set(state => ({
       tabList: state.tabList.filter(tab => tab.id !== tabId),
+    })),
+  closeTabByID: tabId =>
+    set(state => ({
+      tabList: state.tabList.filter(tab => tab.tabId !== tabId),
     })),
 
   emptyTabList: () => set({ tabList: [], nextId: 0 }),
