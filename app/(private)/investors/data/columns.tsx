@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnDef } from "@tanstack/react-table"
 import { ExternalLink } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 
 const allColumns: ColumnDef<any>[] = [
@@ -35,9 +36,11 @@ const allColumns: ColumnDef<any>[] = [
   },
   {
     id: "index",
-    header: "#",
+    header: () => <div className="text-center w-full">#</div>,
     maxSize: 50,
-    cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
+    cell: ({ row }) => (
+      <div className="text-center w-full">{row.index + 1}</div>
+    ),
     enableSorting: false,
     enableHiding: false,
   },
@@ -62,6 +65,21 @@ const allColumns: ColumnDef<any>[] = [
     accessorKey: "investor_name",
     minSize: 400,
     header: () => <div className="text-left min-w-[110px]">Investor Name</div>,
+    cell: ({ row }) => {
+      return (
+        <div className="inline-flex items-center">
+          <Image
+            src="https://placehold.co/50x50"
+            alt="logo"
+            width={20}
+            height={20}
+            className="mr-1.5 rounded"
+            unoptimized={true}
+          />
+          {row.getValue("investor_name") || "-"}
+        </div>
+      )
+    },
   },
   // {
   //   accessorKey: "company_description",

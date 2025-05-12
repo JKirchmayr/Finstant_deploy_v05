@@ -6,6 +6,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useTabPanelStore } from "@/store/tabStore"
 import { GenerateSkeleton } from "./generate-skeleton"
 import Image from "next/image"
+import ChatDataTable from "@/components/chat/data-table"
+import { ExpandableCell } from "@/components/table/epandable-cell"
 
 export type InvestorsProps = {
   investor_id: string
@@ -81,14 +83,15 @@ export default function InvestorsResponseData({
         <button
           onClick={() => handleAddTab(row.original)}
           disabled={row.original.investor_id?.includes("placeholder")}
-          className="hover:underline cursor-pointer inline-flex hover:font-medium transition-all duration-200 text-left w-full"
+          className="hover:underline items-center cursor-pointer inline-flex hover:font-medium transition-all duration-200 text-left w-full"
           type="button">
           <Image
-            src="/images/portfolio_company.png"
-            width={14}
-            height={14}
-            alt="Company"
-            className="mr-1"
+            src="https://placehold.co/50x50"
+            alt="logo"
+            width={18}
+            height={18}
+            className="mr-1.5 rounded"
+            unoptimized={true}
           />
           <GenerateSkeleton
             isPlaceholder={row.original.investor_id?.includes("placeholder")}
@@ -100,12 +103,17 @@ export default function InvestorsResponseData({
     {
       accessorKey: "investor_description",
       header: "Description",
-      cell: ({ row }) => (
-        <GenerateSkeleton
-          isPlaceholder={row.original.investor_id?.includes("placeholder")}
-          text={row.original.investor_description || ""}
-        />
-      ),
+      cell: ({ row }) =>
+        row.original.investor_id?.includes("placeholder") ? (
+          <GenerateSkeleton
+            isPlaceholder={row.original.investor_id?.includes("placeholder")}
+            text={row.original.investor_description || ""}
+          />
+        ) : (
+          <ExpandableCell>
+            {row.original.investor_description || ""}
+          </ExpandableCell>
+        ),
     },
     {
       accessorKey: "similarity_score",
@@ -120,8 +128,8 @@ export default function InvestorsResponseData({
   ]
 
   return (
-    <div className="h-full flex flex-col bg-white w-full pt-1">
-      <PinnableDataTable
+    <div className="h-full flex flex-col bg-white w-full pt-1 ">
+      <ChatDataTable
         data={investors || []}
         columns={columns}
         isLoading={false}

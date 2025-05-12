@@ -227,7 +227,7 @@ const PinnableDataTable = <T extends any>({
                   return (
                     <TableHead
                       key={header.id}
-                      className="text-foreground/70 [&[data-pinned][data-last-col]]:border-border border-b data-pinned:bg-muted/90 relative h-10 truncate data-pinned:backdrop-blur-xs [&:not([data-pinned]):has(+[data-pinned])_div.cursor-col-resize:last-child]:opacity-0 [&[data-last-col=left]_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right]:last-child_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=right][data-last-col=right]]:border-l-0"
+                      className="text-foreground/70 group [&[data-pinned][data-last-col]]:border-border border-b data-pinned:bg-muted/90 relative h-10 truncate data-pinned:backdrop-blur-xs [&:not([data-pinned]):has(+[data-pinned])_div.cursor-col-resize:last-child]:opacity-0 [&[data-last-col=left]_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right]:last-child_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=right][data-last-col=right]]:border-l-0"
                       colSpan={header.colSpan}
                       style={{ ...getPinningStyles(column) }}
                       data-pinned={isPinned || undefined}
@@ -239,7 +239,7 @@ const PinnableDataTable = <T extends any>({
                           : undefined
                       }>
                       <div className="flex items-center justify-between gap-2">
-                        <span className="truncate">
+                        <span className="truncate w-full">
                           {header.isPlaceholder
                             ? null
                             : flexRender(
@@ -254,7 +254,7 @@ const PinnableDataTable = <T extends any>({
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="-mr-1 size-5 shadow-none"
+                              className="-mr-1 size-5 shadow-none group-hover:opacity-60 opacity-0 hover:opacity-100"
                               onClick={() => header.column.pin(false)}
                               aria-label={`Unpin ${
                                 header.column.columnDef.header as string
@@ -269,7 +269,7 @@ const PinnableDataTable = <T extends any>({
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="-mr-1 size-5 shadow-none"
+                              className="-mr-1 size-5 shadow-none group-hover:opacity-60 opacity-0 hover:opacity-100"
                               onClick={() => header.column.pin("left")}
                               aria-label={`Pin ${
                                 header.column.columnDef.header as string
@@ -336,7 +336,7 @@ const PinnableDataTable = <T extends any>({
                           return (
                             <TableCell
                               key={cell.id}
-                              className="py-1.5 px-2 text-[13px] [&[data-pinned][data-last-col]]:border-border data-pinned:bg-background/90 truncate data-pinned:backdrop-blur-xs [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right][data-last-col=right]]:border-l border-r border-gray-300"
+                              className="py-2.5 [&[data-pinned][data-last-col]]:border-border data-pinned:bg-background/90 truncate data-pinned:backdrop-blur-xs [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right][data-last-col=right]]:border-l border-r border-gray-300"
                               style={{ ...getPinningStyles(column) }}
                               data-pinned={isPinned || undefined}
                               data-last-col={

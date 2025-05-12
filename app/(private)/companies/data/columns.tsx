@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnDef } from "@tanstack/react-table"
 import { ExternalLink } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 
 const allColumns: ColumnDef<any>[] = [
@@ -35,7 +36,7 @@ const allColumns: ColumnDef<any>[] = [
   },
   {
     id: "index",
-    header: "#",
+    header: () => <div className="text-center w-full">#</div>,
     maxSize: 50,
     cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
     enableSorting: false,
@@ -61,7 +62,24 @@ const allColumns: ColumnDef<any>[] = [
   {
     accessorKey: "company_name",
     minSize: 260,
-    header: () => <div className="text-left min-w-[110px]">Company Name</div>,
+    header: ({ column }) => {
+      return <div className="text-left ">Company Name</div>
+    },
+    cell: ({ row }) => {
+      return (
+        <div className="inline-flex items-center">
+          <Image
+            src="https://placehold.co/50x50"
+            alt="logo"
+            width={20}
+            height={20}
+            className="mr-1.5 rounded"
+            unoptimized={true}
+          />
+          {row.getValue("company_name") || "-"}
+        </div>
+      )
+    },
   },
   {
     accessorKey: "company_description",
@@ -71,10 +89,11 @@ const allColumns: ColumnDef<any>[] = [
         Description
       </div>
     ),
-    cell: ({ row }) => {
+    cell: ({ row, column }) => {
+      const width = column.getSize()
       return (
         <ExpandableCell
-          className="w-[600px]"
+          className={`w-${width}px`}
           TriggerCell={<p>{row.getValue("company_description")}</p>}>
           {row.getValue("company_description")}
         </ExpandableCell>

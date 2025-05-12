@@ -364,7 +364,7 @@ const PromptField = ({
 
       <form
         onSubmit={internalHandleSend}
-        className="focus-within:border-gray-300 bg-white border-gray-300 relative rounded-xl border shadow-[0_2px_2px_rgba(0,0,0,0.04),0_8px_8px_-8px_rgba(0,0,0,0.04),0_0_8px_rgba(59,130,246,0.2)] transition-shadow">
+        className="focus-within:border-gray-300 bg-white border-gray-300 relative rounded-xl border shadow-[0_2px_2px_rgba(0,0,0,0.08),0_8px_8px_-8px_rgba(0,0,0,0.08),0_0_8px_rgba(128,128,128,0.2)] transition-shadow">
         <div className="@container/textarea bg-white relative z-10 grid min-h-[100px] rounded-xl overflow-hidden">
           <TextareaAutosize
             ref={textareaRef}

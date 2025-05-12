@@ -14,8 +14,8 @@ interface CompanyData {
 export default function InvestorProfile({ data }: { data: any }) {
   // console.log(data)
   return (
-    <div className="w-full h-full border-none p-4">
-      <div className="flex flex-col gap-4">
+    <div className="w-full h-full border-none ">
+      <div className="flex flex-col gap-4 p-4">
         {/* Top section: Logo and Company Info */}
         <div className="flex gap-4 items-start">
           {/* Logo */}
@@ -86,11 +86,10 @@ export default function InvestorProfile({ data }: { data: any }) {
             influence has shaped many of the biggest names in tech.
           </p>
         </div>
-
-        <div className="text-sm flex flex-col gap-2">
-          <span className="font-medium pb-2">Investments:</span>
-          <InvestmentData />
-        </div>
+      </div>
+      <div className="text-sm flex flex-col gap-2">
+        <span className="font-medium pb-2 pl-4">Investments:</span>
+        <InvestmentData />
       </div>
     </div>
   )

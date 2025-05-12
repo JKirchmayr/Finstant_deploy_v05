@@ -97,12 +97,12 @@ export function TabPanel() {
         handleTabClick(id)
       }}
       className="space-x-4 mt-[2px] h-full flex flex-col">
-      <ScrollArea>
-        <TabsList className="before:bg-border justify-start relative mb-1 h-[35px] w-full gap-0.5 bg-transparent p-0 before:absolute before:inset-x-0 before:bottom-0 before:h-.5 border-b ">
+      <ScrollArea className="m-0 border-b">
+        <TabsList className="justify-start relative h-[35px] w-full gap-0.5 bg-transparent p-0 before:absolute before:inset-x-0 before:bottom-0 ">
           {tabList.map(tab => {
             return (
               <TabsTrigger
-                className="group font-medium bg-blue-700/10 hover:bg-blue-600/15 transition-all duration-300 ease-in-out cursor-pointer backdrop-blur-md overflow-hidden rounded-b-none border-x border-t py-1.5 data-[state=active]:z-10 data-[state=active]:shadow-none"
+                className="group font-medium bg-gray-200 hover:bg-gray-300/80 transition-all duration-300 ease-in-out cursor-pointer backdrop-blur-md overflow-hidden rounded-b-none border-x border-t py-1.5 data-[state=active]:z-10 data-[state=active]:shadow-none"
                 value={tab.tabId}
                 key={tab.tabId}
                 ref={el => {
@@ -114,11 +114,12 @@ export function TabPanel() {
                 {(tab.type === "company-profile" ||
                   tab.type === "investor-profile") && (
                   <Image
-                    src="/images/portfolio_company.png"
-                    className="-ms-0.5 "
+                    src="https://placehold.co/50x50"
+                    className="-ms-0.5 rounded  "
                     width={16}
                     height={16}
                     alt="logo"
+                    unoptimized={true}
                   />
                 )}
 
@@ -131,7 +132,7 @@ export function TabPanel() {
                     closeTabPanel(tab.id)
                   }}
                   variant="secondary"
-                  className="ms-1.5 hover:bg-muted-foreground/20 size-4 p-0 opacity-0 transition-opacity group-hover:opacity-100 group-data-[state=active]:opacity-100">
+                  className="ms-1.5 bg-transparent size-4 p-0 opacity-0 transition-opacity group-hover:opacity-100 group-data-[state=active]:opacity-100">
                   <X className="w-4 h-4" />
                 </Badge>
               </TabsTrigger>

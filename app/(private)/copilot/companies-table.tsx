@@ -7,6 +7,7 @@ import { useTabPanelStore } from "@/store/tabStore"
 import CompanyProfile from "@/components/CompanyProfile"
 import { GenerateSkeleton } from "./generate-skeleton"
 import Image from "next/image"
+import ChatDataTable from "@/components/chat/data-table"
 
 export type Company = {
   company_id: string
@@ -78,14 +79,15 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
           <button
             onClick={() => handleAddTab(row.original)}
             disabled={row.original.company_id.includes("placeholder")}
-            className="hover:underline inline-flex cursor-pointer hover:font-medium transition-all duration-200 text-left w-full"
+            className="hover:underline items-center inline-flex cursor-pointer hover:font-medium transition-all duration-200 text-left w-full"
             type="button">
             <Image
-              src="/images/portfolio_company.png"
-              width={16}
-              height={16}
-              alt="Company"
-              className="mr-1"
+              src="https://placehold.co/50x50"
+              alt="logo"
+              width={18}
+              height={18}
+              className="mr-1.5 rounded"
+              unoptimized={true}
             />
             <GenerateSkeleton
               isPlaceholder={row.original.company_id.includes("placeholder")}
@@ -118,8 +120,8 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
   ]
 
   return (
-    <div className="h-full flex flex-col bg-white w-full pt-1">
-      <PinnableDataTable
+    <div className="h-full flex flex-col bg-white w-full pt-1 ">
+      <ChatDataTable
         data={companies ? companies : []}
         columns={columns}
         isLoading={false}
