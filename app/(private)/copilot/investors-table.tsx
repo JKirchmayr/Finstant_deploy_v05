@@ -5,6 +5,7 @@ import PinnableDataTable from "@/components/table/pinnable-data-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useTabPanelStore } from "@/store/tabStore"
 import { GenerateSkeleton } from "./generate-skeleton"
+import Image from "next/image"
 
 export type InvestorsProps = {
   investor_id: string
@@ -80,8 +81,15 @@ export default function InvestorsResponseData({
         <button
           onClick={() => handleAddTab(row.original)}
           disabled={row.original.investor_id?.includes("placeholder")}
-          className="hover:underline hover:font-medium transition-all duration-200 text-left w-full"
+          className="hover:underline cursor-pointer inline-flex hover:font-medium transition-all duration-200 text-left w-full"
           type="button">
+          <Image
+            src="/images/portfolio_company.png"
+            width={14}
+            height={14}
+            alt="Company"
+            className="mr-1"
+          />
           <GenerateSkeleton
             isPlaceholder={row.original.investor_id?.includes("placeholder")}
             text={row.original.investor_name || ""}

@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useTabPanelStore } from "@/store/tabStore"
 import CompanyProfile from "@/components/CompanyProfile"
 import { GenerateSkeleton } from "./generate-skeleton"
+import Image from "next/image"
 
 export type Company = {
   company_id: string
@@ -79,6 +80,13 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
             disabled={row.original.company_id.includes("placeholder")}
             className="hover:underline hover:font-medium transition-all duration-200 text-left w-full"
             type="button">
+            <Image
+              src="/images/portfolio_company.png"
+              width={16}
+              height={16}
+              alt="Company"
+              className="mr-1"
+            />
             <GenerateSkeleton
               isPlaceholder={row.original.company_id.includes("placeholder")}
               text={row.original.company_name}

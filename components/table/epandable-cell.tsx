@@ -10,7 +10,7 @@ type Props = {
 export const ExpandableCell = ({ children, className, TriggerCell }: Props) => {
   return (
     <Popover>
-      <PopoverTrigger asChild className={cn("")}>
+      <PopoverTrigger asChild className={cn("truncate")}>
         {TriggerCell ?? children}
       </PopoverTrigger>
       <PopoverContent

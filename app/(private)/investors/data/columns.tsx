@@ -1,20 +1,13 @@
 // import CompanySheet from "@/components/CompanySheet"
 // import CompanySheet from "@/components/CompanySheet"
 import { ExpandableCell } from "@/components/table/epandable-cell"
+import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnDef } from "@tanstack/react-table"
 import { ExternalLink } from "lucide-react"
 import Link from "next/link"
 
 const allColumns: ColumnDef<any>[] = [
-  {
-    id: "index",
-    header: "#",
-    maxSize: 50,
-    cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
-    enableSorting: false,
-    enableHiding: false,
-  },
   {
     id: "select",
     maxSize: 50,
@@ -37,6 +30,14 @@ const allColumns: ColumnDef<any>[] = [
         className="mr-4"
       />
     ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    id: "index",
+    header: "#",
+    maxSize: 50,
+    cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
     enableSorting: false,
     enableHiding: false,
   },
@@ -92,14 +93,15 @@ const allColumns: ColumnDef<any>[] = [
             row.original.investor_website !== null
               ? row.original.investor_website
               : "/"
-          }
-          className="text-xs bg-blue-50 hover:bg-blue-500 border border-blue-200 rounded px-2 text-blue-600 hover:text-white transition-all inline-flex gap-1 items-center p-0.5 overflow-hidden">
+          }>
           {row.original.investor_website === null && "-"}
           {row.original.investor_website !== null && (
-            <div className="flex space-x-1">
-              visit
+            <Badge
+              className="bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-500 hover:text-white transition-all "
+              variant="outline">
+              visit site
               <ExternalLink size={12} className="size-3 ml-1" />
-            </div>
+            </Badge>
           )}
         </Link>
       )

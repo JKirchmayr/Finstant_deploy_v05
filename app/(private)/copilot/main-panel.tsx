@@ -19,27 +19,19 @@ const MainPanel = () => {
 
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-1">
-      <ResizablePanel>
+      <ResizablePanel
+        defaultSize={tabList.length > 0 ? 60 : 100}
+        style={{ transition: "width 0.3s ease" }}>
         <Chat />
       </ResizablePanel>
       {tabList.length > 0 && (
         <>
-          <ResizableHandle withHandle />
+          <ResizableHandle />
           <ResizablePanel
+            defaultSize={40}
             maxSize={40}
-
-            // onResize={size => {
-            //   if (size < 20) {
-            //     setLayout("chat")
-            //   }
-            //   console.log(size)
-            // }}
-          >
+            style={{ transition: "width 0.3s ease" }}>
             <TabPanel />
-
-            {/* <div className="border-l">
-              <ListBuilder />
-            </div> */}
           </ResizablePanel>
         </>
       )}

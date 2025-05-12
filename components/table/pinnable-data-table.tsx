@@ -211,11 +211,11 @@ const PinnableDataTable = <T extends any>({
       </div>
       <div className="flex flex-col w-full bg-white border overflow-auto">
         <Table
-          className="w-full bg-background [&_td]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_th]:border-b [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b [&_thead]:border-b-0"
+          className="w-full bg-background [&_td]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b [&_thead]:border-b-0"
           style={{ minWidth: "100%", width: table.getTotalSize() }}>
           <TableHeader className="bg-white text-[13px] h-8 sticky top-0 z-10">
             {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id} className="shadow-sm bg-muted/50">
+              <TableRow key={headerGroup.id} className="bg-muted/50">
                 {headerGroup.headers.map(header => {
                   const { column } = header
                   const isPinned = column.getIsPinned()
@@ -227,7 +227,7 @@ const PinnableDataTable = <T extends any>({
                   return (
                     <TableHead
                       key={header.id}
-                      className="text-foreground/70 [&[data-pinned][data-last-col]]:border-border data-pinned:bg-muted/90 relative h-10 truncate  data-pinned:backdrop-blur-xs [&:not([data-pinned]):has(+[data-pinned])_div.cursor-col-resize:last-child]:opacity-0 [&[data-last-col=left]_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right]:last-child_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=right][data-last-col=right]]:border-l-0"
+                      className="text-foreground/70 [&[data-pinned][data-last-col]]:border-border border-b data-pinned:bg-muted/90 relative h-10 truncate data-pinned:backdrop-blur-xs [&:not([data-pinned]):has(+[data-pinned])_div.cursor-col-resize:last-child]:opacity-0 [&[data-last-col=left]_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right]:last-child_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=right][data-last-col=right]]:border-l-0"
                       colSpan={header.colSpan}
                       style={{ ...getPinningStyles(column) }}
                       data-pinned={isPinned || undefined}
@@ -280,48 +280,6 @@ const PinnableDataTable = <T extends any>({
                                 aria-hidden="true"
                               />
                             </Button>
-                            // <DropdownMenu>
-                            //   <DropdownMenuTrigger asChild>
-                            //     <Button
-                            //       size="icon"
-                            //       variant="ghost"
-                            //       className="-mr-1 size-5 shadow-none"
-                            //       aria-label={`Pin options for ${
-                            //         header.column.columnDef.header as string
-                            //       } column`}
-                            //       title={`Pin options for ${
-                            //         header.column.columnDef.header as string
-                            //       } column`}>
-                            //       <EllipsisIcon
-                            //         className="opacity-60"
-                            //         size={16}
-                            //         aria-hidden="true"
-                            //       />
-                            //     </Button>
-                            //   </DropdownMenuTrigger>
-                            //   <DropdownMenuContent align="end">
-                            //     <DropdownMenuItem
-                            //       className="text-xs"
-                            //       onClick={() => header.column.pin("left")}>
-                            //       <ArrowLeftToLineIcon
-                            //         size={16}
-                            //         className="opacity-60"
-                            //         aria-hidden="true"
-                            //       />
-                            //       Stick to left
-                            //     </DropdownMenuItem>
-                            //     <DropdownMenuItem
-                            //       className="text-xs"
-                            //       onClick={() => header.column.pin("right")}>
-                            //       <ArrowRightToLineIcon
-                            //         size={16}
-                            //         className="opacity-60"
-                            //         aria-hidden="true"
-                            //       />
-                            //       Stick to right
-                            //     </DropdownMenuItem>
-                            //   </DropdownMenuContent>
-                            // </DropdownMenu>
                           ))}
                         {header.column.getCanResize() && (
                           <div
@@ -378,7 +336,7 @@ const PinnableDataTable = <T extends any>({
                           return (
                             <TableCell
                               key={cell.id}
-                              className="py-2.5 [&[data-pinned][data-last-col]]:border-border data-pinned:bg-background/90 truncate data-pinned:backdrop-blur-xs [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right][data-last-col=right]]:border-l border-r border-gray-300"
+                              className="py-1.5 px-2 text-[13px] [&[data-pinned][data-last-col]]:border-border data-pinned:bg-background/90 truncate data-pinned:backdrop-blur-xs [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right][data-last-col=right]]:border-l border-r border-gray-300"
                               style={{ ...getPinningStyles(column) }}
                               data-pinned={isPinned || undefined}
                               data-last-col={
