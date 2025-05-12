@@ -155,8 +155,8 @@ const Chat = () => {
                   investor_description: "Analyzing semantic vectors...",
                   similarity_score: "generating...",
                 }))
-                console.log(initID, "initID")
-                addTab(initID, "Investors", "investors", iPlaceholders)
+                // console.log(initID, "initID")
+                addTab(initID, "Generating", "investors", iPlaceholders)
               }
 
               if (parsed?.type === "response") {

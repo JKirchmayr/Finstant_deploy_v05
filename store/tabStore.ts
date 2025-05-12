@@ -69,6 +69,15 @@ export const useTabPanelStore = create<ChatControlStore>()(set => ({
           )
       )
 
+      // Update tab type based on newData type
+      if ("company_id" in newData) {
+        tab.type = "companies"
+        tab.tabTitle = "Companies"
+      } else if ("investor_id" in newData) {
+        tab.type = "investors"
+        tab.tabTitle = "Investors"
+      }
+
       tab.data = [...filteredData, newData]
 
       return { tabList: [...state.tabList] }

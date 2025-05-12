@@ -78,7 +78,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
           <button
             onClick={() => handleAddTab(row.original)}
             disabled={row.original.company_id.includes("placeholder")}
-            className="hover:underline hover:font-medium transition-all duration-200 text-left w-full"
+            className="hover:underline inline-flex cursor-pointer hover:font-medium transition-all duration-200 text-left w-full"
             type="button">
             <Image
               src="/images/portfolio_company.png"
