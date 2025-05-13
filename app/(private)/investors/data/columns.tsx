@@ -11,25 +11,29 @@ import Link from "next/link"
 const allColumns: ColumnDef<any>[] = [
   {
     id: "select",
-    maxSize: 50,
+    maxSize: 45,
     header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="mr-4"
-      />
+      <div className="text-center w-full">
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+          className="mr-4"
+        />
+      </div>
     ),
     cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={value => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="mr-4"
-      />
+      <div className="text-center w-full">
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={value => row.toggleSelected(!!value)}
+          aria-label="Select row"
+          className="mr-4"
+        />
+      </div>
     ),
     enableSorting: false,
     enableHiding: false,
@@ -37,7 +41,7 @@ const allColumns: ColumnDef<any>[] = [
   {
     id: "index",
     header: () => <div className="text-center w-full">#</div>,
-    maxSize: 50,
+    maxSize: 45,
     cell: ({ row }) => (
       <div className="text-center w-full">{row.index + 1}</div>
     ),

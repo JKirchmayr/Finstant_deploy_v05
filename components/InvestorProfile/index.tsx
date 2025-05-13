@@ -15,12 +15,19 @@ export default function InvestorProfile({ data }: { data: any }) {
   // console.log(data)
   return (
     <div className="w-full h-full border-none ">
-      <div className="flex flex-col gap-4 p-4">
+      <div className="flex flex-col gap-4 p-1.5 pt-1">
         {/* Top section: Logo and Company Info */}
         <div className="flex gap-4 items-start">
           {/* Logo */}
-          <div className="w-20 h-20 border border-foreground rounded-md flex items-center justify-center">
-            <span className="text-sm">logo</span>
+          <div className="w-20 h-20 flex items-center justify-center">
+            <Image
+              src="https://placehold.co/50x50"
+              alt="Company Logo"
+              width={50}
+              height={50}
+              className="w-20 h-20 rounded-md border "
+              unoptimized
+            />
           </div>
 
           {/* Company Details */}

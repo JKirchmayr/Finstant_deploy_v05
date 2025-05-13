@@ -103,7 +103,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenuItem
                   key={item.name}
                   className={cn(
-                    `flex items-center justify-center px-1.5 rounded-md border border-transparent cursor-pointer hover:bg-gray-100 hover:border-gray-200 transition-all ease-in-out duration-300`,
+                    `flex items-center justify-center px-1.5 py-0.5 rounded-md border border-transparent cursor-pointer hover:bg-gray-100 hover:border-gray-200 transition-all ease-in-out duration-300`,
                     {
                       "border border-blue-700/30 bg-blue-50 hover:border-blue-700/40":
                         pathname === item.url,
@@ -146,7 +146,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenu>
               {isCollapsed && (
                 <SidebarMenuItem
-                  className={`flex items-center justify-center px-1.5 rounded-md border border-transparent cursor-pointer hover:bg-gray-100 hover:border-gray-200 transition-all ease-in-out duration-300`}>
+                  className={`flex items-center justify-center px-1.5 py-0.5 rounded-md border border-transparent cursor-pointer hover:bg-gray-100 hover:border-gray-200 transition-all ease-in-out duration-300`}>
                   <SidebarMenuButton
                     tooltip="Expand"
                     asChild
@@ -165,7 +165,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenuItem
                   key={item.name}
                   className={cn(
-                    `flex items-center justify-center px-1.5 rounded-md border border-transparent cursor-pointer hover:bg-gray-100 hover:border-gray-200 transition-all ease-in-out duration-300`,
+                    `flex items-center justify-center px-1.5 py-0.5 rounded-md border border-transparent cursor-pointer hover:bg-gray-100 hover:border-gray-200 transition-all ease-in-out duration-300`,
                     {
                       "border border-blue-700/30 bg-blue-50 hover:border-blue-700/40":
                         pathname === item.url,
@@ -184,7 +184,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <Link
                       href={item.url}
                       className={cn(`inline-flex`, {
-                        "text-blue-700 [&>svg]:scale-110":
+                        "text-blue-700 [&>svg]:scale-105":
                           pathname === item.url,
                       })}>
                       <item.icon

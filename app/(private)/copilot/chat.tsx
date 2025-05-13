@@ -215,6 +215,7 @@ const Chat = () => {
                 scrollToBottom()
               }
             } catch (err) {
+              // closeTabByID(initID)
               console.error("Error parsing cleaned chunk:", err, cleaned)
             }
           }
@@ -370,6 +371,7 @@ const PromptField = ({
             ref={textareaRef}
             value={input}
             onChange={handleInputChange}
+            autoFocus
             minRows={1}
             maxRows={2}
             onKeyDown={e => {

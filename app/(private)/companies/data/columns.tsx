@@ -11,25 +11,31 @@ import Link from "next/link"
 const allColumns: ColumnDef<any>[] = [
   {
     id: "select",
-    maxSize: 50,
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="mr-4"
-      />
-    ),
+    maxSize: 45,
+    header: ({ table, column }) => {
+      return (
+        <div className="flex items-center">
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+            className=""
+          />
+        </div>
+      )
+    },
     cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={value => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="mr-4"
-      />
+      <div className="flex items-center">
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={value => row.toggleSelected(!!value)}
+          aria-label="Select row"
+          className=""
+        />
+      </div>
     ),
     enableSorting: false,
     enableHiding: false,
@@ -37,7 +43,7 @@ const allColumns: ColumnDef<any>[] = [
   {
     id: "index",
     header: () => <div className="text-center w-full">#</div>,
-    maxSize: 50,
+    maxSize: 45,
     cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
     enableSorting: false,
     enableHiding: false,
@@ -80,6 +86,7 @@ const allColumns: ColumnDef<any>[] = [
         </div>
       )
     },
+    enablePinning: true,
   },
   {
     accessorKey: "company_description",

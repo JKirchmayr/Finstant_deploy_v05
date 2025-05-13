@@ -19,7 +19,13 @@ export type Company = {
 export default function CompaniesData({ companies }: { companies: Company[] }) {
   const { addTab } = useTabPanelStore()
 
-  console.log(companies, "companies")
+  // console.log(companies, "companies")
+
+  const isPlaceholder = companies.some(company =>
+    company.company_id.includes("placeholder")
+  )
+
+  console.log(isPlaceholder, "isPlaceholder")
 
   const handleAddTab = (data: any) => {
     addTab(
@@ -34,46 +40,60 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
     {
       id: "select",
       header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-          className="mr-4"
-          disabled={table
-            .getFilteredRowModel()
-            .rows.some(row => row.original.company_id.includes("placeholder"))}
-        />
+        <div className="flex items-center">
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+            className=""
+            disabled={table
+              .getFilteredRowModel()
+              .rows.some(row =>
+                row.original.company_id.includes("placeholder")
+              )}
+          />
+        </div>
       ),
       cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={value => row.toggleSelected(!!value)}
-          aria-label="Select row"
-          className="mr-4"
-          disabled={row.original.company_id.includes("placeholder")}
-        />
+        <div className="flex items-center">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={value => row.toggleSelected(!!value)}
+            aria-label="Select row"
+            className=""
+            disabled={row.original.company_id.includes("placeholder")}
+          />
+        </div>
       ),
-      maxSize: 40,
+      maxSize: 45,
       enableSorting: false,
       enableHiding: false,
     },
     {
-      maxSize: 50,
-      header: "#",
+      id: "index",
+      maxSize: 45,
+      header: ({}) => (
+        <div className="flex items-center justify-center">
+          {isPlaceholder ? "Generating" : "#"}
+        </div>
+      ),
       enablePinning: false,
+      enableSorting: false,
       cell: ({ row }) => (
-        <GenerateSkeleton
-          isPlaceholder={row.original.company_id.includes("placeholder")}
-          text={(row.index + 1).toString()}
-        />
+        <div className="text-center">
+          <GenerateSkeleton
+            isPlaceholder={row.original.company_id.includes("placeholder")}
+            text={(row.index + 1).toString()}
+          />
+        </div>
       ),
     },
     {
       accessorKey: "company_name",
-      header: "Company",
+      header: isPlaceholder ? "Generating" : "Company",
       cell: ({ row }) => {
         return (
           <button
@@ -99,7 +119,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
     },
     {
       accessorKey: "company_description",
-      header: "Description",
+      header: isPlaceholder ? "Generating" : "Description",
       cell: ({ row }) => (
         <GenerateSkeleton
           isPlaceholder={row.original.company_id.includes("placeholder")}
@@ -109,7 +129,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
     },
     {
       accessorKey: "similarity_score",
-      header: "Similarity",
+      header: isPlaceholder ? "Generating" : "Similarity",
       cell: ({ row }) => (
         <GenerateSkeleton
           isPlaceholder={row.original.company_id.includes("placeholder")}
@@ -120,7 +140,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
   ]
 
   return (
-    <div className="h-full flex flex-col bg-white w-full pt-1 ">
+    <div className="h-full flex flex-col bg-white w-full pt-1.5 ">
       <ChatDataTable
         data={companies ? companies : []}
         columns={columns}
@@ -128,7 +148,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
         hasMoreData={false}
         loadMoreData={() => console.log("loadmore")}
         filterBy="company_name"
-        topbarClass="px-1"
+        topbarClass="px-1.5 mb-1.5"
       />
     </div>
   )

@@ -23,6 +23,10 @@ export default function InvestorsResponseData({
 }) {
   const { addTab } = useTabPanelStore()
 
+  const isPlaceholder = investors.some(investor =>
+    investor.investor_id?.includes("placeholder")
+  )
+
   const handleAddTab = (data: any) => {
     addTab(
       data?.investor_id || data?.investor_name,
@@ -37,48 +41,55 @@ export default function InvestorsResponseData({
     {
       id: "select",
       header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-          className="mr-4"
-          disabled={table
-            .getFilteredRowModel()
-            .rows.some(row =>
-              row.original.investor_id?.includes("placeholder")
-            )}
-        />
+        <div className="flex items-center">
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+            className=""
+            disabled={table
+              .getFilteredRowModel()
+              .rows.some(row =>
+                row.original.investor_id?.includes("placeholder")
+              )}
+          />
+        </div>
       ),
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={value => row.toggleSelected(!!value)}
           aria-label="Select row"
-          className="mr-4"
+          className=""
           disabled={row.original.investor_id?.includes("placeholder")}
         />
       ),
-      maxSize: 40,
+      maxSize: 45,
       enableSorting: false,
       enableHiding: false,
     },
     {
-      maxSize: 50,
-      header: "#",
+      id: "index",
+      maxSize: 45,
+
+      header: () => (
+        <div className="flex items-center justify-center w-full"> #</div>
+      ),
       enablePinning: false,
       cell: ({ row }) => (
         <GenerateSkeleton
           isPlaceholder={row.original.investor_id?.includes("placeholder")}
           text={(row.index + 1).toString()}
+          className="text-center"
         />
       ),
     },
     {
       accessorKey: "investor_name",
-      header: "Investor",
+      header: isPlaceholder ? "Generating" : "Investor",
       cell: ({ row }) => (
         <button
           onClick={() => handleAddTab(row.original)}
@@ -102,7 +113,7 @@ export default function InvestorsResponseData({
     },
     {
       accessorKey: "investor_description",
-      header: "Description",
+      header: isPlaceholder ? "Generating" : "Description",
       cell: ({ row }) =>
         row.original.investor_id?.includes("placeholder") ? (
           <GenerateSkeleton
@@ -117,7 +128,7 @@ export default function InvestorsResponseData({
     },
     {
       accessorKey: "similarity_score",
-      header: "Similarity",
+      header: isPlaceholder ? "Generating" : "Similarity",
       cell: ({ row }) => (
         <GenerateSkeleton
           isPlaceholder={row.original.investor_id?.includes("placeholder")}
@@ -128,7 +139,7 @@ export default function InvestorsResponseData({
   ]
 
   return (
-    <div className="h-full flex flex-col bg-white w-full pt-1 ">
+    <div className="h-full flex flex-col bg-white w-full pt-1.5 ">
       <ChatDataTable
         data={investors || []}
         columns={columns}
@@ -136,7 +147,7 @@ export default function InvestorsResponseData({
         hasMoreData={false}
         loadMoreData={() => console.log("loadmore")}
         filterBy="investor_name"
-        topbarClass="px-1"
+        topbarClass="px-1.5 mb-1.5"
       />
     </div>
   )

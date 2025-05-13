@@ -13,11 +13,9 @@ export const GenerateSkeleton = ({
   className?: string
 }) => {
   return (
-    <div className="w-full">
+    <div className={cn("w-full", className)}>
       {isPlaceholder ? (
-        <span className="inline-block truncate w-3/4 h-4 bg-gradient-to-r from-black via-gray-900 to-gray-800 animate-pulse bg-clip-text text-transparent">
-          {text}
-        </span>
+        <span className="inline-block truncate w-3/4 h-4 ">{text}</span>
       ) : (
         children ?? (
           <span className={cn("truncate inline-flex", className)}>{text}</span>
