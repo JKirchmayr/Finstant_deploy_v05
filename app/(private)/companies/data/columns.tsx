@@ -1,44 +1,48 @@
 // import CompanySheet from "@/components/CompanySheet"
 // import CompanySheet from "@/components/CompanySheet"
-import { ExpandableCell } from "@/components/table/epandable-cell"
-import { Checkbox } from "@/components/ui/checkbox"
-import { ColumnDef } from "@tanstack/react-table"
-import { ExternalLink } from "lucide-react"
-import Link from "next/link"
+import { ExpandableCell } from "@/components/table/epandable-cell";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ColumnDef } from "@tanstack/react-table";
+import { ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 const allColumns: ColumnDef<any>[] = [
   {
     id: "index",
-    header: "#",
+    header: () => <span className="text-center mx-auto">#</span>,
     maxSize: 50,
-    cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
+    cell: ({ row }) => <div className="text-center mx-auto">{row.index + 1}</div>,
     enableSorting: false,
     enableHiding: false,
+    enablePinning: false,
   },
   {
     id: "select",
     maxSize: 50,
     header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="mr-4"
-      />
+      <div>
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+          className="mx-auto"
+        />
+      </div>
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
-        onCheckedChange={value => row.toggleSelected(!!value)}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
-        className="mr-4"
+        className="mx-auto"
       />
     ),
     enableSorting: false,
     enableHiding: false,
+    enablePinning: false,
   },
   // {
   //   accessorKey: "logo",
@@ -66,18 +70,17 @@ const allColumns: ColumnDef<any>[] = [
     accessorKey: "company_description",
     minSize: 600, // Set the desired width for the description column in p
     header: () => (
-      <div className="text-left overflow-hidden w-[300px]  line-clamp-2">
-        Description
-      </div>
+      <div className="text-left overflow-hidden w-[300px]  line-clamp-2">Description</div>
     ),
     cell: ({ row }) => {
       return (
         <ExpandableCell
           className="w-[600px]"
-          TriggerCell={<p>{row.getValue("company_description")}</p>}>
+          TriggerCell={<p>{row.getValue("company_description")}</p>}
+        >
           {row.getValue("company_description")}
         </ExpandableCell>
-      )
+      );
     },
   },
   {
@@ -87,12 +90,9 @@ const allColumns: ColumnDef<any>[] = [
       return (
         <Link
           target="_blank"
-          href={
-            row.original.company_website !== null
-              ? row.original.company_website
-              : "/"
-          }
-          className="text-xs bg-blue-50 hover:bg-blue-500 border border-blue-200 rounded px-2 text-blue-600 hover:text-white transition-all inline-flex gap-1 items-center p-0.5 overflow-hidden">
+          href={row.original.company_website !== null ? row.original.company_website : "/"}
+          className="text-xs bg-blue-50 hover:bg-blue-500 border border-blue-200 rounded px-2 text-blue-600 hover:text-white transition-all inline-flex gap-1 items-center p-0.5 overflow-hidden"
+        >
           {row.original.company_website === null && "-"}
           {row.original.company_website !== null && (
             <div className="flex space-x-1">
@@ -101,7 +101,7 @@ const allColumns: ColumnDef<any>[] = [
             </div>
           )}
         </Link>
-      )
+      );
     },
   },
   // {
@@ -189,15 +189,15 @@ const allColumns: ColumnDef<any>[] = [
   //     </div>
   //   ),
   // },
-]
+];
 
 export function getColumnsForData(data: any[]): ColumnDef<any>[] {
-  if (!data || data.length === 0) return allColumns
-  const dataKeys = Object.keys(data[0])
+  if (!data || data.length === 0) return allColumns;
+  const dataKeys = Object.keys(data[0]);
   return allColumns.filter(
-    col =>
+    (col) =>
       col.id === "select" ||
       col.id === "index" ||
       ("accessorKey" in col && dataKeys.includes(col.accessorKey as string))
-  )
+  );
 }
