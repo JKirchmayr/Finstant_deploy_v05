@@ -189,7 +189,7 @@ const PinnableDataTable = <T extends any>({
             onChange={event =>
               table.getColumn(filterBy)?.setFilterValue(event.target.value)
             }
-            className="pl-7 focus-visible:ring-0 border-gray-300"
+            className="pl-7 focus-visible:ring-0  border-gray-300 bg-white"
           />
         </div>
         {data.length > 0 && (

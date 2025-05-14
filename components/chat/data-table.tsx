@@ -198,7 +198,7 @@ const ChatDataTable = <T extends any>({
       </div>
       <div className="flex flex-col w-full bg-white overflow-auto">
         <Table
-          className="w-full bg-background border-b [&_td]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b [&_thead]:border-b-0 border-l-0 border-r-0"
+          className="w-full bg-background border-y [&_td]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b [&_thead]:border-b-0 border-l-0 border-r-0"
           style={{ minWidth: "100%", width: table.getTotalSize() }}>
           <TableHeader className="bg-white text-[13px] h-8 sticky top-0 z-10">
             {table.getHeaderGroups().map(headerGroup => (
