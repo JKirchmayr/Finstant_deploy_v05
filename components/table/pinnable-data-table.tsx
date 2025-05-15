@@ -181,7 +181,7 @@ const PinnableDataTable = <T extends any>({
             placeholder="Search"
             value={(table.getColumn(filterBy)?.getFilterValue() as string) ?? ""}
             onChange={(event) => table.getColumn(filterBy)?.setFilterValue(event.target.value)}
-            className="pl-7 focus-visible:ring-0 border-gray-300"
+            className="pl-7 focus-visible:ring-0 bg-white border-gray-300"
           />
         </div>
         {data.length > 0 && (
@@ -203,7 +203,7 @@ const PinnableDataTable = <T extends any>({
       </div>
       <div className="flex-1 flex flex-col w-full bg-white border-l border-b border-r border-gray-200 overflow-auto">
         <Table
-          className="w-full [&_td]:border-border [&_th]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_th]:border-b [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b"
+          className="!w-full [&_td]:border-border [&_th]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_th]:border-b [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b"
           style={{ width: table.getTotalSize() }}
         >
           <TableHeader className="bg-white text-xs font-medium h-8 sticky top-0 z-10">

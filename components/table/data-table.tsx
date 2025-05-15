@@ -1,5 +1,5 @@
-"use client"
-import * as React from "react"
+"use client";
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -10,10 +10,10 @@ import {
   getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
-import { Search, Settings2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+} from "@tanstack/react-table";
+import { Search, Settings2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -21,15 +21,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Skeleton } from "@/components/ui/skeleton"
+} from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface IDataTableProps<T extends any> {
-  data: T[]
-  columns: ColumnDef<T>[]
-  isLoading: boolean
-  loadMoreData: () => void
-  hasMoreData: boolean
+  data: T[];
+  columns: ColumnDef<T>[];
+  isLoading: boolean;
+  loadMoreData: () => void;
+  hasMoreData: boolean;
 }
 
 const DataTable = <T extends any>({
@@ -39,10 +39,10 @@ const DataTable = <T extends any>({
   loadMoreData,
   hasMoreData,
 }: IDataTableProps<T>) => {
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
     data,
@@ -61,42 +61,42 @@ const DataTable = <T extends any>({
       columnVisibility,
       rowSelection,
     },
-  })
+  });
 
-  const observer = React.useRef<IntersectionObserver | null>(null)
+  const observer = React.useRef<IntersectionObserver | null>(null);
   const lastRowRef = React.useCallback(
     (node: HTMLElement | null) => {
-      if (isLoading) return
-      if (observer.current) observer.current.disconnect()
+      if (isLoading) return;
+      if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMoreData) {
-          loadMoreData()
+          loadMoreData();
         }
-      })
+      });
 
-      if (node) observer.current.observe(node)
+      if (node) observer.current.observe(node);
     },
     [isLoading, hasMoreData, loadMoreData]
-  )
+  );
 
   const handleRemove = () => {
-    const selectedIds = Object.keys(rowSelection)
-    console.log("Removing:", selectedIds)
+    const selectedIds = Object.keys(rowSelection);
+    console.log("Removing:", selectedIds);
     // Implement remove logic here
-  }
+  };
 
   const handleExport = () => {
-    const selectedIds = Object.keys(rowSelection)
-    console.log("Exporting:", selectedIds)
+    const selectedIds = Object.keys(rowSelection);
+    console.log("Exporting:", selectedIds);
     // Implement export logic here
-  }
+  };
 
   return (
     <div className="w-full flex h-full flex-col gap-3">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between h-auto md:h-7 gap-2">
         <div className="flex items-center gap-2 order-1 relative w-full md:w-auto">
-          <Search size={14} className="absolute text-gray-400 left-2" />
+          <Search size={14} className="absolute bg-white text-gray-400 left-2" />
           <Input
             placeholder="Search"
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -167,7 +167,7 @@ const DataTable = <T extends any>({
               <>
                 {table.getRowModel().rows.length ? (
                   table.getRowModel().rows.map((row, index) => {
-                    const isLastRow = index === table.getRowModel().rows.length - 1
+                    const isLastRow = index === table.getRowModel().rows.length - 1;
                     return (
                       <tr
                         ref={isLastRow ? lastRowRef : null}
@@ -180,7 +180,7 @@ const DataTable = <T extends any>({
                           </TableCell>
                         ))}
                       </tr>
-                    )
+                    );
                   })
                 ) : (
                   <TableRow>
@@ -195,7 +195,7 @@ const DataTable = <T extends any>({
         </Table>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default DataTable
+export default DataTable;
