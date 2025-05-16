@@ -7,16 +7,8 @@ import { usePathname } from "next/navigation";
 import { Checkbox } from "./ui/checkbox";
 import { useInvestorFilters } from "@/store/useInvestorFilters";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
-import MultipleSelector from "./ui/multiselect";
-import Component from "./comp-225";
+import MultipleSelector, { Option } from "./ui/multiselect";
 
-const locationOptions = [
-  { value: "United States", label: "United States" },
-  { value: "United Kingdom", label: "United Kingdom" },
-  { value: "Germany", label: "Germany" },
-  { value: "Global", label: "Global" },
-  { value: "Europe", label: "Europe" },
-];
 const industryOptions = [
   { value: "Artificial Intelligence", label: "Artificial Intelligence" },
   { value: "Cloud Software", label: "Cloud Software" },
@@ -34,6 +26,14 @@ const industryOptions = [
   { value: "Health Insurance", label: "Health Insurance" },
   { value: "Medical Devices", label: "Medical Devices" },
   { value: "Pharmaceuticals", label: "Pharmaceuticals" },
+];
+
+const locationOptions: Option[] = [
+  { value: "United States", label: "United States", flag: "🇺🇸" },
+  { value: "United Kingdom", label: "United Kingdom", flag: "🇬🇧" },
+  { value: "Germany", label: "Germany", flag: "🇩🇪" },
+  { value: "Global", label: "Global", flag: "🌍" },
+  { value: "Europe", label: "Europe", flag: "🇪🇺" },
 ];
 
 const investorOptions = [
@@ -248,7 +248,7 @@ const Filters = () => {
             }}
             defaultOptions={industryOptions}
             placeholder="Select Industry"
-            hideClearAllButton
+            // hideClearAllButton
             hidePlaceholderWhenSelected
             emptyIndicator={<p className="text-center text-sm">No results found</p>}
           />
@@ -258,7 +258,20 @@ const Filters = () => {
     {
       value: "hq-country",
       title: "HQ Country",
-      content: () => <Component />,
+      content: () => (
+        <MultipleSelector
+          noAbsolute
+          options={locationOptions}
+          placeholder="Select countries"
+          commandProps={{
+            label: "Select countries",
+          }}
+          defaultOptions={locationOptions}
+          //   hideClearAllButton
+          hidePlaceholderWhenSelected
+          emptyIndicator={<p className="text-center text-sm">No results found</p>}
+        />
+      ),
     },
   ];
 

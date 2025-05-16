@@ -183,7 +183,7 @@ const MultipleSelector = ({
   inputProps,
   hideClearAllButton = false,
   noAbsolute = false,
-}: MultipleSelectorProps & { noAbsolute: boolean }) => {
+}: MultipleSelectorProps & { noAbsolute?: boolean }) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [open, setOpen] = React.useState(false);
   const [onScrollbar, setOnScrollbar] = React.useState(false);
@@ -443,7 +443,10 @@ const MultipleSelector = ({
                 data-fixed={option.fixed}
                 data-disabled={disabled || undefined}
               >
-                {option.label}
+                <span className="gap-1 items-center flex">
+                  {option?.flag && <span className="leading-none">{option?.flag}</span>}
+                  <span>{option.label}</span>
+                </span>
                 <button
                   className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute -inset-y-px -end-px flex size-7 items-center justify-center rounded-e-md border border-transparent p-0 outline-hidden transition-[color,box-shadow] outline-none focus-visible:ring-[3px]"
                   onKeyDown={(e) => {
@@ -576,7 +579,8 @@ const MultipleSelector = ({
                                   "pointer-events-none cursor-not-allowed opacity-50"
                               )}
                             >
-                              {option.label}
+                              <span className="text-lg leading-none">{option?.flag}</span>{" "}
+                              <span className="truncate">{option.label}</span>
                             </CommandItem>
                           );
                         })}
