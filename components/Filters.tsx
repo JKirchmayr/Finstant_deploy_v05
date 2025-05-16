@@ -8,6 +8,7 @@ import { Checkbox } from "./ui/checkbox";
 import { useInvestorFilters } from "@/store/useInvestorFilters";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 import MultipleSelector from "./ui/multiselect";
+import Component from "./comp-225";
 
 const locationOptions = [
   { value: "United States", label: "United States" },
@@ -239,58 +240,25 @@ const Filters = () => {
       value: "industry",
       title: "Industry",
       content: () => (
-        <MultipleSelector
-          commandProps={{
-            label: "Select Industry",
-          }}
-          defaultOptions={industryOptions}
-          placeholder="Select Industry"
-          hideClearAllButton
-          hidePlaceholderWhenSelected
-          emptyIndicator={<p className="text-center text-sm">No results found</p>}
-        />
-        // <MultiSelect
-        //   title=""
-        //   options={industryOptions}
-        //   selectedOptions={industryOptions.filter((i) => company.industry?.includes(i.value))}
-        //   onSelectChange={(vals) =>
-        //     handleMultiChange(
-        //       "industry",
-        //       vals.map((v) => v.value)
-        //     )
-        //   }
-        //   placeholder="Select Industry"
-        // />
+        <div className="h-fit">
+          <MultipleSelector
+            noAbsolute
+            commandProps={{
+              label: "Select Industry",
+            }}
+            defaultOptions={industryOptions}
+            placeholder="Select Industry"
+            hideClearAllButton
+            hidePlaceholderWhenSelected
+            emptyIndicator={<p className="text-center text-sm">No results found</p>}
+          />
+        </div>
       ),
     },
     {
       value: "hq-country",
       title: "HQ Country",
-      content: () => (
-        <MultipleSelector
-          className="z-50"
-          commandProps={{
-            label: "Select Country",
-          }}
-          defaultOptions={locationOptions}
-          placeholder="Select Country"
-          hideClearAllButton
-          hidePlaceholderWhenSelected
-          emptyIndicator={<p className="text-center text-sm">No results found</p>}
-        />
-        // <MultiSelect
-        //   title=""
-        //   options={locationOptions}
-        //   selectedOptions={locationOptions.filter((l) => company.hqCountry.includes(l.value))}
-        //   onSelectChange={(vals) =>
-        //     handleMultiChange(
-        //       "hqCountry",
-        //       vals.map((v) => v.value)
-        //     )
-        //   }
-        //   placeholder="Select Country"
-        // />
-      ),
+      content: () => <Component />,
     },
   ];
 
@@ -312,144 +280,6 @@ const Filters = () => {
             </AccordionItem>
           ))}
         </Accordion>
-        <MultipleSelector
-          className="z-50"
-          commandProps={{
-            label: "Select Country",
-            className: "z-100",
-          }}
-          defaultOptions={locationOptions}
-          placeholder="Select Country"
-          hideClearAllButton
-          hidePlaceholderWhenSelected
-          emptyIndicator={<p className="text-center text-sm">No results found</p>}
-        />
-
-        {/* {isCompanies && (
-          <>
-            {isCompanies ? <DiscriptionFilter
-              value={company.description}
-              onChange={(val) => setCompany((prev) => ({ ...prev, description: val }))}
-            />:
-            <InvestorsFilter
-              options={investorOptions}
-              selectedInvestors={investor.investorType}
-              onChange={handleInvestorChange}
-            />
-            }
-            
-
-            <div className="w-full border-b border-gray-200/50 h-[1px]"></div>
-
-            <MinMax
-              title="Revenue (mEUR)"
-              min={company.revenueMin}
-              max={company.revenueMax}
-              onChange={handleMinMaxChange}
-              minKey="revenueMin"
-              maxKey="revenueMax"
-            />
-            <div className="w-full border-b border-gray-200/50 h-[1px]"></div>
-
-            <MinMax
-              title="EBITDA (mEUR)"
-              min={company.ebitdaMin}
-              max={company.ebitdaMax}
-              onChange={handleMinMaxChange}
-              minKey="ebitdaMin"
-              maxKey="ebitdaMax"
-            />
-            <div className="w-full border-b border-gray-200/50 h-[1px]"></div>
-
-            <MultiSelect
-              title="Industry"
-              options={industryOptions}
-              selectedOptions={industryOptions.filter((i) => company.industry?.includes(i.value))}
-              onSelectChange={(vals) =>
-                handleMultiChange(
-                  "industry",
-                  vals.map((v) => v.value)
-                )
-              }
-              placeholder="Select Industry"
-            />
-            <div className="w-full border-b border-gray-200/50 h-[1px]"></div>
-
-            <MultiSelect
-              title="HQ Country"
-              options={locationOptions}
-              selectedOptions={locationOptions.filter((l) => company.hqCountry.includes(l.value))}
-              onSelectChange={(vals) =>
-                handleMultiChange(
-                  "hqCountry",
-                  vals.map((v) => v.value)
-                )
-              }
-              placeholder="Select Country"
-            />
-            <div className="w-full border-b border-gray-200/50 h-[1px]"></div>
-          </>
-        )} */}
-
-        {/* Filters for Investors */}
-        {/* {isInvestors && (
-          <>
-            <InvestorsFilter
-              options={investorOptions}
-              selectedInvestors={investor.investorType}
-              onChange={handleInvestorChange}
-            />
-            <div className="w-full border-b border-gray-200/50 h-[1px]"></div>
-
-            <MinMax
-              title="Revenue (mEUR)"
-              min={company.revenueMin}
-              max={company.revenueMax}
-              onChange={handleMinMaxChange}
-              minKey="revenueMin"
-              maxKey="revenueMax"
-            />
-            <div className="w-full border-b border-gray-200/50 h-[1px]"></div>
-
-            <MinMax
-              title="EBITDA (mEUR)"
-              min={company.ebitdaMin}
-              max={company.ebitdaMax}
-              onChange={handleMinMaxChange}
-              minKey="ebitdaMin"
-              maxKey="ebitdaMax"
-            />
-            <div className="w-full border-b border-gray-200/50 h-[1px]"></div>
-
-            <MultiSelect
-              title="Industry"
-              options={industryOptions}
-              selectedOptions={industryOptions.filter((i) => company.industry?.includes(i.value))}
-              onSelectChange={(vals) =>
-                handleMultiChange(
-                  "industry",
-                  vals.map((v) => v.value)
-                )
-              }
-              placeholder="Select Industry"
-            />
-            <div className="w-full border-b border-gray-200/50 h-[1px]"></div>
-
-            <MultiSelect
-              title="HQ Country"
-              options={locationOptions}
-              selectedOptions={locationOptions.filter((l) => company.hqCountry.includes(l.value))}
-              onSelectChange={(vals) =>
-                handleMultiChange(
-                  "hqCountry",
-                  vals.map((v) => v.value)
-                )
-              }
-              placeholder="Select Country"
-            />
-            <div className="w-full border-b border-gray-200/50 h-[1px]"></div>
-          </>
-        )} */}
       </div>
 
       <div className="relative z-50 border-t border-gray-300 px-3 py-2 min-h-[50px] grid grid-cols-2 gap-3">
