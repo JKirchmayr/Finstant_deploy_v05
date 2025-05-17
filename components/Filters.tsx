@@ -1,7 +1,6 @@
 "use client";
 import { ListFilterPlus, Sparkles } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { MultiSelect } from "@/components/MultiSelect";
 import { useCompanyFilters } from "@/store/useCompanyFilters";
 import { usePathname } from "next/navigation";
 import { Checkbox } from "./ui/checkbox";
@@ -29,11 +28,11 @@ const industryOptions = [
 ];
 
 const locationOptions: Option[] = [
-  { value: "United States", label: "United States", flag: "🇺🇸" },
-  { value: "United Kingdom", label: "United Kingdom", flag: "🇬🇧" },
-  { value: "Germany", label: "Germany", flag: "🇩🇪" },
-  { value: "Global", label: "Global", flag: "🌍" },
-  { value: "Europe", label: "Europe", flag: "🇪🇺" },
+  { value: "United States", label: "United States", flag: "US" },
+  { value: "United Kingdom", label: "United Kingdom", flag: "GB" },
+  { value: "Germany", label: "Germany", flag: "DE" },
+  { value: "Global", label: "Global", flag: "GLOBAL" },
+  { value: "Europe", label: "Europe", flag: "EU" },
 ];
 
 const investorOptions = [
@@ -248,7 +247,6 @@ const Filters = () => {
             }}
             defaultOptions={industryOptions}
             placeholder="Select Industry"
-            // hideClearAllButton
             hidePlaceholderWhenSelected
             emptyIndicator={<p className="text-center text-sm">No results found</p>}
           />
@@ -267,7 +265,6 @@ const Filters = () => {
             label: "Select countries",
           }}
           defaultOptions={locationOptions}
-          //   hideClearAllButton
           hidePlaceholderWhenSelected
           emptyIndicator={<p className="text-center text-sm">No results found</p>}
         />

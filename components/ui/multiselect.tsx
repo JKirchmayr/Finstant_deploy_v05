@@ -7,6 +7,7 @@ import { XIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
+import Flag from "react-world-flags";
 
 export interface Option {
   value: string;
@@ -444,7 +445,11 @@ const MultipleSelector = ({
                 data-disabled={disabled || undefined}
               >
                 <span className="gap-1 items-center flex">
-                  {option?.flag && <span className="leading-none">{option?.flag}</span>}
+                  {option?.flag && (
+                    <span className="h-full w-5 leading-none">
+                      <Flag code={option?.flag as string} height="16" />
+                    </span>
+                  )}
                   <span>{option.label}</span>
                 </span>
                 <button
@@ -579,7 +584,11 @@ const MultipleSelector = ({
                                   "pointer-events-none cursor-not-allowed opacity-50"
                               )}
                             >
-                              <span className="text-lg leading-none">{option?.flag}</span>{" "}
+                              {option?.flag && (
+                                <span className="text-lg h-full w-5 leading-none">
+                                  <Flag code={option?.flag as string} height="16" />
+                                </span>
+                              )}
                               <span className="truncate">{option.label}</span>
                             </CommandItem>
                           );
