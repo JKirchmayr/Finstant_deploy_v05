@@ -450,6 +450,9 @@ const MultipleSelector = ({
                       <Flag code={option?.flag as string} height="16" />
                     </span>
                   )}
+                  {!option?.flag && option?.flagEmoji && (
+                    <span className="h-full w-4 leading-none">{option?.flagEmoji}</span>
+                  )}
                   <span>{option.label}</span>
                 </span>
                 <button
@@ -587,6 +590,11 @@ const MultipleSelector = ({
                               {option?.flag && (
                                 <span className="text-lg h-full w-5 leading-none">
                                   <Flag code={option?.flag as string} height="16" />
+                                </span>
+                              )}
+                              {!option?.flag && option?.flagEmoji && (
+                                <span className="text-lg h-full w-5 leading-none">
+                                  {option?.flagEmoji}
                                 </span>
                               )}
                               <span className="truncate">{option.label}</span>

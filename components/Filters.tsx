@@ -31,7 +31,7 @@ const locationOptions: Option[] = [
   { value: "United States", label: "United States", flag: "US" },
   { value: "United Kingdom", label: "United Kingdom", flag: "GB" },
   { value: "Germany", label: "Germany", flag: "DE" },
-  { value: "Global", label: "Global", flag: "GLOBAL" },
+  { value: "Global", label: "Global", flagEmoji: "🌍" },
   { value: "Europe", label: "Europe", flag: "EU" },
 ];
 
