@@ -5,8 +5,14 @@ import { useCompanyFilters } from "@/store/useCompanyFilters";
 import { usePathname } from "next/navigation";
 import { Checkbox } from "./ui/checkbox";
 import { useInvestorFilters } from "@/store/useInvestorFilters";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./ui/accordion";
 import MultipleSelector, { Option } from "./ui/multiselect";
+import CategorizedCountryMultiSelect from "./CategorizedCountryMultiSelect";
 
 const industryOptions = [
   { value: "Artificial Intelligence", label: "Artificial Intelligence" },
@@ -27,14 +33,6 @@ const industryOptions = [
   { value: "Pharmaceuticals", label: "Pharmaceuticals" },
 ];
 
-const locationOptions: Option[] = [
-  { value: "United States", label: "United States", flag: "US" },
-  { value: "United Kingdom", label: "United Kingdom", flag: "GB" },
-  { value: "Germany", label: "Germany", flag: "DE" },
-  { value: "Global", label: "Global", flagEmoji: "🌍" },
-  { value: "Europe", label: "Europe", flag: "EU" },
-];
-
 const investorOptions = [
   { value: "Private Equity", label: "Private Equity" },
   { value: "Real Estate", label: "Real Estate" },
@@ -47,8 +45,10 @@ const Filters = () => {
   const isCompanies = pathname.includes("companies");
   const isInvestors = pathname.includes("investors");
   const { applyFilters, resetFilters } = useCompanyFilters();
-  const { applyFilters: applyInvestorFilters, resetFilters: resetInvestorFilters } =
-    useInvestorFilters();
+  const {
+    applyFilters: applyInvestorFilters,
+    resetFilters: resetInvestorFilters,
+  } = useInvestorFilters();
 
   const [company, setCompany] = useState({
     description: "",
@@ -189,7 +189,9 @@ const Filters = () => {
             content: () => (
               <DiscriptionFilter
                 value={company.description}
-                onChange={(val) => setCompany((prev) => ({ ...prev, description: val }))}
+                onChange={(val) =>
+                  setCompany((prev) => ({ ...prev, description: val }))
+                }
               />
             ),
           },
@@ -197,7 +199,11 @@ const Filters = () => {
       : [
           {
             value: "description-investor",
-            title: <label className="flex items-center gap-1 text-[13px]">Investor</label>,
+            title: (
+              <label className="flex items-center gap-1 text-[13px]">
+                Investor
+              </label>
+            ),
             content: () => (
               <InvestorsFilter
                 options={investorOptions}
@@ -248,7 +254,9 @@ const Filters = () => {
             defaultOptions={industryOptions}
             placeholder="Select Industry"
             hidePlaceholderWhenSelected
-            emptyIndicator={<p className="text-center text-sm">No results found</p>}
+            emptyIndicator={
+              <p className="text-center text-sm">No results found</p>
+            }
           />
         </div>
       ),
@@ -256,19 +264,7 @@ const Filters = () => {
     {
       value: "hq-country",
       title: "HQ Country",
-      content: () => (
-        <MultipleSelector
-          noAbsolute
-          options={locationOptions}
-          placeholder="Select countries"
-          commandProps={{
-            label: "Select countries",
-          }}
-          defaultOptions={locationOptions}
-          hidePlaceholderWhenSelected
-          emptyIndicator={<p className="text-center text-sm">No results found</p>}
-        />
-      ),
+      content: () => <CategorizedCountryMultiSelect />,
     },
   ];
 
@@ -380,7 +376,13 @@ const MinMax = ({
   );
 };
 
-const LabelAndField = ({ title, children }: { title: string; children: React.ReactNode }) => {
+const LabelAndField = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => {
   return (
     <div className="flex flex-col gap-2">
       <label className="flex items-center gap-1 text-[13px]">{title}</label>
@@ -400,7 +402,11 @@ interface InvestorsProps {
   onChange: (selected: string[]) => void;
 }
 
-const InvestorsFilter: React.FC<InvestorsProps> = ({ options, selectedInvestors, onChange }) => {
+const InvestorsFilter: React.FC<InvestorsProps> = ({
+  options,
+  selectedInvestors,
+  onChange,
+}) => {
   const handleCheckboxChange = (value: string) => {
     const newInvestor = selectedInvestors.includes(value)
       ? selectedInvestors.filter((item) => item !== value)
