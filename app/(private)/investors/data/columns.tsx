@@ -10,40 +10,36 @@ import Link from "next/link"
 
 const allColumns: ColumnDef<any>[] = [
   {
+    id: "index",
+    header: () => <span className="text-center mx-auto">#</span>,
+    maxSize: 50,
+    cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
     id: "select",
-    maxSize: 45,
+    maxSize: 50,
     header: ({ table }) => (
-      <div className="text-center w-full">
+      <div>
         <Checkbox
           checked={
             table.getIsAllPageRowsSelected() ||
             (table.getIsSomePageRowsSelected() && "indeterminate")
           }
-          onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
-          className="mr-4"
+          className="mx-auto"
         />
       </div>
     ),
     cell: ({ row }) => (
-      <div className="text-center w-full">
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={value => row.toggleSelected(!!value)}
-          aria-label="Select row"
-          className="mr-4"
-        />
-      </div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    id: "index",
-    header: () => <div className="text-center w-full">#</div>,
-    maxSize: 45,
-    cell: ({ row }) => (
-      <div className="text-center w-full">{row.index + 1}</div>
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+        className="mx-auto"
+      />
     ),
     enableSorting: false,
     enableHiding: false,
@@ -111,11 +107,9 @@ const allColumns: ColumnDef<any>[] = [
       return (
         <Link
           target="_blank"
-          href={
-            row.original.investor_website !== null
-              ? row.original.investor_website
-              : "/"
-          }>
+          href={row.original.investor_website !== null ? row.original.investor_website : "/"}
+          className="text-xs bg-blue-50 hover:bg-blue-500 border border-blue-200 rounded px-2 text-blue-600 hover:text-white transition-all inline-flex gap-1 items-center p-0.5 overflow-hidden"
+        >
           {row.original.investor_website === null && "-"}
           {row.original.investor_website !== null && (
             <Badge
@@ -126,7 +120,7 @@ const allColumns: ColumnDef<any>[] = [
             </Badge>
           )}
         </Link>
-      )
+      );
     },
   },
   // {
@@ -214,15 +208,15 @@ const allColumns: ColumnDef<any>[] = [
   //     </div>
   //   ),
   // },
-]
+];
 
 export function getColumnsForData(data: any[]): ColumnDef<any>[] {
-  if (!data || data.length === 0) return allColumns
-  const dataKeys = Object.keys(data[0])
+  if (!data || data.length === 0) return allColumns;
+  const dataKeys = Object.keys(data[0]);
   return allColumns.filter(
-    col =>
+    (col) =>
       col.id === "select" ||
       col.id === "index" ||
       ("accessorKey" in col && dataKeys.includes(col.accessorKey as string))
-  )
+  );
 }

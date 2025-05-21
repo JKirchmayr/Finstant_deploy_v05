@@ -1,103 +1,225 @@
-"use client"
-
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import Link from "next/link"
-import { LoginCredType } from "@/types/auth"
-import { useLoginUser } from "@/hooks/useAuth"
+"use client";
+import React, { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useLoginUser } from "@/hooks/useAuth";
 
 // **Validation Schema**
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-})
+});
 
-export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
+const Logo = () => (
+  <div className="flex items-center space-x-3">
+    {/* Wi-Fi Icon */}
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <circle cx="18" cy="18" r="18" fill="#2563eb" />
+      <path
+        d="M9 18C13.4183 13.5817 22.5817 13.5817 27 18"
+        stroke="#fff"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M13.5 21.5C15.5 19.5 20.5 19.5 22.5 21.5"
+        stroke="#fff"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <circle cx="18" cy="25" r="1.5" fill="#fff" />
+    </svg>
+    <span className="text-3xl font-bold text-gray-800 tracking-wide">
+      pmradar
+    </span>
+  </div>
+);
+
+const LoginForm = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const { mutate: loginUser, isPending } = useLoginUser();
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginCredType>({ resolver: zodResolver(loginSchema) })
+  } = useForm({ resolver: zodResolver(loginSchema) });
 
-  const { mutate: loginUser, isPending } = useLoginUser()
+  const [focus, setFocus] = useState({ email: false, password: false });
 
-  const onSubmit = (data: LoginCredType) => {
-    loginUser(data)
-  }
+  const handleFocus = (field: string) => setFocus({ ...focus, [field]: true });
+  const handleBlur = (field: string) => setFocus({ ...focus, [field]: false });
+
+  const onSubmit = (data: z.infer<typeof loginSchema>) => {
+    loginUser(data);
+  };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Login</CardTitle>
-          <CardDescription>
-            Empowering Companies and Startups to Raise Funds Efficiently.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="grid gap-6">
-              {/* Email Field */}
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter email address"
-                  {...register("email")}
-                />
-                {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
-              </div>
-
-              {/* Password Field */}
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto text-xs text-gray-400 underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Password"
-                  {...register("password")}
-                />
-                {errors.password && (
-                  <p className="text-red-500 text-sm">{errors.password.message}</p>
-                )}
-              </div>
-
-              {/* Submit Button */}
-              <Button type="submit" className="w-full" disabled={isPending || isSubmitting}>
-                {isPending || isSubmitting ? "Logging in..." : "Login"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-
-      {/* Terms and Privacy */}
-      <div className="text-center text-xs text-gray-500 dark:text-gray-400 mt-4">
-        By continuing, you agree to our{" "}
-        <Link href="#terms" className="underline">
-          Terms of Service
-        </Link>{" "}
-        and{" "}
-        <Link href="#privacy" className="underline">
-          Privacy Policy
-        </Link>
-        .
+    <div className="min-h-screen flex flex-col md:flex-row font-mont bg-gray-100 w-full">
+      <div className="relative flex-1 flex flex-col justify-center items-center px-8 py-12 bg-gradient-to-br from-blue-100 via-white to-gray-100 overflow-hidden">
+        {/* Fundsradar logo svg */}
+        <svg
+          className="absolute -top-20 -left-20 opacity-10"
+          width="400"
+          height="400"
+          viewBox="0 0 400 400"
+          fill="none"
+        >
+          <circle cx="200" cy="200" r="180" stroke="#60a5fa" strokeWidth="40" />
+        </svg>
+        <Logo />
+        <p className="mt-8 text-lg md:text-xl text-gray-700 text-center max-w-md font-medium drop-shadow-sm">
+          Automating corporate finance workflows with{" "}
+          <br className="hidden md:block" />
+          <span className="text-blue-600">AI and private market data.</span>
+        </p>
       </div>
+
+      <div className="flex-1 flex flex-col justify-center items-center px-8 py-12 bg-white">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="w-full max-w-sm bg-gray-100 bg-opacity-90 rounded-2xl p-8 animate-fade-in"
+        >
+          <h2 className="text-2xl font-semibold text-gray-800 mb-8 text-center tracking-wide">
+            Login
+          </h2>
+          {/* Email Field */}
+          <div className="relative mb-6">
+            <input
+              type="email"
+              {...register("email")}
+              onFocus={() => handleFocus("email")}
+              onBlur={() => handleBlur("email")}
+              className={`
+                w-full px-4 pt-5 pb-2 bg-white text-gray-900 rounded-lg
+                focus:outline-none
+              `}
+              required
+            />
+            <label
+              className={`
+                absolute left-4 top-2 text-gray-400 pointer-events-none transition-all duration-300
+                ${
+                  focus.email || errors.email
+                    ? "text-[10px] -top-4 text-blue-600 px-1"
+                    : "text-xs"
+                }
+              `}
+            >
+              Email
+            </label>
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+          {/* Password Field */}
+          <div className="relative mb-8">
+            <input
+              type={showPassword ? "text" : "password"}
+              {...register("password")}
+              onFocus={() => handleFocus("password")}
+              onBlur={() => handleBlur("password")}
+              className={`
+                w-full px-4 pt-5 pb-2 bg-white text-gray-900 rounded-lg
+                focus:outline-none
+                pr-12
+              `}
+              required
+            />
+            <label
+              className={`
+                absolute left-4 top-2 text-gray-400 pointer-events-none transition-all duration-300
+                ${
+                  focus.password || errors.password
+                    ? "text-[10px] -top-4 text-blue-600 px-1"
+                    : "text-xs"
+                }
+              `}
+            >
+              Password
+            </label>
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-600 focus:outline-none"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <Eye className="h-5 w-5" />
+              ) : (
+                <EyeOff className="h-5 w-5" />
+              )}
+            </button>
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
+          <button
+            type="submit"
+            disabled={isPending || isSubmitting}
+            className={`
+              w-full py-3 rounded-lg font-semibold text-lg text-white
+              bg-blue-600 hover:bg-blue-500 active:bg-blue-700
+              shadow transition-all duration-200
+              focus:outline-none
+              ${
+                isPending || isSubmitting ? "opacity-60 cursor-not-allowed" : ""
+              }
+            `}
+          >
+            {isPending || isSubmitting ? (
+              <span className="flex items-center justify-center">
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-white"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  />
+                </svg>
+                Logging in...
+              </span>
+            ) : (
+              "Login"
+            )}
+          </button>
+        </form>
+      </div>
+      <style jsx global>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: none;
+          }
+        }
+        .animate-fade-in {
+          animation: fade-in 1s cubic-bezier(0.4, 0, 0.2, 1) both;
+        }
+      `}</style>
     </div>
-  )
-}
+  );
+};
+
+export default LoginForm;

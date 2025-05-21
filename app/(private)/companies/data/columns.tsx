@@ -10,43 +10,41 @@ import Link from "next/link"
 
 const allColumns: ColumnDef<any>[] = [
   {
+    id: "index",
+    header: () => <span className="text-center mx-auto">#</span>,
+    maxSize: 50,
+    cell: ({ row }) => <div className="text-center mx-auto">{row.index + 1}</div>,
+    enableSorting: false,
+    enableHiding: false,
+    enablePinning: false,
+  },
+  {
     id: "select",
-    maxSize: 45,
-    header: ({ table, column }) => {
-      return (
-        <div className="flex items-center">
-          <Checkbox
-            checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
-            aria-label="Select all"
-            className=""
-          />
-        </div>
-      )
-    },
-    cell: ({ row }) => (
-      <div className="flex items-center">
+    maxSize: 50,
+    header: ({ table }) => (
+      <div>
         <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={value => row.toggleSelected(!!value)}
-          aria-label="Select row"
-          className=""
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+          className="mx-auto"
         />
       </div>
     ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+        className="mx-auto"
+      />
+    ),
     enableSorting: false,
     enableHiding: false,
-  },
-  {
-    id: "index",
-    header: () => <div className="text-center w-full">#</div>,
-    maxSize: 45,
-    cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
-    enableSorting: false,
-    enableHiding: false,
+    enablePinning: false,
   },
   // {
   //   accessorKey: "logo",
@@ -92,9 +90,7 @@ const allColumns: ColumnDef<any>[] = [
     accessorKey: "company_description",
     minSize: 600, // Set the desired width for the description column in p
     header: () => (
-      <div className="text-left overflow-hidden w-[300px]  line-clamp-2">
-        Description
-      </div>
+      <div className="text-left overflow-hidden w-[300px]  line-clamp-2">Description</div>
     ),
     cell: ({ row, column }) => {
       const width = column.getSize()
@@ -104,7 +100,7 @@ const allColumns: ColumnDef<any>[] = [
           TriggerCell={<p>{row.getValue("company_description")}</p>}>
           {row.getValue("company_description")}
         </ExpandableCell>
-      )
+      );
     },
   },
   {
@@ -114,11 +110,9 @@ const allColumns: ColumnDef<any>[] = [
       return (
         <Link
           target="_blank"
-          href={
-            row.original.company_website !== null
-              ? row.original.company_website
-              : "/"
-          }>
+          href={row.original.company_website !== null ? row.original.company_website : "/"}
+          className="text-xs bg-blue-50 hover:bg-blue-500 border border-blue-200 rounded px-2 text-blue-600 hover:text-white transition-all inline-flex gap-1 items-center p-0.5 overflow-hidden"
+        >
           {row.original.company_website === null && "-"}
           {row.original.company_website !== null && (
             <Badge
@@ -129,7 +123,7 @@ const allColumns: ColumnDef<any>[] = [
             </Badge>
           )}
         </Link>
-      )
+      );
     },
   },
   // {
@@ -217,15 +211,15 @@ const allColumns: ColumnDef<any>[] = [
   //     </div>
   //   ),
   // },
-]
+];
 
 export function getColumnsForData(data: any[]): ColumnDef<any>[] {
-  if (!data || data.length === 0) return allColumns
-  const dataKeys = Object.keys(data[0])
+  if (!data || data.length === 0) return allColumns;
+  const dataKeys = Object.keys(data[0]);
   return allColumns.filter(
-    col =>
+    (col) =>
       col.id === "select" ||
       col.id === "index" ||
       ("accessorKey" in col && dataKeys.includes(col.accessorKey as string))
-  )
+  );
 }

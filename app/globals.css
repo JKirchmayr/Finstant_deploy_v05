@@ -193,6 +193,10 @@ body {
   animation: animloader 1s linear infinite alternate;
 }
 
+.inputStyle {
+  @apply bg-white border border-gray-300 rounded-sm px-2 py-1
+}
+
 @keyframes animloader {
   0% {
     box-shadow: -38px -12px, -14px 0, 14px 0, 38px 0;

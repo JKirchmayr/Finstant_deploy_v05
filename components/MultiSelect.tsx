@@ -7,14 +7,14 @@ import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui
 import { Command as CommandPrimitive } from "cmdk"
 import { cn } from "@/lib/utils"
 
-type Option = Record<"value" | "label", string>
+type Option = Record<"value" | "label", string>;
 
 interface MultiSelectProps {
-  title: string
-  options: Option[]
-  selectedOptions: Option[]
-  onSelectChange: (selected: Option[]) => void
-  placeholder: string
+  title?: string;
+  options: Option[];
+  selectedOptions: Option[];
+  onSelectChange: (selected: Option[]) => void;
+  placeholder: string;
 }
 
 export function MultiSelect({
@@ -34,22 +34,22 @@ export function MultiSelect({
 
   const handleUnselect = React.useCallback(
     (option: Option) => {
-      onSelectChange(selectedOptions.filter((s) => s.value !== option.value))
+      onSelectChange(selectedOptions.filter((s) => s.value !== option.value));
     },
     [selectedOptions, onSelectChange]
-  )
+  );
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      const input = inputRef.current
+      const input = inputRef.current;
       if (input) {
         if (e.key === "Delete" || e.key === "Backspace") {
           if (input.value === "") {
-            onSelectChange(selectedOptions.slice(0, -1))
+            onSelectChange(selectedOptions.slice(0, -1));
           }
         }
         if (e.key === "Escape") {
-          input.blur()
+          input.blur();
         }
       }
     },
@@ -114,10 +114,10 @@ export function MultiSelect({
   const sortedSelectedOptions = [...selectedOptions].sort((a, b) =>
     a.label.toLowerCase().localeCompare(b.label.toLowerCase())
   )
-
+      
   return (
     <div className="flex flex-col gap-2">
-      <label className="flex items-center gap-1 text-[13px]">{title}</label>
+      {title && <label className="flex items-center gap-1 text-[13px]">{title}</label>}
       <Command onKeyDown={handleKeyDown} className="overflow-visible outline-none">
         <div className="group rounded-sm border border-gray-300 px-2 py-[5px] text-xs">
           <CommandPrimitive.Input
@@ -127,7 +127,7 @@ export function MultiSelect({
             onBlur={handleInputBlur}
             onFocus={handleInputFocus}
             placeholder={placeholder}
-            className="flex-1 bg-transparent outline-none placeholder:text-gray-400"
+            className="flex-1 outline-none bg-white placeholder:text-gray-400"
           />
         </div>
         <div className="relative bg-transparent">
@@ -202,5 +202,5 @@ export function MultiSelect({
         ))}
       </div>
     </div>
-  )
+  );
 }
