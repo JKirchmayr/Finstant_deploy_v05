@@ -1,28 +1,19 @@
 // import CompanySheet from "@/components/CompanySheet"
 // import CompanySheet from "@/components/CompanySheet"
-import { ExpandableCell } from "@/components/table/epandable-cell"
-import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
-import { ColumnDef } from "@tanstack/react-table"
-import { ExternalLink } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
+import { ExpandableCell } from "@/components/table/epandable-cell";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ColumnDef } from "@tanstack/react-table";
+import { ExternalLink } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 const allColumns: ColumnDef<any>[] = [
   {
-    id: "index",
-    header: () => <span className="text-center mx-auto">#</span>,
-    maxSize: 50,
-    cell: ({ row }) => <div className="text-center mx-auto">{row.index + 1}</div>,
-    enableSorting: false,
-    enableHiding: false,
-    enablePinning: false,
-  },
-  {
     id: "select",
-    maxSize: 50,
+    maxSize: 40,
     header: ({ table }) => (
-      <div>
+      <div className="flex justify-center">
         <Checkbox
           checked={
             table.getIsAllPageRowsSelected() ||
@@ -30,7 +21,6 @@ const allColumns: ColumnDef<any>[] = [
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
-          className="mx-auto"
         />
       </div>
     ),
@@ -39,8 +29,18 @@ const allColumns: ColumnDef<any>[] = [
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
-        className="mx-auto"
       />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+    enablePinning: false,
+  },
+  {
+    id: "index",
+    header: () => <span className="text-center mx-auto">#</span>,
+    maxSize: 40,
+    cell: ({ row }) => (
+      <div className="text-center mx-auto">{row.index + 1}</div>
     ),
     enableSorting: false,
     enableHiding: false,
@@ -67,7 +67,7 @@ const allColumns: ColumnDef<any>[] = [
     accessorKey: "company_name",
     minSize: 260,
     header: ({ column }) => {
-      return <div className="text-left ">Company Name</div>
+      return <div className="text-left ">Company Name</div>;
     },
     cell: ({ row }) => {
       return (
@@ -82,7 +82,7 @@ const allColumns: ColumnDef<any>[] = [
           />
           {row.getValue("company_name") || "-"}
         </div>
-      )
+      );
     },
     enablePinning: true,
   },
@@ -90,14 +90,17 @@ const allColumns: ColumnDef<any>[] = [
     accessorKey: "company_description",
     minSize: 600, // Set the desired width for the description column in p
     header: () => (
-      <div className="text-left overflow-hidden w-[300px]  line-clamp-2">Description</div>
+      <div className="text-left overflow-hidden w-[300px]  line-clamp-2">
+        Description
+      </div>
     ),
     cell: ({ row, column }) => {
-      const width = column.getSize()
+      const width = column.getSize();
       return (
         <ExpandableCell
           className={`w-${width}px`}
-          TriggerCell={<p>{row.getValue("company_description")}</p>}>
+          TriggerCell={<p>{row.getValue("company_description")}</p>}
+        >
           {row.getValue("company_description")}
         </ExpandableCell>
       );
@@ -110,14 +113,18 @@ const allColumns: ColumnDef<any>[] = [
       return (
         <Link
           target="_blank"
-          href={row.original.company_website !== null ? row.original.company_website : "/"}
-          className="text-xs bg-blue-50 hover:bg-blue-500 border border-blue-200 rounded px-2 text-blue-600 hover:text-white transition-all inline-flex gap-1 items-center p-0.5 overflow-hidden"
+          href={
+            row.original.company_website !== null
+              ? row.original.company_website
+              : "/"
+          }
         >
           {row.original.company_website === null && "-"}
           {row.original.company_website !== null && (
             <Badge
               className="bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-500 hover:text-white transition-all "
-              variant="outline">
+              variant="outline"
+            >
               visit site
               <ExternalLink size={12} className="size-3 ml-1 mt-.5" />
             </Badge>

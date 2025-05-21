@@ -38,11 +38,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Skeleton } from "@/components/ui/skeleton"
-import { DataTablePagination } from "./Pagination"
-import { ExportOptions } from "./export-options"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
+import { DataTablePagination } from "./Pagination";
+import { ExportOptions } from "./export-options";
+import { cn } from "@/lib/utils";
 
 interface IPinnableDataTableProps<T extends any> {
   data: T[];
@@ -136,7 +136,8 @@ const PinnableDataTable = <T extends any>({
         headers
           .map((field) => {
             const val = row[field];
-            const escaped = typeof val === "string" ? `"${val.replace(/"/g, '""')}"` : val;
+            const escaped =
+              typeof val === "string" ? `"${val.replace(/"/g, '""')}"` : val;
             return escaped ?? "";
           })
           .join(",")
@@ -167,41 +168,53 @@ const PinnableDataTable = <T extends any>({
   };
 
   const handleExport = (format: "csv" | "excel") => {
-    const selectedRows = table.getSelectedRowModel().rows.map((row) => row.original);
+    const selectedRows = table
+      .getSelectedRowModel()
+      .rows.map((row) => row.original);
     const exportData = selectedRows.length ? selectedRows : data;
     const filename = `${selectedRows.length ? "selected" : "all"}-data.${
       format === "csv" ? "csv" : "xlsx"
     }`;
 
-    format === "csv" ? exportToCSV(exportData, filename) : exportToExcel(exportData, filename);
+    format === "csv"
+      ? exportToCSV(exportData, filename)
+      : exportToExcel(exportData, filename);
   };
 
   return (
     <div className="w-full flex h-full flex-col gap-3">
       <div
         className={cn(
-          "flex flex-col md:flex-row md:items-center md:justify-between h-auto md:h-7 gap-2 w-full ",
+          "flex flex-col md:flex-row md:items-center md:justify-between h-auto md:h-7 gap-2 w-full",
           topbarClass
-        )}>
+        )}
+      >
         <div className="flex items-center gap-2 order-1 relative w-full md:w-auto ">
           <Search size={14} className="absolute text-gray-400 left-2" />
           <Input
             placeholder="Search"
-            value={(table.getColumn(filterBy)?.getFilterValue() as string) ?? ""}
-            onChange={(event) => table.getColumn(filterBy)?.setFilterValue(event.target.value)}
+            value={
+              (table.getColumn(filterBy)?.getFilterValue() as string) ?? ""
+            }
+            onChange={(event) =>
+              table.getColumn(filterBy)?.setFilterValue(event.target.value)
+            }
             className="pl-7 focus-visible:ring-0 bg-white border-gray-300"
           />
         </div>
         {data.length > 0 && (
           <div className="flex items-center gap-3 order-2 justify-between md:justify-start">
             <p className="text-gray-500 text-[13px]">
-              Showing <strong className="text-gray-700">{data.length}</strong> record
+              Showing <strong className="text-gray-700">{data.length}</strong>{" "}
+              record
               {data.length !== 1 && "s"}.
             </p>
             <ExportOptions
               data={
                 Object.keys(rowSelection).length > 0
-                  ? Object.keys(rowSelection).map((index) => data[Number(index)])
+                  ? Object.keys(rowSelection).map(
+                      (index) => data[Number(index)]
+                    )
                   : data
               }
               onExport={(format: "csv" | "excel") => handleExport(format)}
@@ -212,15 +225,16 @@ const PinnableDataTable = <T extends any>({
       <div className="flex flex-col w-full bg-white border overflow-auto">
         <Table
           className="!w-full bg-background [&_td]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b [&_thead]:border-b-0"
-          style={{ width: table.getTotalSize() }}>
+          style={{ width: table.getTotalSize() }}
+        >
           <TableHeader className="bg-white text-[13px] h-8 sticky top-0 z-10">
-            {table.getHeaderGroups().map(headerGroup => (
+            {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="bg-muted/50">
-                {headerGroup.headers.map(header => {
-                  const { column } = header
-                  const isPinned = column.getIsPinned()
+                {headerGroup.headers.map((header) => {
+                  const { column } = header;
+                  const isPinned = column.getIsPinned();
                   const isLastLeftPinned =
-                    isPinned === "left" && column.getIsLastColumn("left")
+                    isPinned === "left" && column.getIsLastColumn("left");
                   const isFirstRightPinned =
                     isPinned === "right" && column.getIsFirstColumn("right");
 
@@ -232,14 +246,21 @@ const PinnableDataTable = <T extends any>({
                       style={{ ...getPinningStyles(column) }}
                       data-pinned={isPinned || undefined}
                       data-last-col={
-                        isLastLeftPinned ? "left" : isFirstRightPinned ? "right" : undefined
+                        isLastLeftPinned
+                          ? "left"
+                          : isFirstRightPinned
+                          ? "right"
+                          : undefined
                       }
                     >
                       <div className="flex items-center justify-between gap-2">
                         <span className="truncate w-full flex">
                           {header.isPlaceholder
                             ? null
-                            : flexRender(header.column.columnDef.header, header.getContext())}
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
                         </span>
                         {!header.isPlaceholder &&
                           header.column.getCanPin() &&
@@ -253,9 +274,15 @@ const PinnableDataTable = <T extends any>({
                               aria-label={`Unpin ${
                                 header.column.columnDef.header as string
                               } column`}
-                              title={`Unpin ${header.column.columnDef.header as string} column`}
+                              title={`Unpin ${
+                                header.column.columnDef.header as string
+                              } column`}
                             >
-                              <PinOffIcon className="opacity-60" size={16} aria-hidden="true" />
+                              <PinOffIcon
+                                className="opacity-60"
+                                size={16}
+                                aria-hidden="true"
+                              />
                             </Button>
                           ) : (
                             <DropdownMenu>
@@ -279,7 +306,9 @@ const PinnableDataTable = <T extends any>({
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => header.column.pin("left")}>
+                                <DropdownMenuItem
+                                  onClick={() => header.column.pin("left")}
+                                >
                                   <ArrowLeftToLineIcon
                                     size={16}
                                     className="opacity-60"
@@ -287,7 +316,9 @@ const PinnableDataTable = <T extends any>({
                                   />
                                   Stick to left
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => header.column.pin("right")}>
+                                <DropdownMenuItem
+                                  onClick={() => header.column.pin("right")}
+                                >
                                   <ArrowRightToLineIcon
                                     size={16}
                                     className="opacity-60"
@@ -321,7 +352,10 @@ const PinnableDataTable = <T extends any>({
               [...Array(20)].map((_, i) => (
                 <TableRow key={i} className="border-b border-gray-300">
                   {[...Array(columns.length)].map((_, j) => (
-                    <TableCell key={j} className="py-4 min-h-[73px] border-r border-gray-300">
+                    <TableCell
+                      key={j}
+                      className="py-4 min-h-[73px] border-r border-gray-300"
+                    >
                       <Skeleton className="w-full h-4 bg-gray-100" />
                     </TableCell>
                   ))}
@@ -331,19 +365,23 @@ const PinnableDataTable = <T extends any>({
               <>
                 {table.getRowModel().rows.length ? (
                   table.getRowModel().rows.map((row, index) => {
-                    const isLastRow = index === table.getRowModel().rows.length - 5;
+                    const isLastRow =
+                      index === table.getRowModel().rows.length - 5;
                     return (
                       <TableRow
                         ref={isLastRow ? lastRowRef : null}
                         key={row.id}
-                        className="min-h-6 border-b transition-colors hover:bg-gray-100/80">
+                        className="min-h-6 border-b transition-colors hover:bg-gray-100/80"
+                      >
                         {row.getVisibleCells().map((cell: any) => {
                           const { column } = cell;
                           const isPinned = column.getIsPinned();
                           const isLastLeftPinned =
-                            isPinned === "left" && column.getIsLastColumn("left");
+                            isPinned === "left" &&
+                            column.getIsLastColumn("left");
                           const isFirstRightPinned =
-                            isPinned === "right" && column.getIsFirstColumn("right");
+                            isPinned === "right" &&
+                            column.getIsFirstColumn("right");
 
                           return (
                             <TableCell
@@ -352,10 +390,17 @@ const PinnableDataTable = <T extends any>({
                               style={{ ...getPinningStyles(column) }}
                               data-pinned={isPinned || undefined}
                               data-last-col={
-                                isLastLeftPinned ? "left" : isFirstRightPinned ? "right" : undefined
+                                isLastLeftPinned
+                                  ? "left"
+                                  : isFirstRightPinned
+                                  ? "right"
+                                  : undefined
                               }
                             >
-                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                              )}
                             </TableCell>
                           );
                         })}
@@ -364,7 +409,10 @@ const PinnableDataTable = <T extends any>({
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={columns.length} className="h-24 text-center">
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
                       No results.
                     </TableCell>
                   </TableRow>

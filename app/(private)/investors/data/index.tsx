@@ -50,7 +50,7 @@ const InvestorData = () => {
         hasMoreData={hasMoreData}
         loadMoreData={loadMoreData}
         filterBy="investor_name"
-        defaultPinnedColumns={["index", "select", "investor_name"]}
+        defaultPinnedColumns={["select", "index", "investor_name"]}
       />
     </div>
   );
