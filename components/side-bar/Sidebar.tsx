@@ -83,8 +83,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton
               tooltip="Lexicon AI"
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent py-2 gap-4"
-            >
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent py-2 gap-4">
               <div className="flex aspect-square size-8 text-2xl items-center justify-center">
                 <Image src={IMAGES.icon} alt="logo" width={32} height={32} />
               </div>
@@ -100,34 +99,39 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {data.projects.map((item) => (
+              {data.projects.map(item => (
                 <SidebarMenuItem
                   key={item.name}
                   className={cn(
-                    `flex items-center justify-center p-1 rounded-md border border-transparent cursor-pointer hover:bg-gray-100 hover:border-gray-200 transition-all ease-in-out`,
+                    `flex items-center justify-center px-1.5 py-0.5 rounded-md border border-transparent cursor-pointer hover:bg-gray-100 hover:border-gray-200 transition-all ease-in-out duration-300`,
                     {
-                      "border border-gray-300 bg-white": pathname === item.url,
+                      "border border-blue-700/30 bg-blue-50 hover:border-blue-700/40":
+                        pathname === item.url,
                     }
-                  )}
-                >
+                  )}>
                   <SidebarMenuButton
                     tooltip={item.name}
                     asChild
-                    className={cn(`p-0 flex items-center w-full hover:bg-transparent`, {
-                      "justify-center": isCollapsed,
-                      "px-2": !isCollapsed,
-                    })}
-                  >
+                    className={cn(
+                      `p-0 flex items-center w-full hover:bg-transparent`,
+                      {
+                        "justify-center": isCollapsed,
+                        "px-2": !isCollapsed,
+                      }
+                    )}>
                     <Link
                       href={item.url}
                       className={cn(`inline-flex`, {
-                        "text-blue-700 [&>svg]:scale-110": pathname === item.url,
-                      })}
-                    >
+                        "text-blue-700 [&>svg]:scale-110":
+                          pathname === item.url,
+                      })}>
                       <item.icon
-                        className={cn(`!size-5 transition-transform ease-in-out`, {
-                          "!size-5.5": pathname === item.url,
-                        })}
+                        className={cn(
+                          `!size-5 transition-transform ease-in-out`,
+                          {
+                            "!size-5.5": pathname === item.url,
+                          }
+                        )}
                       />
                       {!isCollapsed && <span>{item.name}</span>}
                     </Link>
@@ -141,35 +145,64 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupContent>
             <SidebarMenu>
               {isCollapsed && (
-                <SidebarMenuItem className="cursor-pointer">
+                <SidebarMenuItem
+                  className={`flex items-center justify-center px-1.5 py-0.5 rounded-md border border-transparent cursor-pointer hover:bg-gray-100 hover:border-gray-200 transition-all ease-in-out duration-300`}>
                   <SidebarMenuButton
                     tooltip="Expand"
                     asChild
-                    className="[&>svg]:scale-110 cursor-pointer"
-                  >
-                    <SidebarTrigger className="mx-auto ml-[2px]" />
+                    className={cn(
+                      `p-0 flex items-center w-full hover:bg-transparent `,
+                      {
+                        "justify-center p-0": isCollapsed,
+                      }
+                    )}>
+                    <SidebarTrigger className="" />
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )}
 
-              {data.footer.map((item) => (
-                <SidebarMenuItem key={item.name}>
-                  <SidebarMenuButton tooltip={item.name} asChild>
+              {data.footer.map(item => (
+                <SidebarMenuItem
+                  key={item.name}
+                  className={cn(
+                    `flex items-center justify-center px-1.5 py-0.5 rounded-md border border-transparent cursor-pointer hover:bg-gray-100 hover:border-gray-200 transition-all ease-in-out duration-300`,
+                    {
+                      "border border-blue-700/30 bg-blue-50 hover:border-blue-700/40":
+                        pathname === item.url,
+                    }
+                  )}>
+                  <SidebarMenuButton
+                    tooltip={item.name}
+                    asChild
+                    className={cn(
+                      `p-0 flex items-center w-full hover:bg-transparent`,
+                      {
+                        "justify-center": isCollapsed,
+                        "px-2": !isCollapsed,
+                      }
+                    )}>
                     <Link
                       href={item.url}
-                      className={cn({
-                        "text-blue-700 bg-gray-100 [&>svg]:scale-110": pathname === item.url,
-                      })}
-                    >
-                      <item.icon className="!size-5" />
-                      <span>{item.name}</span>
+                      className={cn(`inline-flex`, {
+                        "text-blue-700 [&>svg]:scale-105":
+                          pathname === item.url,
+                      })}>
+                      <item.icon
+                        className={cn(
+                          `!size-5 transition-transform ease-in-out`,
+                          {
+                            "!size-5.5": pathname === item.url,
+                          }
+                        )}
+                      />
+                      {!isCollapsed && <span>{item.name}</span>}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
 
-              <SidebarMenuItem>
-                <UserMenu />
+              <SidebarMenuItem className="">
+                <UserMenu isCollapsed={isCollapsed} />
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>

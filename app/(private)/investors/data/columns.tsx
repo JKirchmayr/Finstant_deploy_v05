@@ -1,10 +1,12 @@
 // import CompanySheet from "@/components/CompanySheet"
 // import CompanySheet from "@/components/CompanySheet"
-import { ExpandableCell } from "@/components/table/epandable-cell";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ColumnDef } from "@tanstack/react-table";
-import { ExternalLink } from "lucide-react";
-import Link from "next/link";
+import { ExpandableCell } from "@/components/table/epandable-cell"
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import { ColumnDef } from "@tanstack/react-table"
+import { ExternalLink } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
 
 const allColumns: ColumnDef<any>[] = [
   {
@@ -63,6 +65,21 @@ const allColumns: ColumnDef<any>[] = [
     accessorKey: "investor_name",
     minSize: 400,
     header: () => <div className="text-left min-w-[110px]">Investor Name</div>,
+    cell: ({ row }) => {
+      return (
+        <div className="inline-flex items-center">
+          <Image
+            src="https://placehold.co/50x50"
+            alt="logo"
+            width={20}
+            height={20}
+            className="mr-1.5 rounded"
+            unoptimized={true}
+          />
+          {row.getValue("investor_name") || "-"}
+        </div>
+      )
+    },
   },
   // {
   //   accessorKey: "company_description",
@@ -95,10 +112,12 @@ const allColumns: ColumnDef<any>[] = [
         >
           {row.original.investor_website === null && "-"}
           {row.original.investor_website !== null && (
-            <div className="flex space-x-1">
-              visit
+            <Badge
+              className="bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-500 hover:text-white transition-all "
+              variant="outline">
+              visit site
               <ExternalLink size={12} className="size-3 ml-1" />
-            </div>
+            </Badge>
           )}
         </Link>
       );

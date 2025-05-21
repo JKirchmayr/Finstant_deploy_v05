@@ -16,6 +16,7 @@ import Image from "next/image"
 import { useTabPanelStore } from "@/store/tabStore"
 import CompaniesData from "./companies-table"
 import TextareaAutosize from "react-textarea-autosize"
+import InvestorsResponseData from "./investors-table"
 
 type Company = {
   company_name: string
@@ -26,9 +27,6 @@ type Company = {
 const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL! || ""
 
 const Chat = () => {
-  const { setResponse, addCompany, setCompanies, companies, resetStore, clearPlaceholders } =
-    useWSStore()
-
   const userId = "aa227293-c91c-4b03-91db-0d2048ee73e7"
   const socketUrl = `wss://ai-agents-backend-zwa0.onrender.com/chat`
 
@@ -43,7 +41,8 @@ const Chat = () => {
   const lastPromptRef = useRef<string | null>(null)
   const hasSentPromptRef = useRef<boolean>(false)
   const bottomRef = useRef<undefined>(undefined)
-  const { addTab } = useTabPanelStore()
+  const { addTab, appendData, closeTabByID, tabList, setActiveTabId } =
+    useTabPanelStore()
 
   const endRef = useRef<HTMLDivElement>(null)
 
@@ -101,20 +100,28 @@ const Chat = () => {
 
       const decoder = new TextDecoder()
       let accumulatedJSONChunks: any[] = []
+      const initID = `tab-${new Date().getTime()}`
 
       while (true) {
-        console.log("%cStarted reading stream!", "color: green; font-weight: bold")
+        console.log(
+          "%cStarted reading stream!",
+          "color: green; font-weight: bold"
+        )
         const { done, value } = await reader.read()
 
         if (done) {
           setIsStreaming(false)
-          console.log("%cFinished reading stream!", "color: red; font-weight: bold")
+          console.log(
+            "%cFinished reading stream!",
+            "color: red; font-weight: bold"
+          )
           break
         }
 
         const rawChunk = decoder.decode(value, { stream: true })
         const events = rawChunk.split("\n\n")
         let companiesData = []
+        let investorsData = []
 
         for (const event of events) {
           if (!event.trim()) continue
@@ -126,6 +133,32 @@ const Chat = () => {
               const parsed = JSON.parse(cleaned)
               accumulatedJSONChunks.push(parsed)
 
+              if (parsed?.type === "meta") {
+                // ------------For company data-----------
+                // const cPlaceholders: any = Array.from({
+                //   length: 10,
+                // }).map((_, i) => ({
+                //   company_id: `placeholder-${i}`,
+                //   company_name: "Generating...",
+                //   company_description: "Analyzing semantic vectors...",
+                //   similarity_score: "generating...",
+                // }))
+                // console.log(initID, "initID")
+                // addTab(initID, "Loading", "companies", cPlaceholders)
+
+                // ---------For investor data------------------
+                const iPlaceholders: any = Array.from({
+                  length: 10,
+                }).map((_, i) => ({
+                  investor_id: `placeholder-${i}`,
+                  investor_name: "Generating...",
+                  investor_description: "Analyzing semantic vectors...",
+                  similarity_score: "generating...",
+                }))
+                // console.log(initID, "initID")
+                addTab(initID, "Generating", "investors", iPlaceholders)
+              }
+
               if (parsed?.type === "response") {
                 const responseText = parsed?.data?.text
                 if (responseText) {
@@ -133,58 +166,63 @@ const Chat = () => {
                     role: "assistant",
                     content: responseText,
                   })
-                  // Scroll after appending assistant message
                   scrollToBottom()
                 }
-                const placeholders: WSCompany[] = Array.from({
-                  length: 10,
-                }).map((_, i) => ({
-                  company_id: `placeholder-${i}`,
-                  company_name: "Generating company...",
-                  company_description: "Analyzing semantic vectors...",
-                  similarity_score: "generating...",
-                }))
-                setCompanies(placeholders)
               }
 
               if (parsed?.type === "company") {
                 const companyData = parsed?.data
                 if (companyData) {
-                  const company = {
+                  const company: any = {
                     company_id: companyData.company_id,
                     company_name: companyData.company_name,
                     company_description: companyData.company_description,
                     similarity_score: companyData.similarity_score,
                   }
-                  companiesData.push(company)
-                  // Scroll after adding company
+                  appendData(initID, company)
+                  scrollToBottom()
+                }
+              }
+              if (parsed?.type === "investor") {
+                const investorData = parsed?.data
+                if (investorData) {
+                  const investor = {
+                    investor_id:
+                      investorData.investor_id || investorData.investor_name,
+                    investor_name: investorData.investor_name || "-",
+                    investor_description:
+                      investorData.investor_description || "-",
+                    similarity_score: investorData.similarity_score || "-",
+                  }
+                  appendData(initID, investor)
                   scrollToBottom()
                 }
               }
 
               if (parsed?.type === "done") {
-                if (companiesData && companiesData.length > 0) {
-                  addTab(
-                    `companies-tab${new Date().getTime()}`,
-                    "Companies",
-                    <CompaniesData companies={companiesData} />
+                if (
+                  !parsed.data?.companies?.length &&
+                  !parsed.data?.investors?.length
+                ) {
+                  console.log("no dattttttttttta")
+                  closeTabByID(initID)
+                  setActiveTabId(
+                    tabList.length ? tabList[tabList.length - 1].tabId : ""
                   )
                 }
-                console.log("companiesData", companiesData)
-
                 setIsStreaming(false)
-                clearPlaceholders()
                 // Final scroll to bottom
                 scrollToBottom()
               }
             } catch (err) {
+              // closeTabByID(initID)
               console.error("Error parsing cleaned chunk:", err, cleaned)
             }
           }
         }
       }
 
-      // console.log("Full JSON chunks received:", accumulatedJSONChunks)
+      console.log("Full JSON chunks received:", accumulatedJSONChunks)
     } catch (error) {
       append({
         role: "assistant",
@@ -203,8 +241,7 @@ const Chat = () => {
           {
             "grid-rows-[1fr_100px]": messages.length,
           }
-        )}
-      >
+        )}>
         <div className={cn("overflow-y-auto px-4 pt-4 m space-y-4 noscroll")}>
           {messages.map((m, i) => {
             const isUser = m.role === "user"
@@ -216,15 +253,17 @@ const Chat = () => {
                 className={cn("flex", {
                   "justify-end": isUser,
                   "justify-start": isAssistant,
-                })}
-              >
+                })}>
                 <div
-                  className={cn("max-w-full text-sm leading-relaxed px-3 py-1 rounded-md", {
-                    "ml-auto text-gray-700 border border-gray-200 rounded-full bg-white [font_weight:400]":
-                      isUser,
-                    "text-gray-800 mr-auto border-none rounded-md": isAssistant,
-                  })}
-                >
+                  className={cn(
+                    "max-w-full text-sm leading-relaxed px-3 py-1 rounded-md",
+                    {
+                      "ml-auto text-gray-700 border border-gray-200 rounded-full bg-white [font_weight:400]":
+                        isUser,
+                      "text-gray-800 mr-auto border-none rounded-md":
+                        isAssistant,
+                    }
+                  )}>
                   <Markdown>{m.content}</Markdown>
                 </div>
               </div>
@@ -245,15 +284,17 @@ const Chat = () => {
               <button className="underline text-blue-500 ml-2">Retry</button>
             </div>
           )}
-          <div className={cn("h-5 opacity-0", { "h-10": messages.length > 1 })} ref={endRef} />
+          <div
+            className={cn("h-5 opacity-0", { "h-10": messages.length > 1 })}
+            ref={endRef}
+          />
         </div>
         <div
           className={cn("flex justify-center items-center")}
           style={{
             // height: messages.length > 0 ? 100 : 0,
             transition: "all 0.3s",
-          }}
-        >
+          }}>
           <PromptField
             handleSend={handleSend}
             input={input}
@@ -313,8 +354,7 @@ const PromptField = ({
       className={cn("h-[300px] w-full px-2 ", {
         "h-[200px]": messages.length > 0,
       })}
-      style={{ transition: "all 0.3s" }}
-    >
+      style={{ transition: "all 0.3s" }}>
       {!messages.length && (
         <div className="flex justify-center items-center mb-3">
           <h1 className="font-heading text-pretty text-center text-[20px] font-semibold tracking-tighter text-gray-900 sm:text-[32px] md:text-[46px]">
@@ -325,16 +365,16 @@ const PromptField = ({
 
       <form
         onSubmit={internalHandleSend}
-        className="focus-within:border-gray-300 bg-white border-gray-300 relative rounded-xl border shadow-[0_2px_2px_rgba(0,0,0,0.04),0_8px_8px_-8px_rgba(0,0,0,0.04)] transition-shadow"
-      >
+        className="focus-within:border-gray-300 bg-white border-gray-300 relative rounded-xl border shadow-[0_2px_2px_rgba(0,0,0,0.08),0_8px_8px_-8px_rgba(0,0,0,0.08),0_0_8px_rgba(128,128,128,0.2)] transition-shadow">
         <div className="@container/textarea bg-white relative z-10 grid min-h-[100px] rounded-xl overflow-hidden">
           <TextareaAutosize
             ref={textareaRef}
             value={input}
             onChange={handleInputChange}
+            autoFocus
             minRows={1}
             maxRows={2}
-            onKeyDown={(e) => {
+            onKeyDown={e => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault()
                 internalHandleSend(e)
@@ -352,11 +392,10 @@ const PromptField = ({
           <div className="flex items-center gap-2 pb-3 px-3">
             <div className="ml-auto flex items-center gap-1">
               <button
-                className="focus-visible:ring-offset-background inline-flex shrink-0 cursor-pointer select-none items-center justify-center gap-1.5 whitespace-nowrap text-nowrap border font-medium outline-none ring-blue-600 transition-[background,border-color,color,transform,opacity,box-shadow] focus-visible:ring-2 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 disabled:ring-0 has-[:focus-visible]:ring-2 aria-disabled:cursor-not-allowed aria-disabled:bg-gray-100 aria-disabled:text-gray-400 aria-disabled:ring-0 [&>svg]:pointer-events-none [&>svg]:size-4 [&_svg]:shrink-0 disabled:border-alpha-400 text-background aria-disabled:border-alpha-400 bg-gray-900  hover:bg-gray-700 focus:border-gray-700 focus:bg-gray-700 focus-visible:border-gray-700 focus-visible:bg-gray-700 px-3 text-sm has-[>kbd]:gap-2 has-[>svg]:px-2 has-[>kbd]:pr-[6px] ml-1 size-7 rounded-md"
+                className=" inline-flex shrink-0 cursor-pointer select-none items-center justify-center gap-1.5 whitespace-nowrap text-nowrap border-none font-medium outline-none transition-all disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400  [&>svg]:pointer-events-none [&>svg]:size-4 [&_svg]:shrink-0  text-background bg-foreground hover:bg-gray-700 px-3 text-sm has-[>kbd]:gap-2 has-[>svg]:px-2 has-[>kbd]:pr-[6px] ml-1 size-7 rounded-md"
                 type="submit"
                 disabled={isLoading || !input.trim().length}
-                onClick={internalHandleSend}
-              >
+                onClick={internalHandleSend}>
                 {isLoading ? (
                   <Loader2 className="animate-spin w-5 h-5 text-black" />
                 ) : (
@@ -373,16 +412,17 @@ const PromptField = ({
           {[
             "Show me AI companies in Germany",
             "List biotech startups in the US",
-            "Companies working on climate change",
+            "Top 10 investors in the tech industry",
             "Indian healthtech companies",
             "Fintech companies with recent funding",
             "German deep tech startups",
-          ].map((suggestion) => (
+          ].map(suggestion => (
             <button
               key={suggestion}
-              onClick={() => handleInputChange({ target: { value: suggestion } })}
-              className="text-[13px] text-foreground/80 hover:text-foreground bg-white hover:bg-gray-100 px-3 py-1.5 rounded-md border border-gray-200 hover:border-gray-300 transition cursor-pointer"
-            >
+              onClick={() =>
+                handleInputChange({ target: { value: suggestion } })
+              }
+              className="text-[13px] text-foreground/80 hover:text-foreground bg-white hover:bg-gray-100 px-3 py-1.5 rounded-md border border-gray-200 hover:border-gray-300 transition cursor-pointer">
               {suggestion}
             </button>
           ))}

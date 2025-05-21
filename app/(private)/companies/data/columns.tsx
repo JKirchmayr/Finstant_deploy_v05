@@ -1,10 +1,12 @@
 // import CompanySheet from "@/components/CompanySheet"
 // import CompanySheet from "@/components/CompanySheet"
-import { ExpandableCell } from "@/components/table/epandable-cell";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ColumnDef } from "@tanstack/react-table";
-import { ExternalLink } from "lucide-react";
-import Link from "next/link";
+import { ExpandableCell } from "@/components/table/epandable-cell"
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import { ColumnDef } from "@tanstack/react-table"
+import { ExternalLink } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
 
 const allColumns: ColumnDef<any>[] = [
   {
@@ -64,7 +66,25 @@ const allColumns: ColumnDef<any>[] = [
   {
     accessorKey: "company_name",
     minSize: 260,
-    header: () => <div className="text-left min-w-[110px]">Company Name</div>,
+    header: ({ column }) => {
+      return <div className="text-left ">Company Name</div>
+    },
+    cell: ({ row }) => {
+      return (
+        <div className="inline-flex items-center">
+          <Image
+            src="https://placehold.co/50x50"
+            alt="logo"
+            width={20}
+            height={20}
+            className="mr-1.5 rounded"
+            unoptimized={true}
+          />
+          {row.getValue("company_name") || "-"}
+        </div>
+      )
+    },
+    enablePinning: true,
   },
   {
     accessorKey: "company_description",
@@ -72,12 +92,12 @@ const allColumns: ColumnDef<any>[] = [
     header: () => (
       <div className="text-left overflow-hidden w-[300px]  line-clamp-2">Description</div>
     ),
-    cell: ({ row }) => {
+    cell: ({ row, column }) => {
+      const width = column.getSize()
       return (
         <ExpandableCell
-          className="w-[600px]"
-          TriggerCell={<p>{row.getValue("company_description")}</p>}
-        >
+          className={`w-${width}px`}
+          TriggerCell={<p>{row.getValue("company_description")}</p>}>
           {row.getValue("company_description")}
         </ExpandableCell>
       );
@@ -95,10 +115,12 @@ const allColumns: ColumnDef<any>[] = [
         >
           {row.original.company_website === null && "-"}
           {row.original.company_website !== null && (
-            <div className="flex space-x-1">
-              visit
-              <ExternalLink size={12} className="size-3 ml-1" />
-            </div>
+            <Badge
+              className="bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-500 hover:text-white transition-all "
+              variant="outline">
+              visit site
+              <ExternalLink size={12} className="size-3 ml-1 mt-.5" />
+            </Badge>
           )}
         </Link>
       );

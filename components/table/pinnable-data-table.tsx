@@ -19,6 +19,7 @@ import {
   ArrowLeftToLineIcon,
   ArrowRightToLineIcon,
   EllipsisIcon,
+  PinIcon,
   PinOffIcon,
   Search,
 } from "lucide-react";
@@ -37,10 +38,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
-import { DataTablePagination } from "./Pagination";
-import { ExportOptions } from "./export-options";
+} from "@/components/ui/table"
+import { Skeleton } from "@/components/ui/skeleton"
+import { DataTablePagination } from "./Pagination"
+import { ExportOptions } from "./export-options"
+import { cn } from "@/lib/utils"
 
 interface IPinnableDataTableProps<T extends any> {
   data: T[];
@@ -51,6 +53,7 @@ interface IPinnableDataTableProps<T extends any> {
   paginationOption?: boolean;
   filterBy?: string;
   defaultPinnedColumns?: string[];
+  topbarClass?: string;
 }
 
 // Helper function to compute pinning styles for columns
@@ -72,6 +75,7 @@ const PinnableDataTable = <T extends any>({
   loadMoreData,
   hasMoreData,
   paginationOption = true,
+  topbarClass,
   filterBy = "name",
   defaultPinnedColumns = [],
 }: IPinnableDataTableProps<T>) => {
@@ -174,8 +178,12 @@ const PinnableDataTable = <T extends any>({
 
   return (
     <div className="w-full flex h-full flex-col gap-3">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between h-auto md:h-7 gap-2 w-full">
-        <div className="flex items-center gap-2 order-1 relative w-full md:w-auto">
+      <div
+        className={cn(
+          "flex flex-col md:flex-row md:items-center md:justify-between h-auto md:h-7 gap-2 w-full ",
+          topbarClass
+        )}>
+        <div className="flex items-center gap-2 order-1 relative w-full md:w-auto ">
           <Search size={14} className="absolute text-gray-400 left-2" />
           <Input
             placeholder="Search"
@@ -201,25 +209,25 @@ const PinnableDataTable = <T extends any>({
           </div>
         )}
       </div>
-      <div className="flex-1 flex flex-col w-full bg-white border-l border-b border-r border-gray-200 overflow-auto">
+      <div className="flex flex-col w-full bg-white border overflow-auto">
         <Table
-          className="!w-full [&_td]:border-border [&_th]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_th]:border-b [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b"
-          style={{ width: table.getTotalSize() }}
-        >
-          <TableHeader className="bg-white text-xs font-medium h-8 sticky top-0 z-10">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="shadow-sm bg-muted/50">
-                {headerGroup.headers.map((header) => {
-                  const { column } = header;
-                  const isPinned = column.getIsPinned();
-                  const isLastLeftPinned = isPinned === "left" && column.getIsLastColumn("left");
+          className="!w-full bg-background [&_td]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b [&_thead]:border-b-0"
+          style={{ width: table.getTotalSize() }}>
+          <TableHeader className="bg-white text-[13px] h-8 sticky top-0 z-10">
+            {table.getHeaderGroups().map(headerGroup => (
+              <TableRow key={headerGroup.id} className="bg-muted/50">
+                {headerGroup.headers.map(header => {
+                  const { column } = header
+                  const isPinned = column.getIsPinned()
+                  const isLastLeftPinned =
+                    isPinned === "left" && column.getIsLastColumn("left")
                   const isFirstRightPinned =
                     isPinned === "right" && column.getIsFirstColumn("right");
 
                   return (
                     <TableHead
                       key={header.id}
-                      className="[&[data-pinned][data-last-col]]:border-border data-pinned:bg-muted/90 relative h-10 truncate border-t data-pinned:backdrop-blur-xs [&:not([data-pinned]):has(+[data-pinned])_div.cursor-col-resize:last-child]:opacity-0 [&[data-last-col=left]_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right]:last-child_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=right][data-last-col=right]]:border-l"
+                      className="text-foreground/70 group [&[data-pinned][data-last-col]]:border-border border-b data-pinned:bg-muted/90 relative h-10 truncate data-pinned:backdrop-blur-xs [&:not([data-pinned]):has(+[data-pinned])_div.cursor-col-resize:last-child]:opacity-0 [&[data-last-col=left]_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right]:last-child_div.cursor-col-resize:last-child]:opacity-0 [&[data-pinned=right][data-last-col=right]]:border-l-0"
                       colSpan={header.colSpan}
                       style={{ ...getPinningStyles(column) }}
                       data-pinned={isPinned || undefined}
@@ -240,7 +248,7 @@ const PinnableDataTable = <T extends any>({
                             <Button
                               size="icon"
                               variant="ghost"
-                              className="-mr-1 size-7 shadow-none"
+                              className="-mr-1 size-5 shadow-none group-hover:opacity-60 opacity-0 hover:opacity-100"
                               onClick={() => header.column.pin(false)}
                               aria-label={`Unpin ${
                                 header.column.columnDef.header as string
@@ -308,7 +316,7 @@ const PinnableDataTable = <T extends any>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className="text-gray-600 max-h-[400px] overflow-auto">
+          <TableBody className=" max-h-[400px] overflow-auto">
             {isLoading && !data.length ? (
               [...Array(20)].map((_, i) => (
                 <TableRow key={i} className="border-b border-gray-300">
@@ -328,8 +336,7 @@ const PinnableDataTable = <T extends any>({
                       <TableRow
                         ref={isLastRow ? lastRowRef : null}
                         key={row.id}
-                        className="min-h-6 border-b transition-colors odd:bg-[#fbfbfb] hover:bg-gray-100/50"
-                      >
+                        className="min-h-6 border-b transition-colors hover:bg-gray-100/80">
                         {row.getVisibleCells().map((cell: any) => {
                           const { column } = cell;
                           const isPinned = column.getIsPinned();

@@ -1,85 +1,162 @@
-import { cn } from "@/lib/utils"
+"use client"
+
+import { useState, useRef, useEffect } from "react"
+import {
+  Building2,
+  CircleDollarSignIcon,
+  Moon,
+  Sun,
+  X,
+  UserCircle2Icon,
+  FactoryIcon,
+} from "lucide-react"
 import { useTabPanelStore } from "@/store/tabStore"
-import { X } from "lucide-react"
-import React, { useEffect } from "react"
 import { useChatLayoutStore } from "@/store/chatLayout"
-import ListBuilder from "@/components/ListBuilder"
+import { cn } from "@/lib/utils"
+
+import { Badge } from "@/components/ui/badge"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import CompanyProfile from "@/components/CompanyProfile"
+import InvestorProfile from "@/components/InvestorProfile"
 import CompaniesData from "./companies-table"
+import InvestorsResponseData from "./investors-table"
+import Image from "next/image"
 
-export const TabPanel = () => {
-  const { addTab, closeTab, tabList, activeTabId, setActiveTabId } = useTabPanelStore()
+interface TabData {
+  tabId: string
+  type: string
+  data: any
+}
+
+const renderTabContent = (activeTab: TabData | undefined) => {
+  if (!activeTab) return null
+
+  switch (activeTab.type) {
+    case "companies":
+      return <CompaniesData companies={activeTab.data} />
+    case "investors":
+      return <InvestorsResponseData investors={activeTab.data} />
+    case "investor-profile":
+      return <InvestorProfile data={activeTab.data} />
+    case "company-profile":
+      return <CompanyProfile data={activeTab.data} />
+    default:
+      return null
+  }
+}
+
+export function TabPanel() {
+  const { closeTab, tabList, activeTabId, setActiveTabId } = useTabPanelStore()
   const { layout, setLayout } = useChatLayoutStore()
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
-  // Adding tabs when layout becomes "list"
-  // useEffect(() => {
-  //   if (tabList.length > 0) {
-  //     addTab("company-list", "Company List", <CompaniesData />)
-  //   }
-  // }, [tabList])
-
-  // Set first tab as active when tabs change
   useEffect(() => {
     if (tabList.length > 0 && !activeTabId) {
       setActiveTabId(tabList[0].tabId)
     }
   }, [tabList])
 
-  const closeTabPanel = (tabId: string) => {
-    const currentIndex = tabList.findIndex((tab) => tab.tabId === tabId)
+  useEffect(() => {
+    if (activeTabId && tabRefs.current) {
+      const activeTabElement = tabRefs.current[activeTabId]
+      if (activeTabElement) {
+        activeTabElement.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "center",
+        })
+      }
+    }
+  }, [activeTabId, tabList])
+
+  const handleTabClick = (id: string) => {
+    setActiveTabId(id)
+  }
+
+  const closeTabPanel = (id: number) => {
+    const currentIndex = tabList.findIndex(tab => tab.id === id)
     if (currentIndex === -1) return
 
-    // Close tab
-    closeTab(tabId)
+    closeTab(id)
 
-    const newTabList = tabList.filter((tab) => tab.tabId !== tabId)
+    const newTabList = tabList.filter(tab => tab.id !== id)
 
     if (newTabList.length > 0) {
       const newActiveTab =
-        currentIndex > 0
-          ? newTabList[currentIndex - 1] // Move to previous
-          : newTabList[0] // Or first tab
+        currentIndex > 0 ? newTabList[currentIndex - 1] : newTabList[0]
       setActiveTabId(newActiveTab.tabId)
     } else {
-      setLayout("chat") // No tabs left
+      setLayout("chat")
     }
   }
 
-  console.log(tabList, activeTabId, "act")
-
   return (
-    <div className="flex-1 flex flex-col h-full w-full">
-      <div className="bg-gray-100 p-1 pb-0 h-10 flex gap-2 border border-gray-200">
-        {tabList.map((tab) => (
-          <div
-            key={tab.id} // 👈 using numeric id now
-            onClick={() => setActiveTabId(tab.tabId)}
-            className={cn(
-              "flex font-medium border-l border-t border-r border-gray-200   justify-between items-center cursor-pointer select-none min-w-[100px] max-w-[150px] px-2 py-1 mb-1 rounded-md bg-gray-100 hover:bg-gray-200",
-              "transition-all duration-150 group",
-              {
-                "bg-white pb-2 mb-0 rounded-t-md rounded-b-none hover:bg-gray-100":
-                  activeTabId === tab.tabId,
-              }
-            )}
-          >
-            <span className="truncate max-w-[120px]">{tab.tabTitle}</span>
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                closeTabPanel(tab.tabId)
-              }}
-              className="ml-2 p-1 cursor-pointer rounded-full opacity-60 hover:opacity-100 hover:bg-gray-300"
-              aria-label={`Close ${tab.tabTitle}`}
-            >
-              <X size={14} />
-            </button>
-          </div>
-        ))}
-      </div>
+    <Tabs
+      value={activeTabId}
+      onValueChange={id => {
+        handleTabClick(id)
+      }}
+      className="space-x-4 mt-2 h-full flex flex-col">
+      <ScrollArea className="m-0">
+        <TabsList className="before:bg-border justify-start  relative h-auto w-full gap-0.5 bg-transparent p-0 before:absolute before:inset-x-0 before:bottom-0 before:h-px">
+          {tabList.map(tab => {
+            return (
+              <TabsTrigger
+                className="bg-muted group [&:first-child]:ml-1.5 cursor-pointer overflow-hidden max-w-40 border-gray-200 border-b-0 rounded-b-none border-x border-t py-2 text-muted-foreground/80 data-[state=active]:text-foreground hover:text-foreground/75 data-[state=active]:z-10 data-[state=active]:shadow-none"
+                value={tab.tabId}
+                key={tab.tabId}
+                ref={el => {
+                  if (tabRefs.current) {
+                    tabRefs.current[tab.tabId] = el
+                  }
+                }}
+                onClick={() => setActiveTabId(tab.tabId)}>
+                {/* Icons with spacing */}
+                {tab.type === "companies" && (
+                  <Building2 className="-ms-0.5 me-1.5 opacity-60" size={16} />
+                )}
+                {tab.type === "investors" && (
+                  <CircleDollarSignIcon
+                    className="-ms-0.5 me-1.5 opacity-60"
+                    size={16}
+                  />
+                )}
+                {tab.type === "investor-profile" && (
+                  <UserCircle2Icon
+                    className="-ms-0.5 me-1.5 opacity-60"
+                    size={16}
+                  />
+                )}
+                {tab.type === "company-profile" && (
+                  <FactoryIcon
+                    className="-ms-0.5 me-1.5 opacity-60"
+                    size={16}
+                  />
+                )}
+                <span className="truncate">{tab.tabTitle}</span>
 
-      <div className="flex-1 overflow-hidden w-full">
-        {tabList.find((tab) => tab.tabId === activeTabId)?.tabComponent}
-      </div>
-    </div>
+                <Badge
+                  onClick={e => {
+                    e.stopPropagation()
+                    closeTabPanel(tab.id)
+                  }}
+                  variant="secondary"
+                  className="ms-1.5 bg-transparent size-4 p-0 opacity-0 transition-opacity group-hover:opacity-100 group-data-[state=active]:opacity-100">
+                  <X className="w-4 h-4" />
+                </Badge>
+              </TabsTrigger>
+            )
+          })}
+        </TabsList>
+        <ScrollBar orientation="horizontal" hidden />
+      </ScrollArea>
+
+      <TabsContent
+        value={activeTabId}
+        className="flex-1 h-full overflow-auto bg-white noscroll">
+        {renderTabContent(tabList.find(tab => tab.tabId === activeTabId))}
+      </TabsContent>
+    </Tabs>
   )
 }

@@ -1,8 +1,6 @@
 "use client"
-import React, { useEffect } from "react"
+import React, { useRef } from "react"
 import { cn } from "@/lib/utils"
-import { useChatLayoutStore } from "@/store/chatLayout"
-import { TabPanel } from "./tab-panel"
 import { useTabPanelStore } from "@/store/tabStore"
 import {
   ResizableHandle,
@@ -10,38 +8,55 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import Chat from "./chat"
-import ListBuilder from "@/components/ListBuilder"
-import { useWSStore } from "@/store/wsStore"
+import { Button } from "@/components/ui/button"
+import { ChevronsLeft, ChevronsRight } from "lucide-react"
+import { TabPanel } from "./tab-panel"
 
 const MainPanel = () => {
-  const { layout, setLayout } = useChatLayoutStore()
   const { tabList } = useTabPanelStore()
+  const tabPanelRef = useRef<any>(null)
+  const chatPanelRef = useRef<any>(null)
+  const [isCollapsed, setIsCollapsed] = React.useState(false)
 
-  console.log(tabList)
+  const handleToggle = () => {
+    if (isCollapsed) {
+      tabPanelRef.current?.resize(40) // Expand to 40%
+    } else {
+      tabPanelRef.current?.collapse() // Collapse
+    }
+    setIsCollapsed(prev => !prev)
+  }
 
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-1">
-      <ResizablePanel>
+      <ResizablePanel
+        ref={chatPanelRef}
+        defaultSize={tabList.length > 0 ? 60 : 100}
+        className="relative transition-all duration-300">
+        {tabList.length > 0 && (
+          <Button
+            variant="secondary"
+            size="icon"
+            className="absolute top-2 -right-1.5 z-10"
+            onClick={handleToggle}>
+            {isCollapsed ? <ChevronsLeft /> : <ChevronsRight />}
+          </Button>
+        )}
         <Chat />
       </ResizablePanel>
+
       {tabList.length > 0 && (
         <>
-          <ResizableHandle withHandle />
+          <ResizableHandle />
           <ResizablePanel
-            maxSize={40}
-
-            // onResize={size => {
-            //   if (size < 20) {
-            //     setLayout("chat")
-            //   }
-            //   console.log(size)
-            // }}
-          >
-            <TabPanel />
-
-            {/* <div className="border-l">
-              <ListBuilder />
-            </div> */}
+            ref={tabPanelRef}
+            defaultSize={40}
+            minSize={0}
+            collapsible
+            className={cn("transition-all duration-300", {
+              "overflow-hidden": isCollapsed,
+            })}>
+            {!isCollapsed && <TabPanel />}
           </ResizablePanel>
         </>
       )}
