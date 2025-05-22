@@ -9,6 +9,78 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      clean_companies: {
+        Row: {
+          company_contacts: string | null
+          company_current_investor_fund: string | null
+          company_current_investors: string | null
+          company_description: string | null
+          company_description_long: string | null
+          company_description_short: string | null
+          company_EBITDA_mUSD: string | null
+          company_email: string | null
+          company_employees: number | null
+          company_gics_group: string | null
+          company_gics_industry: string | null
+          company_gics_sector: string | null
+          company_gics_sub_industry: string | null
+          company_id: number | null
+          company_industries: string | null
+          company_investors: string | null
+          company_logo: string | null
+          company_name: string | null
+          company_ownership_status: string | null
+          company_revenue_mUSD: string | null
+          company_website: string | null
+        }
+        Insert: {
+          company_contacts?: string | null
+          company_current_investor_fund?: string | null
+          company_current_investors?: string | null
+          company_description?: string | null
+          company_description_long?: string | null
+          company_description_short?: string | null
+          company_EBITDA_mUSD?: string | null
+          company_email?: string | null
+          company_employees?: number | null
+          company_gics_group?: string | null
+          company_gics_industry?: string | null
+          company_gics_sector?: string | null
+          company_gics_sub_industry?: string | null
+          company_id?: number | null
+          company_industries?: string | null
+          company_investors?: string | null
+          company_logo?: string | null
+          company_name?: string | null
+          company_ownership_status?: string | null
+          company_revenue_mUSD?: string | null
+          company_website?: string | null
+        }
+        Update: {
+          company_contacts?: string | null
+          company_current_investor_fund?: string | null
+          company_current_investors?: string | null
+          company_description?: string | null
+          company_description_long?: string | null
+          company_description_short?: string | null
+          company_EBITDA_mUSD?: string | null
+          company_email?: string | null
+          company_employees?: number | null
+          company_gics_group?: string | null
+          company_gics_industry?: string | null
+          company_gics_sector?: string | null
+          company_gics_sub_industry?: string | null
+          company_id?: number | null
+          company_industries?: string | null
+          company_investors?: string | null
+          company_logo?: string | null
+          company_name?: string | null
+          company_ownership_status?: string | null
+          company_revenue_mUSD?: string | null
+          company_website?: string | null
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           company_description: string | null
@@ -454,6 +526,27 @@ export type Database = {
           },
         ]
       }
+      "Investor_Italy&Germany Top 100": {
+        Row: {
+          created_at: string
+          id: number
+          "Investor Name": string
+          Website: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          "Investor Name": string
+          Website?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          "Investor Name"?: string
+          Website?: string | null
+        }
+        Relationships: []
+      }
       investors: {
         Row: {
           investor_id: string
@@ -469,6 +562,24 @@ export type Database = {
           investor_id?: string
           investor_name?: string | null
           investor_website?: string | null
+        }
+        Relationships: []
+      }
+      "Investors List Global": {
+        Row: {
+          Country: string | null
+          "Investor name": string
+          Website: string | null
+        }
+        Insert: {
+          Country?: string | null
+          "Investor name": string
+          Website?: string | null
+        }
+        Update: {
+          Country?: string | null
+          "Investor name"?: string
+          Website?: string | null
         }
         Relationships: []
       }
