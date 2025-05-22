@@ -14,11 +14,11 @@ import {
 } from "@/components/ui/table";
 import PinnableDataTable from "@/components/table/pinnable-data-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useTabPanelStore } from "@/store/tabStore"
-import CompanyProfile from "@/components/CompanyProfile"
-import { GenerateSkeleton } from "./generate-skeleton"
-import Image from "next/image"
-import ChatDataTable from "@/components/chat/data-table"
+import { useTabPanelStore } from "@/store/tabStore";
+import CompanyProfile from "@/components/CompanyProfile";
+import { GenerateSkeleton } from "./generate-skeleton";
+import Image from "next/image";
+import ChatDataTable from "@/components/chat/data-table";
 
 export type Company = {
   company_id: string;
@@ -28,15 +28,13 @@ export type Company = {
 };
 
 export default function CompaniesData({ companies }: { companies: Company[] }) {
-  const { addTab } = useTabPanelStore()
+  const { addTab } = useTabPanelStore();
 
   // console.log(companies, "companies")
 
-  const isPlaceholder = companies.some(company =>
-    company.company_id.includes("placeholder")
-  )
+  const isPlaceholder = companies.some((company) => company.company_id.includes("placeholder"));
 
-  console.log(isPlaceholder, "isPlaceholder")
+  console.log(isPlaceholder, "isPlaceholder");
 
   const handleAddTab = (data: any) => {
     addTab(
@@ -45,49 +43,41 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
       "company-profile",
       data,
       data?.company_id
-    )
-  }
+    );
+  };
   const columns: ColumnDef<Company>[] = [
     {
       id: "select",
       header: ({ table }) => (
-        <div className="flex items-center">
-          <Checkbox
-            checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-            aria-label="Select all"
-            className="mx-auto"
-            disabled={table
-              .getFilteredRowModel()
-              .rows.some(row =>
-                row.original.company_id.includes("placeholder")
-              )}
-          />
-        </div>
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+          disabled={table
+            .getFilteredRowModel()
+            .rows.some((row) => row.original.company_id.includes("placeholder"))}
+        />
       ),
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
-          className="mx-auto"
           disabled={row.original.company_id.includes("placeholder")}
         />
       ),
-      maxSize: 50,
+      maxSize: 40,
       enableSorting: false,
       enableHiding: false,
     },
     {
       id: "index",
-      maxSize: 45,
+      maxSize: 30,
       header: ({}) => (
-        <div className="flex items-center justify-center">
-          {isPlaceholder ? "Generating" : "#"}
-        </div>
+        <div className="flex items-center justify-center">{isPlaceholder ? "Generating" : "#"}</div>
       ),
       enablePinning: false,
       enableSorting: false,
@@ -109,7 +99,8 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
             onClick={() => handleAddTab(row.original)}
             disabled={row.original.company_id.includes("placeholder")}
             className="hover:underline items-center inline-flex cursor-pointer hover:font-medium transition-all duration-200 text-left w-full"
-            type="button">
+            type="button"
+          >
             <Image
               src="https://placehold.co/50x50"
               alt="logo"
@@ -123,7 +114,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
               text={row.original.company_name}
             />
           </button>
-        )
+        );
       },
     },
     {
@@ -153,10 +144,10 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
-          
+
   return (
     <div className="h-full flex flex-col bg-white w-full pt-1.5 ">
-      <ChatDataTable
+      <PinnableDataTable
         data={companies ? companies : []}
         columns={columns}
         isLoading={false}
