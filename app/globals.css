@@ -176,6 +176,11 @@ body {
   background: transparent; /* Optional: just make scrollbar invisible */
   height: 0;
 }
+*::-webkit-scrollbar {
+  width: 1; /* Remove scrollbar space */
+  background: transparent; /* Optional: just make scrollbar invisible */
+  height: 0;
+}
 /* Optional: show position indicator in red */
 /* .noscroll::-webkit-scrollbar-thumb {
   background: #ff0000;

@@ -77,13 +77,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const isCollapsed = state === "collapsed"
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="py-3 border-b border-gray-200">
         <SidebarMenu>
           <SidebarMenuItem className="ml-1">
             <SidebarMenuButton
-              tooltip="Lexicon AI"
+              tooltip="PM Radar"
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent py-2 gap-4">
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent gap-4"
+            >
               <div className="flex aspect-square size-8 text-2xl items-center justify-center">
                 <Image src={IMAGES.icon} alt="logo" width={32} height={32} />
               </div>
@@ -94,12 +95,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <Separator className="my-2" />
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {data.projects.map(item => (
+              {data.projects.map((item) => (
                 <SidebarMenuItem
                   key={item.name}
                   className={cn(
@@ -108,30 +109,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       "border border-blue-700/30 bg-blue-50 hover:border-blue-700/40":
                         pathname === item.url,
                     }
-                  )}>
+                  )}
+                >
                   <SidebarMenuButton
                     tooltip={item.name}
                     asChild
-                    className={cn(
-                      `p-0 flex items-center w-full hover:bg-transparent`,
-                      {
-                        "justify-center": isCollapsed,
-                        "px-2": !isCollapsed,
-                      }
-                    )}>
+                    className={cn(`p-0 flex items-center w-full hover:bg-transparent`, {
+                      "justify-center": isCollapsed,
+                      "px-2": !isCollapsed,
+                    })}
+                  >
                     <Link
                       href={item.url}
                       className={cn(`inline-flex`, {
-                        "text-blue-700 [&>svg]:scale-110":
-                          pathname === item.url,
-                      })}>
+                        "text-blue-700 [&>svg]:scale-110": pathname === item.url,
+                      })}
+                    >
                       <item.icon
-                        className={cn(
-                          `!size-5 transition-transform ease-in-out`,
-                          {
-                            "!size-5.5": pathname === item.url,
-                          }
-                        )}
+                        className={cn(`!size-5 transition-transform ease-in-out`, {
+                          "!size-5.5": pathname === item.url,
+                        })}
                       />
                       {!isCollapsed && <span>{item.name}</span>}
                     </Link>
@@ -146,22 +143,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenu>
               {isCollapsed && (
                 <SidebarMenuItem
-                  className={`flex items-center justify-center px-1.5 py-0.5 rounded-md border border-transparent cursor-pointer hover:bg-gray-100 hover:border-gray-200 transition-all ease-in-out duration-300`}>
+                  className={`flex items-center justify-center px-1.5 py-0.5 rounded-md border border-transparent cursor-pointer hover:bg-gray-100 hover:border-gray-200 transition-all ease-in-out duration-300`}
+                >
                   <SidebarMenuButton
                     tooltip="Expand"
                     asChild
-                    className={cn(
-                      `p-0 flex items-center w-full hover:bg-transparent `,
-                      {
-                        "justify-center p-0": isCollapsed,
-                      }
-                    )}>
+                    className={cn(`p-0 flex items-center w-full hover:bg-transparent `, {
+                      "justify-center p-0": isCollapsed,
+                    })}
+                  >
                     <SidebarTrigger className="" />
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               )}
 
-              {data.footer.map(item => (
+              {data.footer.map((item) => (
                 <SidebarMenuItem
                   key={item.name}
                   className={cn(
@@ -170,30 +166,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       "border border-blue-700/30 bg-blue-50 hover:border-blue-700/40":
                         pathname === item.url,
                     }
-                  )}>
+                  )}
+                >
                   <SidebarMenuButton
                     tooltip={item.name}
                     asChild
-                    className={cn(
-                      `p-0 flex items-center w-full hover:bg-transparent`,
-                      {
-                        "justify-center": isCollapsed,
-                        "px-2": !isCollapsed,
-                      }
-                    )}>
+                    className={cn(`p-0 flex items-center w-full hover:bg-transparent`, {
+                      "justify-center": isCollapsed,
+                      "px-2": !isCollapsed,
+                    })}
+                  >
                     <Link
                       href={item.url}
                       className={cn(`inline-flex`, {
-                        "text-blue-700 [&>svg]:scale-105":
-                          pathname === item.url,
-                      })}>
+                        "text-blue-700 [&>svg]:scale-105": pathname === item.url,
+                      })}
+                    >
                       <item.icon
-                        className={cn(
-                          `!size-5 transition-transform ease-in-out`,
-                          {
-                            "!size-5.5": pathname === item.url,
-                          }
-                        )}
+                        className={cn(`!size-5 transition-transform ease-in-out`, {
+                          "!size-5.5": pathname === item.url,
+                        })}
                       />
                       {!isCollapsed && <span>{item.name}</span>}
                     </Link>

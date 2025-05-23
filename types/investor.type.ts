@@ -27,6 +27,10 @@ interface IInvestor {
   telephone: string | null
   created_at: string
   companies: Company[]
+  investor_linkedin_logo?: string
+  investor_linkedin_url?: string
+  investor_facebook_url?: string
+  investor_twitter_url?: string
 }
 
 interface Company {
