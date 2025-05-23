@@ -1,12 +1,12 @@
 // import CompanySheet from "@/components/CompanySheet"
 // import CompanySheet from "@/components/CompanySheet"
-import { ExpandableCell } from "@/components/table/epandable-cell";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ColumnDef } from "@tanstack/react-table";
-import { ExternalLink } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { ExpandableCell } from "@/components/table/epandable-cell"
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import { ColumnDef } from "@tanstack/react-table"
+import { ExternalLink } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
 
 const allColumns: ColumnDef<any>[] = [
   {
@@ -39,9 +39,7 @@ const allColumns: ColumnDef<any>[] = [
     id: "index",
     header: () => <span className="text-center mx-auto">#</span>,
     maxSize: 40,
-    cell: ({ row }) => (
-      <div className="text-center mx-auto">{row.index + 1}</div>
-    ),
+    cell: ({ row }) => <div className="text-center mx-auto">{row.index + 1}</div>,
     enableSorting: false,
     enableHiding: false,
     enablePinning: false,
@@ -67,13 +65,13 @@ const allColumns: ColumnDef<any>[] = [
     accessorKey: "company_name",
     minSize: 260,
     header: ({ column }) => {
-      return <div className="text-left ">Company Name</div>;
+      return <div className="text-left">Company Name</div>
     },
     cell: ({ row }) => {
       return (
         <div className="inline-flex items-center">
           <Image
-            src="https://placehold.co/50x50"
+            src={row.original.companies_linkedin_logo_url || "https://placehold.co/50x50"}
             alt="logo"
             width={20}
             height={20}
@@ -82,28 +80,26 @@ const allColumns: ColumnDef<any>[] = [
           />
           {row.getValue("company_name") || "-"}
         </div>
-      );
+      )
     },
     enablePinning: true,
   },
   {
-    accessorKey: "company_description",
-    minSize: 600, // Set the desired width for the description column in p
+    accessorKey: "companies_LLM_description",
+    minSize: 600,
     header: () => (
-      <div className="text-left overflow-hidden w-[300px]  line-clamp-2">
-        Description
-      </div>
+      <div className="text-left overflow-hidden w-[300px] line-clamp-2">Description</div>
     ),
     cell: ({ row, column }) => {
-      const width = column.getSize();
+      const width = column.getSize()
       return (
         <ExpandableCell
           className={`w-${width}px`}
-          TriggerCell={<p>{row.getValue("company_description")}</p>}
+          TriggerCell={<p>{row.getValue("companies_LLM_description")}</p>}
         >
-          {row.getValue("company_description")}
+          {row.getValue("companies_LLM_description")}
         </ExpandableCell>
-      );
+      )
     },
   },
   {
@@ -111,18 +107,11 @@ const allColumns: ColumnDef<any>[] = [
     header: () => <div className="text-left">Website</div>,
     cell: ({ row }) => {
       return (
-        <Link
-          target="_blank"
-          href={
-            row.original.company_website !== null
-              ? row.original.company_website
-              : "/"
-          }
-        >
-          {row.original.company_website === null && "-"}
-          {row.original.company_website !== null && (
+        <Link target="_blank" href={row.original.company_website || "/"}>
+          {!row.original.company_website && "-"}
+          {row.original.company_website && (
             <Badge
-              className="bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-500 hover:text-white transition-all "
+              className="bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-500 hover:text-white transition-all"
               variant="outline"
             >
               visit site
@@ -130,8 +119,43 @@ const allColumns: ColumnDef<any>[] = [
             </Badge>
           )}
         </Link>
-      );
+      )
     },
+  },
+  {
+    accessorKey: "companies_linkedin_city",
+    header: () => <div className="text-left">City</div>,
+    cell: ({ row }) => <div>{row.original.companies_linkedin_city || "-"}</div>,
+  },
+  {
+    accessorKey: "companies_LLM_country",
+    header: () => <div className="text-left">Country</div>,
+    cell: ({ row }) => <div>{row.original.companies_LLM_country || "-"}</div>,
+  },
+  {
+    accessorKey: "companies_linkedin_company_size",
+    header: () => <div className="text-left">Company Size</div>,
+    cell: ({ row }) => <div>{row.original.companies_linkedin_company_size || "-"}</div>,
+  },
+  {
+    accessorKey: "companies_linkedin_founded",
+    header: () => <div className="text-left">Founded</div>,
+    cell: ({ row }) => <div>{row.original.companies_linkedin_founded || "-"}</div>,
+  },
+  {
+    accessorKey: "companies_linkedin_industries",
+    header: () => <div className="text-left">Industry</div>,
+    cell: ({ row }) => <div>{row.original.companies_linkedin_industries || "-"}</div>,
+  },
+  {
+    accessorKey: "companies_Revenue_estimate_eurM",
+    header: () => <div className="text-left">Revenue (EURm)</div>,
+    cell: ({ row }) => <div>{row.original.companies_Revenue_estimate_eurM || "-"}</div>,
+  },
+  {
+    accessorKey: "companies_EBITDA_estimate_eurM",
+    header: () => <div className="text-left">EBITDA (EURm)</div>,
+    cell: ({ row }) => <div>{row.original.companies_EBITDA_estimate_eurM || "-"}</div>,
   },
   // {
   //   accessorKey: "status",
@@ -218,15 +242,15 @@ const allColumns: ColumnDef<any>[] = [
   //     </div>
   //   ),
   // },
-];
+]
 
 export function getColumnsForData(data: any[]): ColumnDef<any>[] {
-  if (!data || data.length === 0) return allColumns;
-  const dataKeys = Object.keys(data[0]);
+  if (!data || data.length === 0) return allColumns
+  const dataKeys = Object.keys(data[0])
   return allColumns.filter(
     (col) =>
       col.id === "select" ||
       col.id === "index" ||
       ("accessorKey" in col && dataKeys.includes(col.accessorKey as string))
-  );
+  )
 }

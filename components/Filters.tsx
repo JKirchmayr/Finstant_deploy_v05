@@ -1,18 +1,13 @@
-"use client";
-import { ListFilterPlus, Sparkles } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { useCompanyFilters } from "@/store/useCompanyFilters";
-import { usePathname } from "next/navigation";
-import { Checkbox } from "./ui/checkbox";
-import { useInvestorFilters } from "@/store/useInvestorFilters";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "./ui/accordion";
-import MultipleSelector, { Option } from "./ui/multiselect";
-import CategorizedCountryMultiSelect from "./CategorizedCountryMultiSelect";
+"use client"
+import { ListFilterPlus, Sparkles } from "lucide-react"
+import React, { useEffect, useState } from "react"
+import { useCompanyFilters } from "@/store/useCompanyFilters"
+import { usePathname } from "next/navigation"
+import { Checkbox } from "./ui/checkbox"
+import { useInvestorFilters } from "@/store/useInvestorFilters"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion"
+import MultipleSelector, { Option } from "./ui/multiselect"
+import CategorizedCountryMultiSelect from "./CategorizedCountryMultiSelect"
 
 const industryOptions = [
   { value: "Artificial Intelligence", label: "Artificial Intelligence" },
@@ -31,24 +26,22 @@ const industryOptions = [
   { value: "Health Insurance", label: "Health Insurance" },
   { value: "Medical Devices", label: "Medical Devices" },
   { value: "Pharmaceuticals", label: "Pharmaceuticals" },
-];
+]
 
 const investorOptions = [
   { value: "Private Equity", label: "Private Equity" },
   { value: "Real Estate", label: "Real Estate" },
   { value: "Corporate", label: "Corporate" },
   { value: "Credit", label: "Credit" },
-];
+]
 
 const Filters = () => {
-  const pathname = usePathname();
-  const isCompanies = pathname.includes("companies");
-  const isInvestors = pathname.includes("investors");
-  const { applyFilters, resetFilters } = useCompanyFilters();
-  const {
-    applyFilters: applyInvestorFilters,
-    resetFilters: resetInvestorFilters,
-  } = useInvestorFilters();
+  const pathname = usePathname()
+  const isCompanies = pathname.includes("companies")
+  const isInvestors = pathname.includes("investors")
+  const { applyFilters, resetFilters } = useCompanyFilters()
+  const { applyFilters: applyInvestorFilters, resetFilters: resetInvestorFilters } =
+    useInvestorFilters()
 
   const [company, setCompany] = useState({
     description: "",
@@ -58,7 +51,7 @@ const Filters = () => {
     ebitdaMax: "",
     industry: [] as string[],
     hqCountry: [] as string[],
-  });
+  })
   const [investor, setInvestor] = useState({
     investorType: [] as string[],
     revenueMin: "",
@@ -67,7 +60,7 @@ const Filters = () => {
     ebitdaMax: "",
     industry: [] as string[],
     investorLocation: [] as string[],
-  });
+  })
 
   const isCompanyFilterApplied =
     company.description ||
@@ -76,31 +69,31 @@ const Filters = () => {
     company.ebitdaMin ||
     company.ebitdaMax ||
     company.industry.length > 0 ||
-    company.hqCountry.length > 0;
+    company.hqCountry.length > 0
 
   const handleMinMaxChange = (key: string, value: string) => {
     if (isCompanies) {
-      setCompany((prev) => ({ ...prev, [key]: value }));
+      setCompany((prev) => ({ ...prev, [key]: value }))
     } else {
-      setInvestor((prev) => ({ ...prev, [key]: value }));
+      setInvestor((prev) => ({ ...prev, [key]: value }))
     }
-  };
+  }
 
   const handleMultiChange = (key: string, values: string[]) => {
     if (isCompanies) {
-      setCompany((prev) => ({ ...prev, [key]: values }));
+      setCompany((prev) => ({ ...prev, [key]: values }))
     } else {
-      setInvestor((prev) => ({ ...prev, [key]: values }));
+      setInvestor((prev) => ({ ...prev, [key]: values }))
     }
-  };
+  }
 
   const handleSearch = () => {
     if (isCompanies) {
-      applyFilters(company);
+      applyFilters(company)
     } else {
-      applyInvestorFilters(investor);
+      applyInvestorFilters(investor)
     }
-  };
+  }
 
   const handleClear = () => {
     if (isCompanies) {
@@ -112,8 +105,8 @@ const Filters = () => {
         ebitdaMax: "",
         industry: [],
         hqCountry: [],
-      });
-      resetFilters();
+      })
+      resetFilters()
     } else {
       setInvestor({
         investorType: [],
@@ -123,17 +116,17 @@ const Filters = () => {
         ebitdaMax: "",
         industry: [],
         investorLocation: [],
-      });
-      resetInvestorFilters();
+      })
+      resetInvestorFilters()
     }
-  };
+  }
 
   const handleInvestorChange = (selected: string[]) => {
     setInvestor((prev) => ({
       ...prev,
       investorType: selected,
-    }));
-  };
+    }))
+  }
 
   const isInvestorFilterApplied =
     investor.investorType.length > 0 ||
@@ -142,16 +135,16 @@ const Filters = () => {
     investor.ebitdaMin ||
     investor.ebitdaMax ||
     investor.industry.length > 0 ||
-    investor.investorLocation.length > 0;
+    investor.investorLocation.length > 0
 
   const shouldShowClear = isCompanies
     ? isCompanyFilterApplied
     : isInvestors
     ? isInvestorFilterApplied
-    : false;
+    : false
 
-  const revenueMin = isCompanies ? company.revenueMin : investor.revenueMin;
-  const revenueMax = isCompanies ? company.revenueMax : investor.revenueMax;
+  const revenueMin = isCompanies ? company.revenueMin : investor.revenueMin
+  const revenueMax = isCompanies ? company.revenueMax : investor.revenueMax
 
   useEffect(() => {
     setCompany({
@@ -162,7 +155,7 @@ const Filters = () => {
       ebitdaMax: "",
       industry: [],
       hqCountry: [],
-    });
+    })
     setInvestor({
       investorType: [],
       revenueMin: "",
@@ -171,10 +164,10 @@ const Filters = () => {
       ebitdaMax: "",
       industry: [],
       investorLocation: [],
-    });
-    resetInvestorFilters();
-    resetFilters();
-  }, []);
+    })
+    resetInvestorFilters()
+    resetFilters()
+  }, [])
 
   const accordionItemsConfig = [
     ...(isCompanies
@@ -182,16 +175,14 @@ const Filters = () => {
           {
             value: "description-investor",
             title: (
-              <label className="flex items-center gap-1 text-[13px]">
-                <Sparkles size={14} className="text-blue-700" /> Description
+              <label className="flex items-center gap-1 text-[14px]">
+                Description <Sparkles size={14} className="text-blue-700" />
               </label>
             ),
             content: () => (
               <DiscriptionFilter
                 value={company.description}
-                onChange={(val) =>
-                  setCompany((prev) => ({ ...prev, description: val }))
-                }
+                onChange={(val) => setCompany((prev) => ({ ...prev, description: val }))}
               />
             ),
           },
@@ -199,11 +190,7 @@ const Filters = () => {
       : [
           {
             value: "description-investor",
-            title: (
-              <label className="flex items-center gap-1 text-[13px]">
-                Investor
-              </label>
-            ),
+            title: <label className="flex items-center gap-1 text-sm">Investor</label>,
             content: () => (
               <InvestorsFilter
                 options={investorOptions}
@@ -254,9 +241,7 @@ const Filters = () => {
             defaultOptions={industryOptions}
             placeholder="Select Industry"
             hidePlaceholderWhenSelected
-            emptyIndicator={
-              <p className="text-center text-sm">No results found</p>
-            }
+            emptyIndicator={<p className="text-center text-sm">No results found</p>}
           />
         </div>
       ),
@@ -266,7 +251,7 @@ const Filters = () => {
       title: "HQ Country",
       content: () => <CategorizedCountryMultiSelect />,
     },
-  ];
+  ]
 
   return (
     <div className="flex flex-col bg-[#fbfbfb] h-full overflow-hidden relative border-r border-gray-200 transition-transform ease-in-out duration-300">
@@ -279,7 +264,9 @@ const Filters = () => {
         <Accordion type="multiple" className="w-full">
           {accordionItemsConfig.map((item) => (
             <AccordionItem key={item.value} value={item.value}>
-              <AccordionTrigger>{item.title}</AccordionTrigger>
+              <AccordionTrigger className="hover:no-underline hover:cursor-pointer">
+                {item.title}
+              </AccordionTrigger>
               <AccordionContent className="overflow-visible z-10">
                 {item.content()}
               </AccordionContent>
@@ -305,15 +292,15 @@ const Filters = () => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
 const DiscriptionFilter = ({
   value,
   onChange,
 }: {
-  value: string;
-  onChange: (value: string) => void;
+  value: string
+  onChange: (value: string) => void
 }) => {
   return (
     <div className="flex flex-col gap-2">
@@ -325,8 +312,8 @@ const DiscriptionFilter = ({
         rows={4}
       />
     </div>
-  );
-};
+  )
+}
 
 const MinMax = ({
   title,
@@ -336,26 +323,26 @@ const MinMax = ({
   minKey,
   maxKey,
 }: {
-  title: string;
-  min: string;
-  max: string;
-  minKey: string;
-  maxKey: string;
-  onChange: (key: string, val: string) => void;
+  title: string
+  min: string
+  max: string
+  minKey: string
+  maxKey: string
+  onChange: (key: string, val: string) => void
 }) => {
   const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    const value = e.target.value
     if (/^\d*\.?\d*$/.test(value)) {
-      onChange(minKey, value);
+      onChange(minKey, value)
     }
-  };
+  }
 
   const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    const value = e.target.value
     if (/^\d*\.?\d*$/.test(value)) {
-      onChange(maxKey, value);
+      onChange(maxKey, value)
     }
-  };
+  }
 
   return (
     <div className="flex items-center gap-2">
@@ -373,46 +360,36 @@ const MinMax = ({
         onChange={handleMaxChange}
       />
     </div>
-  );
-};
+  )
+}
 
-const LabelAndField = ({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) => {
+const LabelAndField = ({ title, children }: { title: string; children: React.ReactNode }) => {
   return (
     <div className="flex flex-col gap-2">
-      <label className="flex items-center gap-1 text-[13px]">{title}</label>
+      <label className="flex items-center gap-1 text-sm">{title}</label>
       {children}
     </div>
-  );
-};
+  )
+}
 
 interface InvestorOption {
-  value: string;
-  label: string;
+  value: string
+  label: string
 }
 
 interface InvestorsProps {
-  options: InvestorOption[];
-  selectedInvestors: string[];
-  onChange: (selected: string[]) => void;
+  options: InvestorOption[]
+  selectedInvestors: string[]
+  onChange: (selected: string[]) => void
 }
 
-const InvestorsFilter: React.FC<InvestorsProps> = ({
-  options,
-  selectedInvestors,
-  onChange,
-}) => {
+const InvestorsFilter: React.FC<InvestorsProps> = ({ options, selectedInvestors, onChange }) => {
   const handleCheckboxChange = (value: string) => {
     const newInvestor = selectedInvestors.includes(value)
       ? selectedInvestors.filter((item) => item !== value)
-      : [...selectedInvestors, value];
-    onChange(newInvestor);
-  };
+      : [...selectedInvestors, value]
+    onChange(newInvestor)
+  }
 
   return (
     <div className="flex flex-col justify-between gap-2">
@@ -434,6 +411,6 @@ const InvestorsFilter: React.FC<InvestorsProps> = ({
         ))}
       </div>
     </div>
-  );
-};
-export default Filters;
+  )
+}
+export default Filters

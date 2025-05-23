@@ -3,11 +3,11 @@ import { createClient } from "@/lib/supabase/server"
 import { Database } from "@/types/supabase"
 
 export async function GET(req: NextRequest) {
-  type CompanyRow = Database["public"]["Tables"]["companies"]["Row"]
+  type CompanyRow = Database["development"]["Tables"]["companies"]["Row"]
 
   // Dynamically build the select string
   const selectedFields = Object.keys({} as CompanyRow)
-    .filter(key => key !== "company_description_embedding")
+    .filter((key) => key !== "company_description_embedding")
     .join(",")
 
   console.log(selectedFields)
@@ -16,15 +16,13 @@ export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient()
     let { data: companies, error } = await supabase
+      .schema("development")
       .from("companies")
-      .select("company_description, company_name, company_website")
+      .select(selectedFields)
       .range(from, to)
     if (error) {
       console.error("❌ Supabase error:", error.message)
-      return NextResponse.json(
-        { error: "Failed to fetch companies" },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: "Failed to fetch companies" }, { status: 500 })
     }
 
     return NextResponse.json({
