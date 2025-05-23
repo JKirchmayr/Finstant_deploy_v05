@@ -32,9 +32,7 @@ export default function InvestorProfile({ data }: { data: any }) {
 
           {/* Company Details */}
           <div className="flex flex-col gap-1">
-            <h2 className="text-lg font-semibold">
-              {data.investor_name || "Company Name"}
-            </h2>
+            <h2 className="text-lg font-semibold">{data.investor_name || "Company Name"}</h2>
             <div className="text-sm text-gray-700 flex items-center gap-1">
               <p>United States, New York</p>
             </div>
@@ -87,10 +85,10 @@ export default function InvestorProfile({ data }: { data: any }) {
           <span className="font-medium">Description:</span>
           <p className="mt-1 ">{data.company_description}</p>
           <p className="mt-1 text-foreground/80">
-            One of Silicon Valley’s most legendary VC firms, Sequoia has made
-            significant investments in AI, including Nvidia, OpenAI, DeepMind,
-            and RunwayML. They support companies from seed to IPO, and their
-            influence has shaped many of the biggest names in tech.
+            One of Silicon Valley’s most legendary VC firms, Sequoia has made significant
+            investments in AI, including Nvidia, OpenAI, DeepMind, and RunwayML. They support
+            companies from seed to IPO, and their influence has shaped many of the biggest names in
+            tech.
           </p>
         </div>
       </div>

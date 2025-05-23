@@ -11,7 +11,7 @@ import Link from "next/link"
 const allColumns: ColumnDef<any>[] = [
   {
     id: "select",
-    maxSize: 30,
+    maxSize: 45,
     header: ({ table }) => (
       <div className="flex justify-center">
         <Checkbox
@@ -19,7 +19,7 @@ const allColumns: ColumnDef<any>[] = [
             table.getIsAllPageRowsSelected() ||
             (table.getIsSomePageRowsSelected() && "indeterminate")
           }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
         />
       </div>
@@ -27,7 +27,7 @@ const allColumns: ColumnDef<any>[] = [
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onCheckedChange={value => row.toggleSelected(!!value)}
         aria-label="Select row"
       />
     ),
@@ -265,7 +265,7 @@ export function getColumnsForData(data: any[]): ColumnDef<any>[] {
   if (!data || data.length === 0) return allColumns
   const dataKeys = Object.keys(data[0])
   return allColumns.filter(
-    (col) =>
+    col =>
       col.id === "select" ||
       col.id === "index" ||
       ("accessorKey" in col && dataKeys.includes(col.accessorKey as string))

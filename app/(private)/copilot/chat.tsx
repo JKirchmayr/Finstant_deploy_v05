@@ -31,9 +31,6 @@ const Chat = () => {
   const socketUrl = `wss://ai-agents-backend-zwa0.onrender.com/chat`
 
   const { messages, input, handleInputChange, append, setInput } = useChat()
-  const wsRef = useRef<WebSocket | null>(null)
-  const reconnectAttempts = useRef(0)
-  const MAX_RETRIES = 5
 
   const [isStreaming, setIsStreaming] = useState(false)
   const [connectionError, setConnectionError] = useState(false)
@@ -41,8 +38,7 @@ const Chat = () => {
   const lastPromptRef = useRef<string | null>(null)
   const hasSentPromptRef = useRef<boolean>(false)
   const bottomRef = useRef<undefined>(undefined)
-  const { addTab, appendData, closeTabByID, tabList, setActiveTabId } =
-    useTabPanelStore()
+  const { addTab, appendData, closeTabByID, tabList, setActiveTabId } = useTabPanelStore()
 
   const endRef = useRef<HTMLDivElement>(null)
 
@@ -103,18 +99,12 @@ const Chat = () => {
       const initID = `tab-${new Date().getTime()}`
 
       while (true) {
-        console.log(
-          "%cStarted reading stream!",
-          "color: green; font-weight: bold"
-        )
+        console.log("%cStarted reading stream!", "color: green; font-weight: bold")
         const { done, value } = await reader.read()
 
         if (done) {
           setIsStreaming(false)
-          console.log(
-            "%cFinished reading stream!",
-            "color: red; font-weight: bold"
-          )
+          console.log("%cFinished reading stream!", "color: red; font-weight: bold")
           break
         }
 
@@ -187,11 +177,9 @@ const Chat = () => {
                 const investorData = parsed?.data
                 if (investorData) {
                   const investor = {
-                    investor_id:
-                      investorData.investor_id || investorData.investor_name,
+                    investor_id: investorData.investor_id || investorData.investor_name,
                     investor_name: investorData.investor_name || "-",
-                    investor_description:
-                      investorData.investor_description || "-",
+                    investor_description: investorData.investor_description || "-",
                     similarity_score: investorData.similarity_score || "-",
                   }
                   appendData(initID, investor)
@@ -200,15 +188,10 @@ const Chat = () => {
               }
 
               if (parsed?.type === "done") {
-                if (
-                  !parsed.data?.companies?.length &&
-                  !parsed.data?.investors?.length
-                ) {
+                if (!parsed.data?.companies?.length && !parsed.data?.investors?.length) {
                   console.log("no dattttttttttta")
                   closeTabByID(initID)
-                  setActiveTabId(
-                    tabList.length ? tabList[tabList.length - 1].tabId : ""
-                  )
+                  setActiveTabId(tabList.length ? tabList[tabList.length - 1].tabId : "")
                 }
                 setIsStreaming(false)
                 // Final scroll to bottom
@@ -241,7 +224,8 @@ const Chat = () => {
           {
             "grid-rows-[1fr_100px]": messages.length,
           }
-        )}>
+        )}
+      >
         <div className={cn("overflow-y-auto px-4 pt-4 m space-y-4 noscroll")}>
           {messages.map((m, i) => {
             const isUser = m.role === "user"
@@ -253,17 +237,15 @@ const Chat = () => {
                 className={cn("flex", {
                   "justify-end": isUser,
                   "justify-start": isAssistant,
-                })}>
+                })}
+              >
                 <div
-                  className={cn(
-                    "max-w-full text-sm leading-relaxed px-3 py-1 rounded-md",
-                    {
-                      "ml-auto text-gray-700 border border-gray-200 rounded-full bg-white [font_weight:400]":
-                        isUser,
-                      "text-gray-800 mr-auto border-none rounded-md":
-                        isAssistant,
-                    }
-                  )}>
+                  className={cn("max-w-full text-sm leading-relaxed px-3 py-1 rounded-md", {
+                    "ml-auto text-gray-700 border border-gray-200 rounded-full bg-white [font_weight:400]":
+                      isUser,
+                    "text-gray-800 mr-auto border-none rounded-md": isAssistant,
+                  })}
+                >
                   <Markdown>{m.content}</Markdown>
                 </div>
               </div>
@@ -284,17 +266,15 @@ const Chat = () => {
               <button className="underline text-blue-500 ml-2">Retry</button>
             </div>
           )}
-          <div
-            className={cn("h-5 opacity-0", { "h-10": messages.length > 1 })}
-            ref={endRef}
-          />
+          <div className={cn("h-5 opacity-0", { "h-10": messages.length > 1 })} ref={endRef} />
         </div>
         <div
           className={cn("flex justify-center items-center")}
           style={{
             // height: messages.length > 0 ? 100 : 0,
             transition: "all 0.3s",
-          }}>
+          }}
+        >
           <PromptField
             handleSend={handleSend}
             input={input}
@@ -313,7 +293,38 @@ function formatCompanyAsMarkdown(c: Company): string {
 ${c.company_description}
 *Similarity Score:* ${c.similarity_score.toFixed(2)}`
 }
-// show me ai base companies in germany
+type SuggestionCategories = {
+  [key: string]: string[]
+}
+
+const suggestions: SuggestionCategories = {
+  companies: [
+    "Show me AI companies in Germany",
+    "List biotech startups in the US",
+    "Companies working on climate change",
+    "Indian healthtech companies",
+    "Fintech companies with recent funding",
+    "German deep tech startups",
+  ],
+
+  investors: [
+    "Investors focused on AI startups",
+    "VCs investing in Southeast Asia",
+    "List climate tech investors in Europe",
+    "Healthtech investors in the US",
+    "Show fintech-focused investors",
+    "Investors backing diverse founders",
+  ],
+
+  deals: [
+    "Show recent Series A deals",
+    "Find latest healthtech acquisitions",
+    "List climate tech funding rounds",
+    "Show fintech investments in 2024",
+    "Find AI startup deals in Europe",
+    "List recent deep tech investments",
+  ],
+}
 
 const PromptField = ({
   handleSend,
@@ -330,6 +341,7 @@ const PromptField = ({
 }) => {
   const textareaRef = useRef<any>(null)
   const [showSuggestions, setShowSuggestions] = useState(true)
+  const [type, setType] = useState<string>("companies")
 
   useEffect(() => {
     const textarea = textareaRef.current
@@ -354,18 +366,50 @@ const PromptField = ({
       className={cn("h-[300px] w-full px-2 ", {
         "h-[200px]": messages.length > 0,
       })}
-      style={{ transition: "all 0.3s" }}>
+      style={{ transition: "all 0.3s" }}
+    >
       {!messages.length && (
-        <div className="flex justify-center items-center mb-3">
-          <h1 className="font-heading text-pretty text-center text-[20px] font-semibold tracking-tighter text-gray-900 sm:text-[32px] md:text-[46px]">
-            How can I help?
+        <div className="flex justify-center items-center mb-3 flex-col gap-y-3">
+          <h1 className="font-heading text-pretty text-center text-sm font-medium tracking-tighter text-gray-900 sm:text-xl">
+            Ask me about :
           </h1>
+          <div className="flex space-x-6">
+            {[
+              { label: "Companies", img: "/images/office-co.png" },
+              { label: "Investors", img: "/images/investor-co.png" },
+              { label: "Deals", img: "/images/handshake-co.png" },
+            ].map((item, index) => (
+              <span
+                key={index}
+                onClick={() => setType(item.label.toLowerCase())}
+                className={cn(
+                  "px-4 py-2 rounded-full text-sm font-medium cursor-pointer flex flex-col items-center"
+                )}
+              >
+                <Image
+                  src={item.img}
+                  alt={`${item.label} Icon`}
+                  width={80}
+                  height={80}
+                  className="inline-block mr-1"
+                />
+                <span
+                  className={cn("text-gray-400 mt-4 transition p-1 px-1.5 rounded-xl", {
+                    " text-foreground bg-foreground/5  ": type === item.label.toLowerCase(),
+                  })}
+                >
+                  {item.label}
+                </span>{" "}
+              </span>
+            ))}
+          </div>
         </div>
       )}
 
       <form
         onSubmit={internalHandleSend}
-        className="focus-within:border-gray-300 bg-white border-gray-300 relative rounded-xl border shadow-[0_2px_2px_rgba(0,0,0,0.08),0_8px_8px_-8px_rgba(0,0,0,0.08),0_0_8px_rgba(128,128,128,0.2)] transition-shadow">
+        className="focus-within:border-gray-300 bg-white border-gray-300 relative rounded-xl border shadow-[0_2px_2px_rgba(0,0,0,0.08),0_8px_8px_-8px_rgba(0,0,0,0.08),0_0_8px_rgba(128,128,128,0.2)] transition-shadow"
+      >
         <div className="@container/textarea bg-white relative z-10 grid min-h-[100px] rounded-xl overflow-hidden">
           <TextareaAutosize
             ref={textareaRef}
@@ -395,7 +439,8 @@ const PromptField = ({
                 className=" inline-flex shrink-0 cursor-pointer select-none items-center justify-center gap-1.5 whitespace-nowrap text-nowrap border-none font-medium outline-none transition-all disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400  [&>svg]:pointer-events-none [&>svg]:size-4 [&_svg]:shrink-0  text-background bg-foreground hover:bg-gray-700 px-3 text-sm has-[>kbd]:gap-2 has-[>svg]:px-2 has-[>kbd]:pr-[6px] ml-1 size-7 rounded-md"
                 type="submit"
                 disabled={isLoading || !input.trim().length}
-                onClick={internalHandleSend}>
+                onClick={internalHandleSend}
+              >
                 {isLoading ? (
                   <Loader2 className="animate-spin w-5 h-5 text-black" />
                 ) : (
@@ -409,20 +454,12 @@ const PromptField = ({
 
       {!messages.length && showSuggestions && (
         <div className="mt-3 flex flex-wrap gap-2 mx-4">
-          {[
-            "Show me AI companies in Germany",
-            "List biotech startups in the US",
-            "Top 10 investors in the tech industry",
-            "Indian healthtech companies",
-            "Fintech companies with recent funding",
-            "German deep tech startups",
-          ].map(suggestion => (
+          {suggestions[type as keyof typeof suggestions].map((suggestion: string) => (
             <button
               key={suggestion}
-              onClick={() =>
-                handleInputChange({ target: { value: suggestion } })
-              }
-              className="text-[13px] text-foreground/80 hover:text-foreground bg-white hover:bg-gray-100 px-3 py-1.5 rounded-md border border-gray-200 hover:border-gray-300 transition cursor-pointer">
+              onClick={() => handleInputChange({ target: { value: suggestion } })}
+              className="text-[13px] text-foreground/80 hover:text-foreground bg-white hover:bg-gray-100 px-3 py-1.5 rounded-md border border-gray-200 hover:border-gray-300 transition cursor-pointer"
+            >
               {suggestion}
             </button>
           ))}
