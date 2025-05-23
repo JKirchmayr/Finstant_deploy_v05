@@ -1,5 +1,6 @@
 // import CompanySheet from "@/components/CompanySheet"
 // import CompanySheet from "@/components/CompanySheet"
+import InvestorSheet from "@/components/InvestorSheet"
 import { ExpandableCell } from "@/components/table/epandable-cell"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -65,17 +66,19 @@ const allColumns: ColumnDef<any>[] = [
     header: () => <div className="text-left min-w-[110px]">Investor Name</div>,
     cell: ({ row }) => {
       return (
-        <div className="inline-flex items-center">
-          <Image
-            src={row.original.investor_linkedin_logo.trimEnd() || "https://placehold.co/50x50"}
-            alt="logo"
-            width={20}
-            height={20}
-            className="mr-1.5 rounded"
-            unoptimized={true}
-          />
-          {row.getValue("investor_name") || "-"}
-        </div>
+        <InvestorSheet investor={row.original}>
+          <div className="inline-flex items-center hover:font-semibold transition-all duration-200">
+            <Image
+              src={row.original.investor_linkedin_logo.trimEnd() || "https://placehold.co/50x50"}
+              alt="logo"
+              width={20}
+              height={20}
+              className="mr-1.5 rounded"
+              unoptimized={true}
+            />
+            {row.getValue("investor_name") || "-"}
+          </div>
+        </InvestorSheet>
       )
     },
   },

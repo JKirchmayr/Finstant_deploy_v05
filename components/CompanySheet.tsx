@@ -78,17 +78,44 @@ const dummyCompany = {
     },
   ],
 }
+interface ICompany {
+  company_id?: number
+  investor_id?: number
+  Investor_name?: string
+  company_investor_status?: string
+  company_investor_entry_year?: string
+  company_name?: string
+  company_website?: string
+  companies_LLM_description?: string
+  linkedin_page?: string
+  companies_linkedin_last_scraped_at?: string
+  companies_linkedin_city?: string
+  companies_LLM_country?: string
+  companies_linkedin_about?: string
+  companies_linkedin_company_size?: number
+  companies_linkedin_founded?: number
+  companies_linkedin_specialties?: string
+  companies_linkedin_logo_url?: string
+  companies_linkedin_company_type?: string
+  companies_linkedin_employee_range_MIN?: number
+  companies_linkedin_employee_range_MAX?: number
+  companies_linkedin_industries?: string
+  companies_revenue_estimate_meur?: number | null
+  companies_EBITDA_estimate_meur?: number | null
+  description?: string
+  entry_year?: number
+  ebitda_in_meur?: number | null
+}
 
 const CompanySheet = ({ children, company }: { children: React.ReactNode; company: ICompany }) => {
   const [open, setOpen] = useState(false)
+  // console.log(company)
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger className="cursor-pointer text-left whitespace-nowrap">
-        {children}
-      </SheetTrigger>
+      <SheetTrigger className="cursor-pointer text-left whitespace-nowrap">{children}</SheetTrigger>
       <SheetContent className="min-w-[900px] rounded-tl-2xl rounded-bl-2xl">
         {/* Modal Header */}
-        <div className="flex space-x-2 ml-auto px-4 py-3 md:fixed right-0">
+        {/* <div className="flex space-x-2 ml-auto px-4 py-3 md:fixed right-0">
           <Button variant="outline" className="cursor-pointer">
             <ChevronLeft size={20} />
           </Button>
@@ -98,28 +125,33 @@ const CompanySheet = ({ children, company }: { children: React.ReactNode; compan
           <Button variant="outline" className="cursor-pointer" onClick={() => setOpen(false)}>
             ✕
           </Button>
-        </div>
+        </div> */}
 
         <div className="p-6 flex flex-col justify-between text-center md:text-left">
           <div className="flex flex-col items-center md:flex-row md:items-start md:gap-4">
             <div className="w-24 h-24 relative mb-4 md:mb-0">
               <Image
-                src={dummyCompany.imageUrl}
-                alt="Company Logo"
+                src={company.companies_linkedin_logo_url || ""}
+                alt={`${company.company_name} Logo`}
                 layout="fill"
                 objectFit="cover"
                 className="rounded-lg"
               />
             </div>
             <div className="flex flex-col gap-1 text-center md:text-left">
-              <h2 className="text-xl font-bold">{company.name}</h2>
+              <h2 className="text-xl font-bold">{company.company_name}</h2>
               <p className="text-sm text-gray-500 flex items-center gap-2">
-                {dummyCompany.city} <span>{dummyCompany.countryFlag}</span>
+                {company.companies_linkedin_city}, {company.companies_LLM_country}
               </p>
-              <a href="#" className="text-blue-500 underline">
-                {company.website}
+              <a
+                href={company.company_website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 underline"
+              >
+                {company.company_website}
               </a>
-              <Badge className="mt-2">{dummyCompany.industry}</Badge>
+              <Badge className="mt-2">{company.companies_linkedin_industries}</Badge>
             </div>
           </div>
         </div>
@@ -131,7 +163,9 @@ const CompanySheet = ({ children, company }: { children: React.ReactNode; compan
               {/* Company Description */}
               <div>
                 <h3 className="text-lg font-semibold mb-2">Company Description</h3>
-                <p className="text-gray-700 text-sm">{company.description}</p>
+                <p className="text-gray-700 text-sm">
+                  {company.description || company.companies_linkedin_about}
+                </p>
               </div>
 
               {/* Key Information */}

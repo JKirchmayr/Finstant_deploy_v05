@@ -1,5 +1,6 @@
 // import CompanySheet from "@/components/CompanySheet"
 // import CompanySheet from "@/components/CompanySheet"
+import CompanySheet from "@/components/CompanySheet"
 import { ExpandableCell } from "@/components/table/epandable-cell"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -69,17 +70,19 @@ const allColumns: ColumnDef<any>[] = [
     },
     cell: ({ row }) => {
       return (
-        <div className="inline-flex items-center">
-          <Image
-            src={row.original.companies_linkedin_logo_url || "https://placehold.co/50x50"}
-            alt="logo"
-            width={20}
-            height={20}
-            className="mr-1.5 rounded"
-            unoptimized={true}
-          />
-          {row.getValue("company_name") || "-"}
-        </div>
+        <CompanySheet company={row.original}>
+          <div className="inline-flex items-center hover:font-semibold transition-all duration-200">
+            <Image
+              src={row.original.companies_linkedin_logo_url || "https://placehold.co/50x50"}
+              alt="logo"
+              width={20}
+              height={20}
+              className="mr-1.5 rounded"
+              unoptimized={true}
+            />
+            {row.getValue("company_name") || "-"}
+          </div>
+        </CompanySheet>
       )
     },
     enablePinning: true,

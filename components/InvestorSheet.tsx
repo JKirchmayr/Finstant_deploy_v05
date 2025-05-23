@@ -22,48 +22,67 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 
+interface IInvestor {
+  id?: number
+  name?: string
+  website?: string
+  description?: string
+  type?: string
+  asset_classes?: string
+  strategy?: string
+  investment_criteria_description?: string
+  investor_linkedin_logo?: string
+  linkedin_url?: string
+  linkedin_employees?: number
+  country?: string
+  hq_city?: string
+  founded_year?: number
+  industry?: string
+  linkedin_description?: string
+  investment_focus?: string[]
+  investor_name?: string
+  investor_linkedin_city?: string
+  investor_LLM_country?: string
+  investor_linkedin_founded?: number
+  investor_type?: string
+  investor_asset_classes?: string
+  investor_industry?: string
+  investor_linkedin_description?: string
+}
+
+interface IDeal {
+  company: string
+  city: string
+  industry: string
+  website: string
+  description: string
+}
+
+interface IPerson {
+  name: string
+  location: string
+  position: string
+  email: string
+  description: string
+}
+
 const dummyInvestor = {
-  name: "Investor Name",
-  city: "City, Region, Country",
-  website: "www.investorwebsite.com",
-  description:
-    "Short description of the investor (max 3 lines) Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ip Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume",
-  imageUrl: "https://placehold.co/600x400/png",
-  tags: ["Private Equity", "Venture Capital", "Corporate"],
   deals: [
     {
-      company: "Company A",
-      city: "New York",
-      industry: "IT Services",
-      website: "#",
-      description:
-        "Short descriptio Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume.",
-    },
-    {
-      company: "Company B",
-      city: "London",
-      industry: "Industrial",
-      website: "#",
-      description:
-        "Short descriptio Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume",
+      company: "Example Company",
+      city: "Berlin",
+      industry: "Technology",
+      website: "https://example.com",
+      description: "A sample deal description",
     },
   ],
   people: [
     {
-      name: "Max Mustermann",
-      location: "Italy",
-      position: "Partner",
-      email: "max@example.com",
-      description:
-        "Short descriptio Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume.",
-    },
-    {
-      name: "Jane Doe",
-      location: "France",
-      position: "Analyst",
-      email: "jane@example.com",
-      description:
-        "Short descriptio Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume Lorem Ipsume.",
+      name: "John Doe",
+      location: "Berlin",
+      position: "Investment Manager",
+      email: "john@example.com",
+      description: "Team member description",
     },
   ],
 }
@@ -75,15 +94,14 @@ const InvestorSheet = ({
   children: React.ReactNode
   investor: IInvestor
 }) => {
+  // console.log(investor)
   const [open, setOpen] = useState(false)
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger className="cursor-pointer text-left whitespace-nowrap">
-        {children}
-      </SheetTrigger>
+      <SheetTrigger className="cursor-pointer text-left whitespace-nowrap">{children}</SheetTrigger>
       <SheetContent className="min-w-[900px] rounded-tl-2xl rounded-bl-2xl">
         {/* Modal Header */}
-        <div className="flex space-x-2 ml-auto px-4 py-3 md:fixed right-0">
+        {/* <div className="flex space-x-2 ml-auto px-4 py-3 md:fixed right-0">
           <Button variant="outline" className="cursor-pointer">
             <ChevronLeft size={20} />
           </Button>
@@ -93,39 +111,50 @@ const InvestorSheet = ({
           <Button variant="outline" className="cursor-pointer" onClick={() => setOpen(false)}>
             ✕
           </Button>
-        </div>
+        </div> */}
 
         {/* Modal Content */}
         <div className="p-6 border-b flex flex-col justify-between text-center md:text-left">
-          <div className="border-b flex flex-col items-center md:flex-row md:items-start md:gap-3">
+          <div className="border-b flex flex-col items-center md:flex-row md:items-start md:gap-3 pb-4">
             <div className="w-24 h-24 relative mb-4 md:mb-0 flex items-center justify-center">
               <img
-                src={investor.logo ? investor.logo : "https://placehold.co/600x400/png"}
-                alt="Investor Logo"
-                className="rounded-md"
+                src={investor.investor_linkedin_logo ?? "https://placehold.co/600x400/png"}
+                alt={`${investor.name} Logo`}
+                className="rounded-md object-contain"
               />
             </div>
-            <div className="flex flex-col gap-1">
-              <h2 className="text-xl font-bold">{investor.name}</h2>
-              <p className="text-sm text-gray-500">{investor.hq_city} </p>
+            <div className="flex flex-col gap-2">
+              <h2 className="text-xl font-bold">{investor.investor_name}</h2>
+              <div className="flex flex-col gap-1 text-sm">
+                <p className="text-gray-500">
+                  {investor.investor_linkedin_city}, {investor.investor_LLM_country}
+                </p>
+                <p className="text-gray-500">Founded: {investor.investor_linkedin_founded}</p>
+                <p className="text-gray-500">
+                  {investor.investor_type} • {investor.investor_asset_classes}
+                </p>
+              </div>
               <Link
                 href={investor.website ? investor.website : "/investors"}
                 target="_blank"
-                className="text-blue-500 underline"
+                className="text-blue-500 hover:text-blue-700 underline flex items-center gap-1"
               >
-                {investor.website}
+                Visit {investor.website} <ExternalLink size={14} />
               </Link>
-              <div className="mt-2 flex flex-wrap space-x-2 md:items-start items-center justify-center md:justify-start space-y-2">
-                {investor.investment_focus.map((tag, index) => (
-                  <Badge key={index} variant="secondary">
-                    {tag}
-                  </Badge>
-                ))}
-                {/* {investor.investment_focus} */}
+              <div className="mt-2 flex flex-wrap gap-2 md:items-start items-center justify-center md:justify-start">
+                <Badge variant="secondary">{investor.strategy}</Badge>
+                <Badge variant="secondary">{investor.industry}</Badge>
               </div>
             </div>
           </div>
-          <p className="md:text-sm text-xs text-gray-600 mt-4">{investor.description}</p>
+          <div className="mt-4 space-y-3">
+            <p className="md:text-sm text-xs text-gray-600">
+              {investor.investor_linkedin_description}
+            </p>
+            <p className="md:text-sm text-xs text-gray-600">
+              {investor.investment_criteria_description}
+            </p>
+          </div>
         </div>
 
         {/* Modal Body */}
