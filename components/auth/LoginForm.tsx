@@ -31,9 +31,7 @@ const Logo = () => (
       />
       <circle cx="18" cy="25" r="1.5" fill="#fff" />
     </svg>
-    <span className="text-3xl font-bold text-gray-800 tracking-wide">
-      pmradar
-    </span>
+    <span className="text-3xl font-bold text-gray-800 tracking-wide">pmradar</span>
   </div>
 );
 
@@ -71,8 +69,7 @@ const LoginForm = () => {
         </svg>
         <Logo />
         <p className="mt-8 text-lg md:text-xl text-gray-700 text-center max-w-md font-medium drop-shadow-sm">
-          Automating corporate finance workflows with{" "}
-          <br className="hidden md:block" />
+          Automating corporate finance workflows with <br className="hidden md:block" />
           <span className="text-blue-600">AI and private market data.</span>
         </p>
       </div>
@@ -86,100 +83,56 @@ const LoginForm = () => {
             Login
           </h2>
           {/* Email Field */}
-          <div className="relative mb-6">
-            <input
-              type="email"
-              {...register("email")}
-              onFocus={() => handleFocus("email")}
-              onBlur={() => handleBlur("email")}
-              className={`
-                w-full px-4 pt-5 pb-2 bg-white text-gray-900 rounded-lg
-                focus:outline-none
-              `}
-              required
-            />
-            <label
-              className={`
-                absolute left-4 top-2 text-gray-400 pointer-events-none transition-all duration-300
-                ${
-                  focus.email || errors.email
-                    ? "text-[10px] -top-4 text-blue-600 px-1"
-                    : "text-xs"
-                }
-              `}
-            >
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1 pl-1">
               Email
             </label>
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.email.message}
-              </p>
-            )}
+            <input
+              id="email"
+              type="email"
+              {...register("email")}
+              className="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300 text-gray-900 bg-white"
+              required
+              placeholder="example@mail.com"
+            />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
           </div>
           {/* Password Field */}
-          <div className="relative mb-8">
-            <input
-              type={showPassword ? "text" : "password"}
-              {...register("password")}
-              onFocus={() => handleFocus("password")}
-              onBlur={() => handleBlur("password")}
-              className={`
-                w-full px-4 pt-5 pb-2 bg-white text-gray-900 rounded-lg
-                focus:outline-none
-                pr-12
-              `}
-              required
-            />
-            <label
-              className={`
-                absolute left-4 top-2 text-gray-400 pointer-events-none transition-all duration-300
-                ${
-                  focus.password || errors.password
-                    ? "text-[10px] -top-4 text-blue-600 px-1"
-                    : "text-xs"
-                }
-              `}
-            >
+          <div className="mb-6">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1 pl-1">
               Password
             </label>
-            <button
-              type="button"
-              tabIndex={-1}
-              onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-600 focus:outline-none"
-              aria-label={showPassword ? "Hide password" : "Show password"}
-            >
-              {showPassword ? (
-                <Eye className="h-5 w-5" />
-              ) : (
-                <EyeOff className="h-5 w-5" />
-              )}
-            </button>
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                {...register("password")}
+                className="block w-full border border-gray-300 rounded-md px-3 py-2 pr-10 focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-300 text-gray-900 bg-white"
+                required
+                placeholder="Password"
+              />
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 focus:outline-none"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
+              </button>
+            </div>
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.password.message}
-              </p>
+              <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
             )}
           </div>
           <button
             type="submit"
             disabled={isPending || isSubmitting}
-            className={`
-              w-full py-3 rounded-lg font-semibold text-lg text-white
-              bg-blue-600 hover:bg-blue-500 active:bg-blue-700
-              shadow transition-all duration-200
-              focus:outline-none
-              ${
-                isPending || isSubmitting ? "opacity-60 cursor-not-allowed" : ""
-              }
-            `}
+            className="w-full py-2 rounded-md font-semibold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 transition-colors duration-150 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isPending || isSubmitting ? (
               <span className="flex items-center justify-center">
-                <svg
-                  className="animate-spin h-5 w-5 mr-2 text-white"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24">
                   <circle
                     className="opacity-25"
                     cx="12"
