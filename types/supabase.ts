@@ -11,7 +11,7 @@ export type Database = {
     Tables: {
       companies: {
         Row: {
-          companies_EBITDA_estimate_eurM: number | null
+          companies_EBITDA_estimate_mEUR: number | null
           companies_linkedin_about: string | null
           companies_linkedin_city: string | null
           companies_linkedin_company_size: number | null
@@ -25,18 +25,18 @@ export type Database = {
           companies_linkedin_specialties: string | null
           companies_LLM_country: string | null
           companies_LLM_description: string | null
-          companies_Revenue_estimate_eurM: number | null
+          companies_revenue_estimate_mEUR: number | null
           company_id: number
           company_investor_entry_year: string | null
           company_investor_status: string | null
-          company_name: string | null
+          company_name: string
           company_website: string | null
           investor_id: number | null
           Investor_name: string | null
           linkedin_page: string | null
         }
         Insert: {
-          companies_EBITDA_estimate_eurM?: number | null
+          companies_EBITDA_estimate_mEUR?: number | null
           companies_linkedin_about?: string | null
           companies_linkedin_city?: string | null
           companies_linkedin_company_size?: number | null
@@ -50,18 +50,18 @@ export type Database = {
           companies_linkedin_specialties?: string | null
           companies_LLM_country?: string | null
           companies_LLM_description?: string | null
-          companies_Revenue_estimate_eurM?: number | null
+          companies_revenue_estimate_mEUR?: number | null
           company_id: number
           company_investor_entry_year?: string | null
           company_investor_status?: string | null
-          company_name?: string | null
+          company_name: string
           company_website?: string | null
           investor_id?: number | null
           Investor_name?: string | null
           linkedin_page?: string | null
         }
         Update: {
-          companies_EBITDA_estimate_eurM?: number | null
+          companies_EBITDA_estimate_mEUR?: number | null
           companies_linkedin_about?: string | null
           companies_linkedin_city?: string | null
           companies_linkedin_company_size?: number | null
@@ -75,11 +75,11 @@ export type Database = {
           companies_linkedin_specialties?: string | null
           companies_LLM_country?: string | null
           companies_LLM_description?: string | null
-          companies_Revenue_estimate_eurM?: number | null
+          companies_revenue_estimate_mEUR?: number | null
           company_id?: number
           company_investor_entry_year?: string | null
           company_investor_status?: string | null
-          company_name?: string | null
+          company_name?: string
           company_website?: string | null
           investor_id?: number | null
           Investor_name?: string | null
@@ -90,19 +90,19 @@ export type Database = {
             foreignKeyName: "companies_investor_id_fkey"
             columns: ["investor_id"]
             isOneToOne: false
-            referencedRelation: "investor"
+            referencedRelation: "investors"
             referencedColumns: ["investor_id"]
           },
           {
             foreignKeyName: "companies_Investor_name_fkey"
             columns: ["Investor_name"]
             isOneToOne: false
-            referencedRelation: "investor"
+            referencedRelation: "investors"
             referencedColumns: ["investor_name"]
           },
         ]
       }
-      investor: {
+      investors: {
         Row: {
           investor_asset_classes: string | null
           investor_id: number
@@ -159,7 +159,7 @@ export type Database = {
         }
         Relationships: []
       }
-      transaction: {
+      transactions: {
         Row: {
           transaction_add_on: string | null
           transaction_buyer: string | null
@@ -223,7 +223,22 @@ export type Database = {
           transaction_target_website?: string | null
           transaction_year?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "transaction_transaction_buyer_fkey"
+            columns: ["transaction_buyer"]
+            isOneToOne: false
+            referencedRelation: "investors"
+            referencedColumns: ["investor_name"]
+          },
+          {
+            foreignKeyName: "transaction_transaction_target_fkey"
+            columns: ["transaction_target"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["company_name"]
+          },
+        ]
       }
     }
     Views: {
