@@ -1,9 +1,9 @@
-"use client"
-import { useWSStore } from "@/store/wsStore"
-import { useState, useMemo } from "react"
-import { ColumnDef, useReactTable, getCoreRowModel, flexRender } from "@tanstack/react-table"
-import { Pencil } from "lucide-react"
-import { ScrollArea } from "@/components/ui/scroll-area"
+"use client";
+import { useWSStore } from "@/store/wsStore";
+import { useState, useMemo } from "react";
+import { ColumnDef, useReactTable, getCoreRowModel, flexRender } from "@tanstack/react-table";
+import { Pencil } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
   TableBody,
@@ -11,30 +11,30 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import PinnableDataTable from "@/components/table/pinnable-data-table"
-import { Checkbox } from "@/components/ui/checkbox"
-import { useTabPanelStore } from "@/store/tabStore"
-import CompanyProfile from "@/components/CompanyProfile"
-import { GenerateSkeleton } from "./generate-skeleton"
-import Image from "next/image"
-import ChatDataTable from "@/components/chat/data-table"
+} from "@/components/ui/table";
+import PinnableDataTable from "@/components/table/pinnable-data-table";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useTabPanelStore } from "@/store/tabStore";
+import CompanyProfile from "@/components/CompanyProfile";
+import { GenerateSkeleton } from "./generate-skeleton";
+import Image from "next/image";
+import ChatDataTable from "@/components/chat/data-table";
 
 export type Company = {
-  company_id: string
-  company_name: string
-  company_description: string
-  similarity_score: number
-}
+  company_id: string;
+  company_name: string;
+  company_description: string;
+  similarity_score: number;
+};
 
 export default function CompaniesData({ companies }: { companies: Company[] }) {
-  const { addTab } = useTabPanelStore()
+  const { addTab } = useTabPanelStore();
 
   // console.log(companies, "companies")
 
-  const isPlaceholder = companies.some((company) => company.company_id.includes("placeholder"))
+  const isPlaceholder = companies.some((company) => company.company_id.includes("placeholder"));
 
-  console.log(isPlaceholder, "isPlaceholder")
+  console.log(isPlaceholder, "isPlaceholder");
 
   const handleAddTab = (data: any) => {
     addTab(
@@ -43,13 +43,13 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
       "company-profile",
       data,
       data?.company_id
-    )
-  }
+    );
+  };
   const columns: ColumnDef<Company>[] = [
     {
       id: "select",
       header: ({ table }) => (
-        <div className="flex items-center">
+        <div className="flex items-center w-full justify-center pr-4">
           <Checkbox
             checked={
               table.getIsAllPageRowsSelected() ||
@@ -65,12 +65,14 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
         </div>
       ),
       cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-          disabled={row.original.company_id.includes("placeholder")}
-        />
+        <div className="flex items-center w-full justify-center pr-4">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+            disabled={row.original.company_id.includes("placeholder")}
+          />
+        </div>
       ),
       maxSize: 40,
       enableSorting: false,
@@ -80,7 +82,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
       id: "index",
       maxSize: 30,
       header: ({}) => (
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center w-full">
           {isPlaceholder ? "Generating" : "#"}
         </div>
       ),
@@ -119,7 +121,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
               text={row.original.company_name}
             />
           </button>
-        )
+        );
       },
     },
     {
@@ -142,13 +144,13 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
         />
       ),
     },
-  ]
+  ];
 
   const table = useReactTable({
     data: companies,
     columns,
     getCoreRowModel: getCoreRowModel(),
-  })
+  });
 
   return (
     <div className="h-full flex flex-col bg-white w-full pt-1.5 ">
@@ -163,5 +165,5 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
         // defaultPinnedColumns={["index", "select", "company_name"]}
       />
     </div>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import React from "react"
+import React from "react";
 import {
   Building2,
   HandCoins,
@@ -15,7 +15,7 @@ import {
   Store,
   WandSparkles,
   Workflow,
-} from "lucide-react"
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -29,14 +29,14 @@ import {
   SidebarRail,
   SidebarTrigger,
   useSidebar,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import UserMenu from "./UserMenu"
-import { Separator } from "../ui/separator"
-import Image from "next/image"
-import IMAGES from "@/constant/images"
+} from "@/components/ui/sidebar";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import UserMenu from "./UserMenu";
+import { Separator } from "../ui/separator";
+import Image from "next/image";
+import IMAGES from "@/constant/images";
 
 const data = {
   projects: [
@@ -58,23 +58,18 @@ const data = {
   ],
   footer: [
     {
-      name: "Support",
-      url: "/support",
-      icon: LifeBuoy,
-    },
-    {
       name: "Settings",
       url: "/settings",
       icon: Settings,
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const pathname = usePathname()
-  const { state } = useSidebar()
+  const pathname = usePathname();
+  const { state } = useSidebar();
 
-  const isCollapsed = state === "collapsed"
+  const isCollapsed = state === "collapsed";
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="py-3 border-b border-gray-200">
@@ -202,5 +197,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
