@@ -21,6 +21,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 interface IInvestor {
   id?: number;
@@ -95,142 +96,193 @@ const InvestorSheet = ({
   children: React.ReactNode;
   investor: IInvestor;
 }) => {
-  // console.log(investor)
   const [open, setOpen] = useState(false);
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger className="cursor-pointer text-left whitespace-nowrap">{children}</SheetTrigger>
-      <SheetContent className="min-w-[900px] rounded-tl-2xl rounded-bl-2xl">
-        {/* Modal Header */}
-        {/* <div className="flex space-x-2 ml-auto px-4 py-3 md:fixed right-0">
-          <Button variant="outline" className="cursor-pointer">
-            <ChevronLeft size={20} />
-          </Button>
-          <Button variant="outline" className="cursor-pointer">
-            <ChevronRight size={20} />
-          </Button>
-          <Button variant="outline" className="cursor-pointer" onClick={() => setOpen(false)}>
-            ✕
-          </Button>
-        </div> */}
-
-        {/* Modal Content */}
-        <div className="p-6 border-b flex flex-col justify-between text-center md:text-left">
-          <div className="border-b flex flex-col items-center md:flex-row md:items-start md:gap-3 pb-4">
-            <div className="w-24 h-24 relative mb-4 md:mb-0 flex items-center justify-center">
-              <img
-                src={investor.investor_linkedin_logo ?? "https://placehold.co/600x400/png"}
-                alt={`${investor.name} Logo`}
-                className="rounded-md object-contain"
-              />
+      <SheetContent className="min-w-[900px] p-0 overflow-hidden">
+        <div className="h-full flex flex-col">
+          {/* Header Section */}
+          <div className="p-8 bg-gradient-to-r from-slate-50 to-gray-50 border-b">
+            <div className="flex items-start gap-6">
+              <div className="w-20 h-20 relative flex-shrink-0">
+                <Image
+                  src={investor.investor_linkedin_logo || "/placeholder.svg?height=80&width=80"}
+                  alt={`${investor.investor_name || investor.name} Logo`}
+                  fill
+                  className="rounded-xl object-cover border shadow-sm"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                  {investor.investor_name || investor.name}
+                </h1>
+                <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                  <div className="flex items-center gap-1">
+                    <span>🏢</span>
+                    {investor.investor_linkedin_city}, {investor.investor_LLM_country}
+                  </div>
+                  {investor.investor_website && (
+                    <a
+                      href={investor.investor_website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Website
+                    </a>
+                  )}
+                </div>
+                {(investor.investor_type || investor.investor_asset_classes) && (
+                  <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
+                    {investor.investor_type}{" "}
+                    {investor.investor_asset_classes && `• ${investor.investor_asset_classes}`}
+                  </Badge>
+                )}
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {investor.strategy && <Badge variant="secondary">{investor.strategy}</Badge>}
+                  {investor.industry && <Badge variant="secondary">{investor.industry}</Badge>}
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col gap-2">
-              <h2 className="text-xl font-bold">{investor.investor_name}</h2>
-              <div className="flex flex-col gap-1 text-sm">
-                <p className="text-gray-500">
-                  {investor.investor_linkedin_city}, {investor.investor_LLM_country}
-                </p>
-                <p className="text-gray-500">Founded: {investor.investor_linkedin_founded}</p>
-                <p className="text-gray-500">
-                  {investor.investor_type} • {investor.investor_asset_classes}
+          </div>
+
+          {/* Content Section */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-8 space-y-8">
+              {/* Overview Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Description */}
+                <div className="space-y-3">
+                  <h2 className="text-lg font-semibold text-gray-900">About</h2>
+                  <p className="text-gray-700 leading-relaxed">
+                    {investor.investor_linkedin_description || investor.description}
+                  </p>
+                </div>
+                {/* Key Information */}
+                <div className="space-y-3">
+                  <h2 className="text-lg font-semibold text-gray-900">Key Information</h2>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <span>Founded</span>
+                      </div>
+                      <p className="font-medium">{investor.investor_linkedin_founded || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <span>Employees</span>
+                      </div>
+                      <p className="font-medium">{investor.linkedin_employees || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <span>Type</span>
+                      </div>
+                      <p className="font-medium">{investor.investor_type || "-"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <span>Asset Classes</span>
+                      </div>
+                      <p className="font-medium">{investor.investor_asset_classes || "-"}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Investment Criteria */}
+              <div className="space-y-3">
+                <h2 className="text-lg font-semibold text-gray-900">Investment Criteria</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  {investor.investment_criteria_description || "No investment criteria provided."}
                 </p>
               </div>
-              <Link
-                href={investor.investor_website ? investor.investor_website : "/investors"}
-                target="_blank"
-                className="text-blue-500 hover:text-blue-700 underline flex items-center gap-1"
-              >
-                Visit {investor.investor_website} <ExternalLink size={14} />
-              </Link>
-              <div className="mt-2 flex flex-wrap gap-2 md:items-start items-center justify-center md:justify-start">
-                <Badge variant="secondary">{investor.strategy}</Badge>
-                <Badge variant="secondary">{investor.industry}</Badge>
+
+              <Separator />
+
+              {/* Deal History Section */}
+              <div className="space-y-4">
+                <h2 className="text-lg font-semibold text-gray-900">Deal History</h2>
+                <div className="bg-gray-50 rounded-lg overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-gray-100/50">
+                        <TableHead className="font-medium">Company</TableHead>
+                        <TableHead className="font-medium">City</TableHead>
+                        <TableHead className="font-medium">Industry</TableHead>
+                        <TableHead className="font-medium">Website</TableHead>
+                        <TableHead className="font-medium">Description</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {dummyInvestor.deals.map((deal, index) => (
+                        <TableRow key={index} className="border-gray-200">
+                          <TableCell className="font-medium">{deal.company}</TableCell>
+                          <TableCell>{deal.city}</TableCell>
+                          <TableCell>{deal.industry}</TableCell>
+                          <TableCell>
+                            <Link
+                              href={deal.website}
+                              className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                              <span className="text-sm">Visit</span>
+                            </Link>
+                          </TableCell>
+                          <TableCell className="text-gray-600 text-sm max-w-xs">
+                            {deal.description}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+
+              {/* People Section */}
+              <div className="space-y-4">
+                <h2 className="text-lg font-semibold text-gray-900">People</h2>
+                <div className="bg-gray-50 rounded-lg overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-gray-100/50">
+                        <TableHead className="font-medium">Name</TableHead>
+                        <TableHead className="font-medium">Location</TableHead>
+                        <TableHead className="font-medium">Position</TableHead>
+                        <TableHead className="font-medium">Email</TableHead>
+                        <TableHead className="font-medium">Description</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {dummyInvestor.people.map((person, index) => (
+                        <TableRow key={index} className="border-gray-200">
+                          <TableCell className="font-medium">{person.name}</TableCell>
+                          <TableCell>{person.location}</TableCell>
+                          <TableCell>{person.position}</TableCell>
+                          <TableCell>
+                            <a
+                              href={`mailto:${person.email}`}
+                              className="text-blue-600 hover:text-blue-800 transition-colors text-sm"
+                            >
+                              {person.email}
+                            </a>
+                          </TableCell>
+                          <TableCell className="text-gray-600 text-sm max-w-xs">
+                            {person.description}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="mt-4 space-y-3">
-            <p className="md:text-sm text-xs text-gray-600">
-              {investor.investor_linkedin_description}
-            </p>
-            <p className="md:text-sm text-xs text-gray-600">
-              {investor.investment_criteria_description}
-            </p>
-          </div>
-        </div>
-
-        {/* Modal Body */}
-        <div className="p-6 overflow-y-auto h-[calc(100%-60px)]">
-          {/* Deal History */}
-          <div className="border rounded-md p-4 mb-4">
-            <h3 className="text-lg font-semibold mb-2">Deal History</h3>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Company</TableHead>
-                  <TableHead>City</TableHead>
-                  <TableHead>Industry</TableHead>
-                  <TableHead>Website</TableHead>
-                  <TableHead className="min-w-72 whitespace-normal break-words">
-                    Description
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {dummyInvestor.deals.map((deal, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{deal.company}</TableCell>
-                    <TableCell>{deal.city}</TableCell>
-                    <TableCell>{deal.industry}</TableCell>
-                    <TableCell>
-                      <Link
-                        href={deal.website}
-                        className="text-blue-500 underline flex items-center"
-                      >
-                        <ExternalLink size={14} className="mr-1" /> Visit
-                      </Link>
-                    </TableCell>
-                    <TableCell className="whitespace-normal break-words text-gray-600">
-                      {deal.description}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* People Section */}
-          <div className="border rounded-md p-4">
-            <h3 className="text-lg font-semibold mb-2">People</h3>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Position</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead className="min-w-72 whitespace-normal break-words">
-                    Description
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {dummyInvestor.people.map((person, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{person.name}</TableCell>
-                    <TableCell>{person.location}</TableCell>
-                    <TableCell>{person.position}</TableCell>
-                    <TableCell>
-                      <a href={`mailto:${person.email}`} className="text-blue-500 underline">
-                        {person.email}
-                      </a>
-                    </TableCell>
-                    <TableCell className="whitespace-normal break-words text-gray-600">
-                      {person.description}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
           </div>
         </div>
       </SheetContent>
