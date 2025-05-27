@@ -17,7 +17,7 @@ export default function InvestorProfile({ data }: { data: any }) {
     country: "United States",
     city: "New York",
     website: "www.investor.com",
-    imageUrl: "https://placehold.co/50x50",
+    imageUrl: "https://placehold.co/50x50.png",
     investorTypes: [
       "Direct ",
       "Co-Invest",

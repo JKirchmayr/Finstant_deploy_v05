@@ -73,7 +73,7 @@ const allColumns: ColumnDef<any>[] = [
         <CompanySheet company={row.original}>
           <div className="inline-flex items-center hover:font-semibold transition-all duration-200">
             <Image
-              src={row.original.companies_linkedin_logo_url || "https://placehold.co/50x50"}
+              src={row.original.companies_linkedin_logo_url || "https://placehold.co/50x50.png"}
               alt="logo"
               width={20}
               height={20}

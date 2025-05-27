@@ -70,7 +70,9 @@ const allColumns: ColumnDef<any>[] = [
         <InvestorSheet investor={row.original}>
           <div className="inline-flex items-center hover:font-semibold transition-all duration-200">
             <Image
-              src={row.original.investor_linkedin_logo.trimEnd() || "https://placehold.co/50x50"}
+              src={
+                row.original.investor_linkedin_logo.trimEnd() || "https://placehold.co/50x50.png"
+              }
               alt="logo"
               width={20}
               height={20}

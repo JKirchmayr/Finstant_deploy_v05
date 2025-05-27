@@ -109,7 +109,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
             type="button"
           >
             <Image
-              src="https://placehold.co/50x50"
+              src="https://placehold.co/50x50.png"
               alt="logo"
               width={18}
               height={18}
