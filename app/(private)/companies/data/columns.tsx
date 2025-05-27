@@ -12,7 +12,7 @@ import Link from "next/link";
 const allColumns: ColumnDef<any>[] = [
   {
     id: "select",
-    maxSize: 45,
+    maxSize: 50,
     header: ({ table }) => (
       <Checkbox
         checked={
@@ -24,7 +24,7 @@ const allColumns: ColumnDef<any>[] = [
       />
     ),
     cell: ({ row }) => (
-      <div className="flex items-center w-full justify-center pr-4">
+      <div className="flex justify-center items-center w-full">
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}

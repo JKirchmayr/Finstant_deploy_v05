@@ -49,7 +49,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
     {
       id: "select",
       header: ({ table }) => (
-        <div className="flex items-center w-full justify-center pr-4">
+        <div className="flex items-center w-full justify-center">
           <Checkbox
             checked={
               table.getIsAllPageRowsSelected() ||
@@ -65,7 +65,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
         </div>
       ),
       cell: ({ row }) => (
-        <div className="flex items-center w-full justify-center pr-4">
+        <div className="flex items-center w-full justify-center">
           <Checkbox
             checked={row.getIsSelected()}
             onCheckedChange={(value) => row.toggleSelected(!!value)}
