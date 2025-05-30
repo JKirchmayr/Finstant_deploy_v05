@@ -1,9 +1,9 @@
-"use client";
-import { useWSStore } from "@/store/wsStore";
-import { useState, useMemo } from "react";
-import { ColumnDef, useReactTable, getCoreRowModel, flexRender } from "@tanstack/react-table";
-import { Pencil } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+"use client"
+import { useWSStore } from "@/store/wsStore"
+import { useState, useMemo } from "react"
+import { ColumnDef, useReactTable, getCoreRowModel, flexRender } from "@tanstack/react-table"
+import { Pencil } from "lucide-react"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Table,
   TableBody,
@@ -11,30 +11,30 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import PinnableDataTable from "@/components/table/pinnable-data-table";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useTabPanelStore } from "@/store/tabStore";
-import CompanyProfile from "@/components/CompanyProfile";
-import { GenerateSkeleton } from "./generate-skeleton";
-import Image from "next/image";
-import ChatDataTable from "@/components/chat/data-table";
+} from "@/components/ui/table"
+import PinnableDataTable from "@/components/table/pinnable-data-table"
+import { Checkbox } from "@/components/ui/checkbox"
+import { useTabPanelStore } from "@/store/tabStore"
+import CompanyProfile from "@/components/CompanyProfile"
+import { GenerateSkeleton } from "./generate-skeleton"
+import Image from "next/image"
+import ChatDataTable from "@/components/chat/data-table"
 
 export type Company = {
-  company_id: string;
-  company_name: string;
-  company_description: string;
-  similarity_score: number;
-};
+  company_id: string
+  company_name: string
+  company_description: string
+  similarity_score: number
+}
 
 export default function CompaniesData({ companies }: { companies: Company[] }) {
-  const { addTab } = useTabPanelStore();
+  const { addTab } = useTabPanelStore()
 
   // console.log(companies, "companies")
 
-  const isPlaceholder = companies.some((company) => company.company_id.includes("placeholder"));
+  const isPlaceholder = companies.some(company => company.company_id.includes("placeholder"))
 
-  console.log(isPlaceholder, "isPlaceholder");
+  console.log(isPlaceholder, "isPlaceholder")
 
   const handleAddTab = (data: any) => {
     addTab(
@@ -43,8 +43,8 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
       "company-profile",
       data,
       data?.company_id
-    );
-  };
+    )
+  }
   const columns: ColumnDef<Company>[] = [
     {
       id: "select",
@@ -55,12 +55,12 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
               table.getIsAllPageRowsSelected() ||
               (table.getIsSomePageRowsSelected() && "indeterminate")
             }
-            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
             aria-label="Select all"
             className="mx-auto"
             disabled={table
               .getFilteredRowModel()
-              .rows.some((row) => row.original.company_id.includes("placeholder"))}
+              .rows.some(row => row.original.company_id.includes("placeholder"))}
           />
         </div>
       ),
@@ -68,7 +68,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
         <div className="flex items-center w-full justify-center">
           <Checkbox
             checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            onCheckedChange={value => row.toggleSelected(!!value)}
             aria-label="Select row"
             disabled={row.original.company_id.includes("placeholder")}
           />
@@ -121,7 +121,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
               text={row.original.company_name}
             />
           </button>
-        );
+        )
       },
     },
     {
@@ -144,13 +144,7 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
         />
       ),
     },
-  ];
-
-  const table = useReactTable({
-    data: companies,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
+  ]
 
   return (
     <div className="h-full flex flex-col bg-white w-full pt-1.5 ">
@@ -162,8 +156,8 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
         loadMoreData={() => console.log("loadmore")}
         filterBy="company_name"
         topbarClass="px-1.5 mb-1.5"
-        // defaultPinnedColumns={["index", "select", "company_name"]}
+        defaultPinnedColumns={["index", "select", "company_name"]}
       />
     </div>
-  );
+  )
 }

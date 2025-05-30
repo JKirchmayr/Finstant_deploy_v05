@@ -1,25 +1,26 @@
-"use client";
+"use client"
 
-import { ColumnDef } from "@tanstack/react-table";
-import PinnableDataTable from "@/components/table/pinnable-data-table";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useTabPanelStore } from "@/store/tabStore";
-import { GenerateSkeleton } from "./generate-skeleton";
-import Image from "next/image";
-import ChatDataTable from "@/components/chat/data-table";
-import { ExpandableCell } from "@/components/table/epandable-cell";
+import { ColumnDef } from "@tanstack/react-table"
+import PinnableDataTable from "@/components/table/pinnable-data-table"
+import { Checkbox } from "@/components/ui/checkbox"
+import { useTabPanelStore } from "@/store/tabStore"
+import { GenerateSkeleton } from "./generate-skeleton"
+import Image from "next/image"
+import ChatDataTable from "@/components/chat/data-table"
+import { ExpandableCell } from "@/components/table/epandable-cell"
+import { AddColumnProvider, useAddColumn } from "@/context/newColumn"
 
 export type InvestorsProps = {
-  investor_id: string;
-  investor_name?: string;
-  investor_description?: string;
-  similarity_score?: number;
-};
+  investor_id: string
+  investor_name?: string
+  investor_description?: string
+  similarity_score?: number
+}
 
 export default function InvestorsResponseData({ investors }: { investors: InvestorsProps[] }) {
-  const { addTab } = useTabPanelStore();
+  const { addTab } = useTabPanelStore()
 
-  const isPlaceholder = investors.some((investor) => investor.investor_id?.includes("placeholder"));
+  const isPlaceholder = investors.some(investor => investor.investor_id?.includes("placeholder"))
 
   const handleAddTab = (data: any) => {
     addTab(
@@ -28,8 +29,8 @@ export default function InvestorsResponseData({ investors }: { investors: Invest
       "investor-profile",
       data,
       data?.investor_id
-    );
-  };
+    )
+  }
 
   const columns: ColumnDef<InvestorsProps>[] = [
     {
@@ -41,19 +42,19 @@ export default function InvestorsResponseData({ investors }: { investors: Invest
               table.getIsAllPageRowsSelected() ||
               (table.getIsSomePageRowsSelected() && "indeterminate")
             }
-            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
             aria-label="Select all"
             className=""
             disabled={table
               .getFilteredRowModel()
-              .rows.some((row) => row.original.investor_id?.includes("placeholder"))}
+              .rows.some(row => row.original.investor_id?.includes("placeholder"))}
           />
         </div>
       ),
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          onCheckedChange={value => row.toggleSelected(!!value)}
           aria-label="Select row"
           className=""
           disabled={row.original.investor_id?.includes("placeholder")}
@@ -125,7 +126,9 @@ export default function InvestorsResponseData({ investors }: { investors: Invest
         />
       ),
     },
-  ];
+  ]
+
+  const { query, setQuery, handleSearch } = useAddColumn()
 
   return (
     <div className="h-full flex flex-col bg-white w-full pt-1.5 ">
@@ -139,5 +142,5 @@ export default function InvestorsResponseData({ investors }: { investors: Invest
         topbarClass="px-1.5 mb-1.5"
       />
     </div>
-  );
+  )
 }
