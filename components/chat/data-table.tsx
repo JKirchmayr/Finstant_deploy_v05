@@ -95,7 +95,7 @@ const ChatDataTable = <T extends any>({
       if (isLoading) return
       if (observer.current) observer.current.disconnect()
 
-      observer.current = new IntersectionObserver(entries => {
+      observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMoreData) {
           loadMoreData()
         }
@@ -112,9 +112,9 @@ const ChatDataTable = <T extends any>({
     const headers = Object.keys(data[0])
     const csvRows = [
       headers.join(","),
-      ...data.map(row =>
+      ...data.map((row) =>
         headers
-          .map(field => {
+          .map((field) => {
             const val = row[field]
             const escaped = typeof val === "string" ? `"${val.replace(/"/g, '""')}"` : val
             return escaped ?? ""
@@ -147,7 +147,7 @@ const ChatDataTable = <T extends any>({
   }
 
   const handleExport = (format: "csv" | "excel") => {
-    const selectedRows = table.getSelectedRowModel().rows.map(row => row.original)
+    const selectedRows = table.getSelectedRowModel().rows.map((row) => row.original)
     const exportData = selectedRows.length ? selectedRows : data
     const filename = `${selectedRows.length ? "selected" : "all"}-data.${
       format === "csv" ? "csv" : "xlsx"
@@ -168,7 +168,7 @@ const ChatDataTable = <T extends any>({
           <Input
             placeholder="Search"
             value={(table.getColumn(filterBy)?.getFilterValue() as string) ?? ""}
-            onChange={event => table.getColumn(filterBy)?.setFilterValue(event.target.value)}
+            onChange={(event) => table.getColumn(filterBy)?.setFilterValue(event.target.value)}
             className="pl-7 focus-visible:ring-0 border-gray-300"
           />
         </div>
@@ -181,7 +181,7 @@ const ChatDataTable = <T extends any>({
             <ExportOptions
               data={
                 Object.keys(rowSelection).length > 0
-                  ? Object.keys(rowSelection).map(index => data[Number(index)])
+                  ? Object.keys(rowSelection).map((index) => data[Number(index)])
                   : data
               }
               onExport={(format: "csv" | "excel") => handleExport(format)}
@@ -195,9 +195,9 @@ const ChatDataTable = <T extends any>({
           style={{ minWidth: "100%", width: table.getTotalSize() }}
         >
           <TableHeader className="bg-white text-[13px] h-8 sticky top-0 z-10">
-            {table.getHeaderGroups().map(headerGroup => (
+            {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="bg-muted/50">
-                {headerGroup.headers.map(header => {
+                {headerGroup.headers.map((header) => {
                   const { column } = header
                   const isPinned = column.getIsPinned()
                   const isLastLeftPinned = isPinned === "left" && column.getIsLastColumn("left")
@@ -264,7 +264,7 @@ const ChatDataTable = <T extends any>({
                     </TableHead>
                   )
                 })}
-                <TableHead className="px-0 w-10 ">
+                <TableHead className="px-0 max-w-[40px] overflow-auto">
                   <AddNewColumn />
                 </TableHead>
               </TableRow>
@@ -307,7 +307,11 @@ const ChatDataTable = <T extends any>({
                               style={{ ...getPinningStyles(column) }}
                               data-pinned={isPinned || undefined}
                               data-last-col={
-                                isLastLeftPinned ? "left" : isFirstRightPinned ? "right" : undefined
+                                isLastLeftPinned
+                                  ? "left"
+                                  : isFirstRightPinned
+                                  ? "right"
+                                  : undefined
                               }
                             >
                               {flexRender(cell.column.columnDef.cell, cell.getContext())}
