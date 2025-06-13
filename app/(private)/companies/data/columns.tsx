@@ -1,50 +1,56 @@
 // import CompanySheet from "@/components/CompanySheet"
 // import CompanySheet from "@/components/CompanySheet"
-import CompanySheet from "@/components/CompanySheet";
-import { ExpandableCell } from "@/components/table/epandable-cell";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ColumnDef } from "@tanstack/react-table";
-import { ExternalLink } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import CompanySheet from "@/components/CompanySheet"
+import { ExpandableCell } from "@/components/table/epandable-cell"
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import { ColumnDef } from "@tanstack/react-table"
+import { ExternalLink } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
 
 const allColumns: ColumnDef<any>[] = [
   {
     id: "select",
-    maxSize: 50,
+    // maxSize: 45,
+    size: 65,
     header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="mx-auto"
-      />
+      <div className="flex justify-center items-center w-full gap-2">
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+          // className="mx-auto"
+        />
+        <div className="text-center">#</div>
+      </div>
     ),
     cell: ({ row }) => (
-      <div className="flex justify-center items-center w-full">
+      <div className="flex justify-center items-center w-full gap-2">
         <Checkbox
           checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          onCheckedChange={value => row.toggleSelected(!!value)}
           aria-label="Select row"
+          // className="mx-auto"
         />
+        <div className="text-center">{row.index + 1}</div>
       </div>
     ),
     enableSorting: false,
     enableHiding: false,
-    enablePinning: false,
   },
-  {
-    id: "index",
-    header: () => <span className="text-center mx-auto">#</span>,
-    maxSize: 40,
-    cell: ({ row }) => <div className="text-center mx-auto">{row.index + 1}</div>,
-    enableSorting: false,
-    enableHiding: false,
-    enablePinning: false,
-  },
+  // {
+  //   id: "index",
+  //   header: () => <span className="text-center mx-auto">#</span>,
+  //   maxSize: 40,
+  //   cell: ({ row }) => <div className="text-center mx-auto">{row.index + 1}</div>,
+  //   enableSorting: false,
+  //   enableHiding: false,
+  //   enablePinning: false,
+  // },
   // {
   //   accessorKey: "logo",
   //   header: "Logo",
@@ -66,7 +72,7 @@ const allColumns: ColumnDef<any>[] = [
     accessorKey: "company_name",
     minSize: 260,
     header: ({ column }) => {
-      return <div className="text-left">Company Name</div>;
+      return <div className="text-left">Company Name</div>
     },
     cell: ({ row }) => {
       return (
@@ -83,7 +89,7 @@ const allColumns: ColumnDef<any>[] = [
             {row.getValue("company_name") || "-"}
           </div>
         </CompanySheet>
-      );
+      )
     },
     enablePinning: true,
   },
@@ -94,7 +100,7 @@ const allColumns: ColumnDef<any>[] = [
       <div className="text-left overflow-hidden w-[300px] line-clamp-2">Description</div>
     ),
     cell: ({ row, column }) => {
-      const width = column.getSize();
+      const width = column.getSize()
       return (
         <ExpandableCell
           className={`w-${width}px`}
@@ -102,7 +108,7 @@ const allColumns: ColumnDef<any>[] = [
         >
           {row.getValue("companies_LLM_description")}
         </ExpandableCell>
-      );
+      )
     },
   },
   {
@@ -122,7 +128,7 @@ const allColumns: ColumnDef<any>[] = [
             </Badge>
           )}
         </Link>
-      );
+      )
     },
   },
   {
@@ -245,15 +251,15 @@ const allColumns: ColumnDef<any>[] = [
   //     </div>
   //   ),
   // },
-];
+]
 
 export function getColumnsForData(data: any[]): ColumnDef<any>[] {
-  if (!data || data.length === 0) return allColumns;
-  const dataKeys = Object.keys(data[0]);
+  if (!data || data.length === 0) return allColumns
+  const dataKeys = Object.keys(data[0])
   return allColumns.filter(
-    (col) =>
+    col =>
       col.id === "select" ||
       col.id === "index" ||
       ("accessorKey" in col && dataKeys.includes(col.accessorKey as string))
-  );
+  )
 }

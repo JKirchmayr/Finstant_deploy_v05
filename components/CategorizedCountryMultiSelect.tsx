@@ -1,43 +1,51 @@
-"use client";
+"use client"
 
-import React from "react";
-import MultipleSelector, { Option } from "./ui/multiselect";
+import React, { useEffect } from "react"
+import MultipleSelector, { Option } from "./ui/multiselect"
 
 const categorizedOptions: Option[] = [
   // North America
   {
-    value: "us",
+    value: "United States",
     label: "United States",
     flag: "US",
     category: "North America",
   },
-  { value: "ca", label: "Canada", flag: "CA", category: "North America" },
-  { value: "mx", label: "Mexico", flag: "MX", category: "North America" },
+  { value: "Canada", label: "Canada", flag: "CA", category: "North America" },
+  { value: "Mexico", label: "Mexico", flag: "MX", category: "North America" },
 
   // Europe
-  { value: "gb", label: "United Kingdom", flag: "GB", category: "Europe" },
-  { value: "fr", label: "France", flag: "FR", category: "Europe" },
-  { value: "de", label: "Germany", flag: "DE", category: "Europe" },
-  { value: "it", label: "Italy", flag: "IT", category: "Europe" },
+  { value: "United Kingdom", label: "United Kingdom", flag: "GB", category: "Europe" },
+  { value: "France", label: "France", flag: "FR", category: "Europe" },
+  { value: "Germany", label: "Germany", flag: "DE", category: "Europe" },
+  { value: "Italy", label: "Italy", flag: "IT", category: "Europe" },
 
   // Asia
-  { value: "jp", label: "Japan", flag: "JP", category: "Asia" },
-  { value: "cn", label: "China", flag: "CN", category: "Asia" },
-  { value: "kr", label: "South Korea", flag: "KR", category: "Asia" },
-  { value: "in", label: "India", flag: "IN", category: "Asia" },
+  { value: "Japan", label: "Japan", flag: "JP", category: "Asia" },
+  { value: "China", label: "China", flag: "CN", category: "Asia" },
+  { value: "South Korea", label: "South Korea", flag: "KR", category: "Asia" },
+  { value: "India", label: "India", flag: "IN", category: "Asia" },
 
   // Global
-  { value: "GLOBAL", label: "Global", flagEmoji: "🌍", category: "Global" },
-];
+  { value: "Global", label: "Global", flagEmoji: "🌍", category: "Global" },
+]
 
-export function CategorizedCountryMultiSelect() {
-  const [selectedCountries, setSelectedCountries] = React.useState<Option[]>(
-    []
-  );
+export function CategorizedCountryMultiSelect({
+  onSelecCountries,
+}: {
+  onSelecCountries: (countries: Option[]) => void
+}) {
+  const [selectedCountries, setSelectedCountries] = React.useState<Option[]>([])
 
   const handleChange = (options: Option[]) => {
-    setSelectedCountries(options);
-  };
+    setSelectedCountries(options)
+  }
+
+  useEffect(() => {
+    if (selectedCountries.length > 0) {
+      onSelecCountries(selectedCountries)
+    }
+  }, [selectedCountries])
   return (
     <MultipleSelector
       noAbsolute
@@ -52,8 +60,9 @@ export function CategorizedCountryMultiSelect() {
       commandProps={{
         label: "Select countries",
       }}
+      className="border-gray-300"
     />
-  );
+  )
 }
 
-export default CategorizedCountryMultiSelect;
+export default CategorizedCountryMultiSelect

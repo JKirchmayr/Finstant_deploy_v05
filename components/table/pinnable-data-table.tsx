@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import React, { CSSProperties, useCallback, useRef, useState } from "react";
-import * as XLSX from "xlsx";
+import React, { CSSProperties, useCallback, useRef, useState } from "react"
+import * as XLSX from "xlsx"
 import {
   Column,
   ColumnDef,
@@ -14,23 +14,24 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
+} from "@tanstack/react-table"
 import {
   ArrowLeftToLineIcon,
   ArrowRightToLineIcon,
   EllipsisIcon,
+  Loader,
   PinIcon,
   PinOffIcon,
   Search,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu"
 import {
   Table,
   TableBody,
@@ -38,35 +39,37 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
-import { DataTablePagination } from "./Pagination";
-import { ExportOptions } from "./export-options";
-import { cn } from "@/lib/utils";
+} from "@/components/ui/table"
+import { Skeleton } from "@/components/ui/skeleton"
+import { DataTablePagination } from "./Pagination"
+import { ExportOptions } from "./export-options"
+import { cn } from "@/lib/utils"
+import { usePathname } from "next/navigation"
+import Image from "next/image"
 
 interface IPinnableDataTableProps<T extends any> {
-  data: T[];
-  columns: ColumnDef<T>[];
-  isLoading: boolean;
-  loadMoreData: () => void;
-  hasMoreData: boolean;
-  paginationOption?: boolean;
-  filterBy?: string;
-  defaultPinnedColumns?: string[];
-  topbarClass?: string;
+  data: T[]
+  columns: ColumnDef<T>[]
+  isLoading: boolean
+  loadMoreData: () => void
+  hasMoreData: boolean
+  paginationOption?: boolean
+  filterBy?: string
+  defaultPinnedColumns?: string[]
+  topbarClass?: string
 }
 
 // Helper function to compute pinning styles for columns
 const getPinningStyles = <T,>(column: Column<T>): CSSProperties => {
-  const isPinned = column.getIsPinned();
+  const isPinned = column.getIsPinned()
   return {
     left: isPinned === "left" ? `${column.getStart("left")}px` : undefined,
     right: isPinned === "right" ? `${column.getAfter("right")}px` : undefined,
     position: isPinned ? "sticky" : "relative",
     width: column.getSize(),
     zIndex: isPinned ? 1 : 0,
-  };
-};
+  }
+}
 
 const PinnableDataTable = <T extends any>({
   data,
@@ -79,10 +82,14 @@ const PinnableDataTable = <T extends any>({
   filterBy = "name",
   defaultPinnedColumns = [],
 }: IPinnableDataTableProps<T>) => {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [rowSelection, setRowSelection] = useState({})
+
+  const pathname = usePathname()
+  const investors = pathname === "/investors"
+  const companies = pathname === "/companies"
 
   const table = useReactTable({
     data,
@@ -107,74 +114,74 @@ const PinnableDataTable = <T extends any>({
         right: [],
       },
     },
-  });
+  })
 
-  const observer = useRef<IntersectionObserver | null>(null);
+  const observer = useRef<IntersectionObserver | null>(null)
   const lastRowRef = useCallback(
     (node: HTMLElement | null) => {
-      if (isLoading) return;
-      if (observer.current) observer.current.disconnect();
+      if (isLoading) return
+      if (observer.current) observer.current.disconnect()
 
-      observer.current = new IntersectionObserver((entries) => {
+      observer.current = new IntersectionObserver(entries => {
         if (entries[0].isIntersecting && hasMoreData) {
-          loadMoreData();
+          loadMoreData()
         }
-      });
+      })
 
-      if (node) observer.current.observe(node);
+      if (node) observer.current.observe(node)
     },
     [isLoading, hasMoreData, loadMoreData]
-  );
+  )
 
   const exportToCSV = (data: any[], filename = "export.csv") => {
-    if (!data.length) return;
+    if (!data.length) return
 
-    const headers = Object.keys(data[0]);
+    const headers = Object.keys(data[0])
     const csvRows = [
       headers.join(","),
-      ...data.map((row) =>
+      ...data.map(row =>
         headers
-          .map((field) => {
-            const val = row[field];
-            const escaped = typeof val === "string" ? `"${val.replace(/"/g, '""')}"` : val;
-            return escaped ?? "";
+          .map(field => {
+            const val = row[field]
+            const escaped = typeof val === "string" ? `"${val.replace(/"/g, '""')}"` : val
+            return escaped ?? ""
           })
           .join(",")
       ),
-    ];
+    ]
 
-    const csvContent = csvRows.join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
+    const csvContent = csvRows.join("\n")
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
 
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", filename);
-    link.style.display = "none";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+    const link = document.createElement("a")
+    link.setAttribute("href", url)
+    link.setAttribute("download", filename)
+    link.style.display = "none"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   const exportToExcel = (data: any[], filename = "export.xlsx") => {
-    if (!data.length) return;
+    if (!data.length) return
 
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    const worksheet = XLSX.utils.json_to_sheet(data)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1")
 
-    XLSX.writeFile(workbook, filename);
-  };
+    XLSX.writeFile(workbook, filename)
+  }
 
   const handleExport = (format: "csv" | "excel") => {
-    const selectedRows = table.getSelectedRowModel().rows.map((row) => row.original);
-    const exportData = selectedRows.length ? selectedRows : data;
+    const selectedRows = table.getSelectedRowModel().rows.map(row => row.original)
+    const exportData = selectedRows.length ? selectedRows : data
     const filename = `${selectedRows.length ? "selected" : "all"}-data.${
       format === "csv" ? "csv" : "xlsx"
-    }`;
+    }`
 
-    format === "csv" ? exportToCSV(exportData, filename) : exportToExcel(exportData, filename);
-  };
+    format === "csv" ? exportToCSV(exportData, filename) : exportToExcel(exportData, filename)
+  }
 
   return (
     <div className="w-full flex h-full flex-col gap-3">
@@ -189,7 +196,7 @@ const PinnableDataTable = <T extends any>({
           <Input
             placeholder="Search"
             value={(table.getColumn(filterBy)?.getFilterValue() as string) ?? ""}
-            onChange={(event) => table.getColumn(filterBy)?.setFilterValue(event.target.value)}
+            onChange={event => table.getColumn(filterBy)?.setFilterValue(event.target.value)}
             className="pl-7 focus-visible:ring-0 bg-white border-gray-300"
           />
         </div>
@@ -202,7 +209,7 @@ const PinnableDataTable = <T extends any>({
             <ExportOptions
               data={
                 Object.keys(rowSelection).length > 0
-                  ? Object.keys(rowSelection).map((index) => data[Number(index)])
+                  ? Object.keys(rowSelection).map(index => data[Number(index)])
                   : data
               }
               onExport={(format: "csv" | "excel") => handleExport(format)}
@@ -216,14 +223,14 @@ const PinnableDataTable = <T extends any>({
           style={{ width: table.getTotalSize() }}
         >
           <TableHeader className="bg-white text-[13px] h-8 sticky top-0 z-10">
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id} className="bg-muted/50">
-                {headerGroup.headers.map((header) => {
-                  const { column } = header;
-                  const isPinned = column.getIsPinned();
-                  const isLastLeftPinned = isPinned === "left" && column.getIsLastColumn("left");
+                {headerGroup.headers.map(header => {
+                  const { column } = header
+                  const isPinned = column.getIsPinned()
+                  const isLastLeftPinned = isPinned === "left" && column.getIsLastColumn("left")
                   const isFirstRightPinned =
-                    isPinned === "right" && column.getIsFirstColumn("right");
+                    isPinned === "right" && column.getIsFirstColumn("right")
 
                   return (
                     <TableHead
@@ -312,7 +319,7 @@ const PinnableDataTable = <T extends any>({
                         )}
                       </div>
                     </TableHead>
-                  );
+                  )
                 })}
               </TableRow>
             ))}
@@ -332,7 +339,7 @@ const PinnableDataTable = <T extends any>({
               <>
                 {table.getRowModel().rows.length ? (
                   table.getRowModel().rows.map((row, index) => {
-                    const isLastRow = index === table.getRowModel().rows.length - 5;
+                    const isLastRow = index === table.getRowModel().rows.length - 5
                     return (
                       <TableRow
                         ref={isLastRow ? lastRowRef : null}
@@ -340,12 +347,12 @@ const PinnableDataTable = <T extends any>({
                         className="min-h-6 border-b transition-colors hover:bg-gray-100/80"
                       >
                         {row.getVisibleCells().map((cell: any) => {
-                          const { column } = cell;
-                          const isPinned = column.getIsPinned();
+                          const { column } = cell
+                          const isPinned = column.getIsPinned()
                           const isLastLeftPinned =
-                            isPinned === "left" && column.getIsLastColumn("left");
+                            isPinned === "left" && column.getIsLastColumn("left")
                           const isFirstRightPinned =
-                            isPinned === "right" && column.getIsFirstColumn("right");
+                            isPinned === "right" && column.getIsFirstColumn("right")
 
                           return (
                             <TableCell
@@ -359,15 +366,25 @@ const PinnableDataTable = <T extends any>({
                             >
                               {flexRender(cell.column.columnDef.cell, cell.getContext())}
                             </TableCell>
-                          );
+                          )
                         })}
                       </TableRow>
-                    );
+                    )
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={columns.length} className="h-24 text-center">
-                      No results.
+                    <TableCell colSpan={investors ? 8 : 5}>
+                      <div className="h-40 text-center text-lg font-medium flex justify-center items-center flex-col shrink-0">
+                        <Image
+                          src="/images/no-data.png"
+                          alt="No data"
+                          width={150}
+                          height={150}
+                          className="shrink-0"
+                          style={{ mixBlendMode: "multiply" }}
+                        />
+                        <p className="text-sm text-muted-foreground"> No results.</p>
+                      </div>
                     </TableCell>
                   </TableRow>
                 )}
@@ -376,11 +393,16 @@ const PinnableDataTable = <T extends any>({
           </TableBody>
         </Table>
       </div>
+      {isLoading && data.length > 0 && (
+        <div className="h-20 py-2 flex justify-center items-center bg-white text-center">
+          <Loader className="animate-spin mx-auto" />
+        </div>
+      )}
       {/* {paginationOption && data.length > 9 && (
         <DataTablePagination table={table} />
       )} */}
     </div>
-  );
-};
+  )
+}
 
-export default PinnableDataTable;
+export default PinnableDataTable

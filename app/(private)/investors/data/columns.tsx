@@ -1,49 +1,55 @@
 // import CompanySheet from "@/components/CompanySheet"
 // import CompanySheet from "@/components/CompanySheet"
-import InvestorSheet from "@/components/InvestorSheet";
-import { ExpandableCell } from "@/components/table/epandable-cell";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ColumnDef } from "@tanstack/react-table";
-import { ExternalLink } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import InvestorSheet from "@/components/InvestorSheet"
+import { ExpandableCell } from "@/components/table/epandable-cell"
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import { ColumnDef } from "@tanstack/react-table"
+import { ExternalLink } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
 
 const allColumns: ColumnDef<any>[] = [
   {
     id: "select",
-    maxSize: 45,
+    // maxSize: 45,
+    size: 65,
     header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="mx-auto"
-      />
+      <div className="flex justify-center items-center w-full gap-2">
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+          // className="mx-auto"
+        />
+        <div className="text-center">#</div>
+      </div>
     ),
     cell: ({ row }) => (
-      <div className="flex justify-center items-center w-full">
+      <div className="flex justify-center items-center w-full gap-2">
         <Checkbox
           checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          onCheckedChange={value => row.toggleSelected(!!value)}
           aria-label="Select row"
-          className="mx-auto"
+          // className="mx-auto"
         />
+        <div className="text-center">{row.index + 1}</div>
       </div>
     ),
     enableSorting: false,
     enableHiding: false,
   },
-  {
-    id: "index",
-    header: () => <span className="text-center mx-auto">#</span>,
-    maxSize: 40,
-    cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
-    enableSorting: false,
-    enableHiding: false,
-  },
+  // {
+  //   id: "index",
+  //   header: () => <span className="text-center mx-auto">#</span>,
+  //   maxSize: 40,
+  //   cell: ({ row }) => <div className="text-center">{row.index + 1}</div>,
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
   // {
   //   accessorKey: "logo",
   //   header: "Logo",
@@ -82,7 +88,7 @@ const allColumns: ColumnDef<any>[] = [
             {row.getValue("investor_name") || "-"}
           </div>
         </InvestorSheet>
-      );
+      )
     },
   },
   {
@@ -139,7 +145,7 @@ const allColumns: ColumnDef<any>[] = [
             </Badge>
           )}
         </Link>
-      );
+      )
     },
   },
   {
@@ -160,7 +166,7 @@ const allColumns: ColumnDef<any>[] = [
             </Badge>
           )}
         </Link>
-      );
+      )
     },
   },
   {
@@ -177,7 +183,7 @@ const allColumns: ColumnDef<any>[] = [
         >
           {row.getValue("investors_LLM_description")}
         </ExpandableCell>
-      );
+      )
     },
   },
   // {
@@ -265,15 +271,15 @@ const allColumns: ColumnDef<any>[] = [
   //     </div>
   //   ),
   // },
-];
+]
 
 export function getColumnsForData(data: any[]): ColumnDef<any>[] {
-  if (!data || data.length === 0) return allColumns;
-  const dataKeys = Object.keys(data[0]);
+  if (!data || data.length === 0) return allColumns
+  const dataKeys = Object.keys(data[0])
   return allColumns.filter(
-    (col) =>
+    col =>
       col.id === "select" ||
       col.id === "index" ||
       ("accessorKey" in col && dataKeys.includes(col.accessorKey as string))
-  );
+  )
 }

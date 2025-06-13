@@ -1,43 +1,45 @@
-"use client";
-import DataTable from "@/components/table/data-table";
-import React from "react";
-import { getColumnsForData } from "./columns";
-import { useInvestors } from "@/hooks/useInvestors";
-import { useInvestorFilters } from "@/store/useInvestorFilters";
-import PinnableDataTable from "@/components/table/pinnable-data-table";
+"use client"
+import DataTable from "@/components/table/data-table"
+import React from "react"
+import { getColumnsForData } from "./columns"
+import { useInvestors } from "@/hooks/useInvestors"
+import { useInvestorFilters } from "@/store/useInvestorFilters"
+import PinnableDataTable from "@/components/table/pinnable-data-table"
 const InvestorData = () => {
-  const { appliedFilters } = useInvestorFilters();
-  const [from, setFrom] = React.useState(1);
-  const [to, setTo] = React.useState(30);
+  const { appliedFilters } = useInvestorFilters()
+  console.log(appliedFilters, "appliedFilters")
+
+  const [from, setFrom] = React.useState(1)
+  const [to, setTo] = React.useState(30)
 
   const { data, isPending } = useInvestors({
     ...(appliedFilters || {}),
     from,
     to,
-  });
+  })
 
-  const [moreData, setMoreData] = React.useState<any[]>([]);
-  const [hasMoreData, setHasMoreData] = React.useState(false);
+  const [moreData, setMoreData] = React.useState<any[]>([])
+  const [hasMoreData, setHasMoreData] = React.useState(false)
 
   React.useEffect(() => {
     if (data && from === 1) {
-      setMoreData(data);
+      setMoreData(data)
     } else if (data && from > 1) {
-      setMoreData((prev) => [...prev, ...data]);
+      setMoreData(prev => [...prev, ...data])
     }
     if (data && data.length < to - from + 1) {
-      setHasMoreData(false);
+      setHasMoreData(false)
     } else if (data && data.length === to - from + 1) {
-      setHasMoreData(true);
+      setHasMoreData(true)
     }
-  }, [data, from, to]);
+  }, [data, from, to])
 
   const loadMoreData = () => {
     if (!isPending && hasMoreData) {
-      setFrom((prev) => prev + (to - from + 1));
-      setTo((prev) => prev + (to - from + 1));
+      setFrom(prev => prev + (to - from + 1))
+      setTo(prev => prev + (to - from + 1))
     }
-  };
+  }
 
   // console.log(moreData)
 
@@ -53,7 +55,7 @@ const InvestorData = () => {
         defaultPinnedColumns={["select", "index", "investor_name"]}
       />
     </div>
-  );
-};
+  )
+}
 
-export default InvestorData;
+export default InvestorData
