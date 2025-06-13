@@ -17,6 +17,7 @@ import IMAGES from "@/constant/images"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import Filters from "../Filters"
+import InvestorFilters from "../InvestorFilters"
 
 const Sidebar = () => {
   const pathname = usePathname()
@@ -77,7 +78,8 @@ const Sidebar = () => {
           })}
         </nav>
       </div>
-      <Filters />
+      {companies && <Filters />}
+      {investors && <InvestorFilters />}
     </aside>
   )
 }

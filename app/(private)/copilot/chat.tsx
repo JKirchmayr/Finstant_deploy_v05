@@ -80,8 +80,9 @@ const Chat = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          prompt: promptToSend,
+          user_prompt: promptToSend,
           user_id: userId,
+          session_id: null,
         }),
       })
 
@@ -418,7 +419,7 @@ const PromptField = ({
             autoFocus
             minRows={1}
             maxRows={2}
-            onKeyDown={(e) => {
+            onKeyDown={e => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault()
                 internalHandleSend(e)

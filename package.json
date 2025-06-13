@@ -45,6 +45,7 @@
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.55.0",
     "react-markdown": "^10.1.0",
+    "react-range-slider-input": "^3.2.1",
     "react-resizable-panels": "^2.1.9",
     "react-textarea-autosize": "^8.5.9",
     "react-world-flags": "^1.6.0",
