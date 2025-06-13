@@ -11,6 +11,8 @@ import CategorizedCountryMultiSelect from "./CategorizedCountryMultiSelect"
 
 const industryOptions = [
   { value: "Artificial Intelligence", label: "Artificial Intelligence" },
+  { value: "Software Development", label: "Software Development" },
+  { value: "IT Services and IT Consulting", label: "IT Services and IT Consulting" },
   { value: "Cloud Software", label: "Cloud Software" },
   { value: "Cybersecurity", label: "Cybersecurity" },
   { value: "Data Analytics", label: "Data Analytics" },
@@ -26,10 +28,16 @@ const industryOptions = [
   { value: "Health Insurance", label: "Health Insurance" },
   { value: "Medical Devices", label: "Medical Devices" },
   { value: "Pharmaceuticals", label: "Pharmaceuticals" },
+  { value: "Investment Management", label: "Investment Management" },
+  {
+    value: "Venture Capital and Private Equity Principals",
+    label: "Venture Capital and Private Equity Principals",
+  },
 ]
 
 const investorOptions = [
   { value: "Private Equity", label: "Private Equity" },
+  { value: "Fund Manager", label: "Fund Manager" },
   { value: "Real Estate", label: "Real Estate" },
   { value: "Corporate", label: "Corporate" },
   { value: "Credit", label: "Credit" },
@@ -73,17 +81,17 @@ const Filters = () => {
 
   const handleMinMaxChange = (key: string, value: string) => {
     if (isCompanies) {
-      setCompany((prev) => ({ ...prev, [key]: value }))
+      setCompany(prev => ({ ...prev, [key]: value }))
     } else {
-      setInvestor((prev) => ({ ...prev, [key]: value }))
+      setInvestor(prev => ({ ...prev, [key]: value }))
     }
   }
 
   const handleMultiChange = (key: string, values: string[]) => {
     if (isCompanies) {
-      setCompany((prev) => ({ ...prev, [key]: values }))
+      setCompany(prev => ({ ...prev, [key]: values }))
     } else {
-      setInvestor((prev) => ({ ...prev, [key]: values }))
+      setInvestor(prev => ({ ...prev, [key]: values }))
     }
   }
 
@@ -122,9 +130,29 @@ const Filters = () => {
   }
 
   const handleInvestorChange = (selected: string[]) => {
-    setInvestor((prev) => ({
+    setInvestor(prev => ({
       ...prev,
       investorType: selected,
+    }))
+  }
+  const handleSelectCountries = (countries: string[]) => {
+    console.log(countries)
+    if (isCompanies) {
+      setCompany(prev => ({ ...prev, hqCountry: countries }))
+    }
+    setInvestor(prev => ({
+      ...prev,
+      investorLocation: countries,
+    }))
+  }
+
+  const handleSelectIndustries = (industries: string[]) => {
+    if (isCompanies) {
+      setCompany(prev => ({ ...prev, industry: industries }))
+    }
+    setInvestor(prev => ({
+      ...prev,
+      investorType: industries,
     }))
   }
 
@@ -182,7 +210,7 @@ const Filters = () => {
             content: () => (
               <DiscriptionFilter
                 value={company.description}
-                onChange={(val) => setCompany((prev) => ({ ...prev, description: val }))}
+                onChange={val => setCompany(prev => ({ ...prev, description: val }))}
               />
             ),
           },
@@ -238,6 +266,7 @@ const Filters = () => {
             commandProps={{
               label: "Select Industry",
             }}
+            onChange={v => handleSelectIndustries(v.map(i => i.value))}
             defaultOptions={industryOptions}
             placeholder="Select Industry"
             hidePlaceholderWhenSelected
@@ -249,7 +278,13 @@ const Filters = () => {
     {
       value: "hq-country",
       title: "HQ Country",
-      content: () => <CategorizedCountryMultiSelect />,
+      content: () => (
+        <CategorizedCountryMultiSelect
+          onSelecCountries={(countries: Option[]) =>
+            handleSelectCountries(countries.map(c => c.label))
+          }
+        />
+      ),
     },
   ]
 
@@ -262,7 +297,7 @@ const Filters = () => {
 
       <div className="flex flex-col gap-3 overflow-y-auto p-3 flex-1">
         <Accordion type="multiple" className="w-full">
-          {accordionItemsConfig.map((item) => (
+          {accordionItemsConfig.map(item => (
             <AccordionItem key={item.value} value={item.value}>
               <AccordionTrigger className="hover:no-underline hover:cursor-pointer">
                 {item.title}
@@ -308,7 +343,7 @@ const DiscriptionFilter = ({
         placeholder="Describe the company you are looking for..."
         className="w-full h-full bg-white border border-gray-300 rounded-sm p-2 text-gray-700"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={e => onChange(e.target.value)}
         rows={4}
       />
     </div>
@@ -386,7 +421,7 @@ interface InvestorsProps {
 const InvestorsFilter: React.FC<InvestorsProps> = ({ options, selectedInvestors, onChange }) => {
   const handleCheckboxChange = (value: string) => {
     const newInvestor = selectedInvestors.includes(value)
-      ? selectedInvestors.filter((item) => item !== value)
+      ? selectedInvestors.filter(item => item !== value)
       : [...selectedInvestors, value]
     onChange(newInvestor)
   }
@@ -394,12 +429,12 @@ const InvestorsFilter: React.FC<InvestorsProps> = ({ options, selectedInvestors,
   return (
     <div className="flex flex-col justify-between gap-2">
       <div className="flex flex-col gap-1">
-        {options.map((option) => (
+        {options.map(option => (
           <div className="flex items-center space-x-2" key={option.value}>
             <Checkbox
               id={option.value}
               checked={selectedInvestors.includes(option.value)}
-              onCheckedChange={(checked) => handleCheckboxChange(option.value)}
+              onCheckedChange={checked => handleCheckboxChange(option.value)}
             />
             <label
               htmlFor={option.value}

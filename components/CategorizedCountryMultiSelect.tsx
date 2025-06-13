@@ -1,7 +1,7 @@
-"use client";
+"use client"
 
-import React from "react";
-import MultipleSelector, { Option } from "./ui/multiselect";
+import React, { useEffect } from "react"
+import MultipleSelector, { Option } from "./ui/multiselect"
 
 const categorizedOptions: Option[] = [
   // North America
@@ -28,16 +28,24 @@ const categorizedOptions: Option[] = [
 
   // Global
   { value: "GLOBAL", label: "Global", flagEmoji: "🌍", category: "Global" },
-];
+]
 
-export function CategorizedCountryMultiSelect() {
-  const [selectedCountries, setSelectedCountries] = React.useState<Option[]>(
-    []
-  );
+export function CategorizedCountryMultiSelect({
+  onSelecCountries,
+}: {
+  onSelecCountries: (countries: Option[]) => void
+}) {
+  const [selectedCountries, setSelectedCountries] = React.useState<Option[]>([])
 
   const handleChange = (options: Option[]) => {
-    setSelectedCountries(options);
-  };
+    setSelectedCountries(options)
+  }
+
+  useEffect(() => {
+    if (selectedCountries.length > 0) {
+      onSelecCountries(selectedCountries)
+    }
+  }, [selectedCountries])
   return (
     <MultipleSelector
       noAbsolute
@@ -53,7 +61,7 @@ export function CategorizedCountryMultiSelect() {
         label: "Select countries",
       }}
     />
-  );
+  )
 }
 
-export default CategorizedCountryMultiSelect;
+export default CategorizedCountryMultiSelect
