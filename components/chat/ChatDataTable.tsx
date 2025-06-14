@@ -11,13 +11,29 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
+  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { PinIcon, PinOffIcon, Search } from "lucide-react"
+import {
+  ArrowLeftToLineIcon,
+  ArrowRightToLineIcon,
+  ChevronLeft,
+  ChevronRight,
+  EllipsisIcon,
+  Loader,
+  PinIcon,
+  PinOffIcon,
+  Search,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   Table,
   TableBody,
@@ -27,10 +43,13 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
-
-import { cn } from "@/lib/utils"
+import { cn, handleCopyAsTSV } from "@/lib/utils"
+import { usePathname } from "next/navigation"
+import Image from "next/image"
 import { ExportOptions } from "../table/export-options"
 import { AddNewColumn } from "./AddNewColumn"
+import { toast } from "sonner"
+import { useSingleTabStore } from "@/store/singleTabStore"
 
 interface IChatDataTableProps<T extends any> {
   data: T[]
@@ -40,7 +59,13 @@ interface IChatDataTableProps<T extends any> {
   hasMoreData: boolean
   paginationOption?: boolean
   filterBy?: string
+  defaultPinnedColumns?: string[]
   topbarClass?: string
+  noSearch?: boolean
+  togglePanel: () => void
+  titleName: string
+  noHeader?: boolean
+  addColumn?: boolean
 }
 
 // Helper function to compute pinning styles for columns
@@ -64,11 +89,20 @@ const ChatDataTable = <T extends any>({
   paginationOption = true,
   topbarClass,
   filterBy = "name",
+  defaultPinnedColumns = [],
+  noHeader = false,
+  togglePanel,
+  titleName,
+  addColumn = true,
 }: IChatDataTableProps<T>) => {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
+
+  const pathname = usePathname()
+  const investors = pathname === "/investors"
+  const companies = pathname === "/companies"
 
   const table = useReactTable({
     data,
@@ -87,7 +121,15 @@ const ChatDataTable = <T extends any>({
       columnVisibility,
       rowSelection,
     },
+    initialState: {
+      columnPinning: {
+        left: defaultPinnedColumns,
+        right: [],
+      },
+    },
   })
+  const { setSingleTab, isCollapsed } = useSingleTabStore()
+  // console.log(isCollapsed)
 
   const observer = useRef<IntersectionObserver | null>(null)
   const lastRowRef = useCallback(
@@ -95,7 +137,7 @@ const ChatDataTable = <T extends any>({
       if (isLoading) return
       if (observer.current) observer.current.disconnect()
 
-      observer.current = new IntersectionObserver((entries) => {
+      observer.current = new IntersectionObserver(entries => {
         if (entries[0].isIntersecting && hasMoreData) {
           loadMoreData()
         }
@@ -112,9 +154,9 @@ const ChatDataTable = <T extends any>({
     const headers = Object.keys(data[0])
     const csvRows = [
       headers.join(","),
-      ...data.map((row) =>
+      ...data.map(row =>
         headers
-          .map((field) => {
+          .map(field => {
             const val = row[field]
             const escaped = typeof val === "string" ? `"${val.replace(/"/g, '""')}"` : val
             return escaped ?? ""
@@ -146,8 +188,8 @@ const ChatDataTable = <T extends any>({
     XLSX.writeFile(workbook, filename)
   }
 
+  const selectedRows = table.getSelectedRowModel().rows.map(row => row.original)
   const handleExport = (format: "csv" | "excel") => {
-    const selectedRows = table.getSelectedRowModel().rows.map((row) => row.original)
     const exportData = selectedRows.length ? selectedRows : data
     const filename = `${selectedRows.length ? "selected" : "all"}-data.${
       format === "csv" ? "csv" : "xlsx"
@@ -155,49 +197,142 @@ const ChatDataTable = <T extends any>({
 
     format === "csv" ? exportToCSV(exportData, filename) : exportToExcel(exportData, filename)
   }
+
+  const handleCopySelected = () => {
+    if (selectedRows.length === 0) {
+      toast.warning("No data selected, Please select data to Copy")
+      return
+    }
+
+    handleCopyAsTSV(selectedRows)
+  }
+
+  const handleDeleteSelected = () => {
+    if (selectedRows.length === 0) {
+      toast.warning("No data selected, Please select data to Delete")
+      return
+    }
+
+    const updatedData = data.filter(row => !selectedRows.includes(row))
+    setRowSelection({})
+    // setData(updatedData)
+    setSingleTab("abc", "companies", updatedData, "final")
+    toast.success("Data Deleted Successfully")
+    // console.log(updatedData)
+  }
+
   return (
     <div className="w-full flex h-full flex-col gap-3">
-      <div
-        className={cn(
-          "flex flex-col md:flex-row md:items-center md:justify-between h-auto md:h-7 gap-2 w-full ",
-          topbarClass
-        )}
-      >
-        <div className="flex items-center gap-2 order-1 relative w-full md:w-auto ">
-          <Search size={14} className="absolute text-gray-400 left-2" />
-          <Input
-            placeholder="Search"
-            value={(table.getColumn(filterBy)?.getFilterValue() as string) ?? ""}
-            onChange={(event) => table.getColumn(filterBy)?.setFilterValue(event.target.value)}
-            className="pl-7 focus-visible:ring-0 border-gray-300"
-          />
-        </div>
-        {data.length > 0 && (
-          <div className="flex items-center gap-3 order-2 justify-between md:justify-start">
-            <p className="text-gray-500 text-[13px]">
-              Showing <strong className="text-gray-700">{data.length}</strong> record
-              {data.length !== 1 && "s"}.
-            </p>
-            <ExportOptions
-              data={
-                Object.keys(rowSelection).length > 0
-                  ? Object.keys(rowSelection).map((index) => data[Number(index)])
-                  : data
-              }
-              onExport={(format: "csv" | "excel") => handleExport(format)}
+      {/* {!noSearch && (
+        <div
+          className={cn(
+            "flex flex-col md:flex-row md:items-center md:justify-between h-auto md:h-7 gap-2 w-full",
+            topbarClass
+          )}
+        >
+          <div className="flex items-center gap-2 order-1 relative w-full md:w-auto ">
+            <Search size={14} className="absolute text-gray-400 left-2" />
+            <Input
+              placeholder="Search"
+              value={(table.getColumn(filterBy)?.getFilterValue() as string) ?? ""}
+              onChange={event => table.getColumn(filterBy)?.setFilterValue(event.target.value)}
+              className="pl-7 focus-visible:ring-0 bg-white border-gray-300"
             />
           </div>
-        )}
-      </div>
-      <div className="flex w-full bg-white overflow-auto">
+          {data.length > 0 && (
+            <div className="flex items-center gap-3 order-2 justify-between md:justify-start">
+              <p className="text-gray-500 text-[13px]">
+                Showing <strong className="text-gray-700">{data.length}</strong> record
+                {data.length !== 1 && "s"}.
+              </p>
+              <ExportOptions
+                data={
+                  Object.keys(rowSelection).length > 0
+                    ? Object.keys(rowSelection).map(index => data[Number(index)])
+                    : data
+                }
+                onExport={(format: "csv" | "excel") => handleExport(format)}
+              />
+            </div>
+          )}
+        </div>
+      )} */}
+      {!noHeader && (
+        <div className="">
+          <div className="p-2 space-y-1">
+            <div className="flex justify-between items-center">
+              <div className="flex gap-2 shrink-0">
+                <Button
+                  variant="secondary"
+                  size="xs"
+                  className="!px-[6px] hover:bg-gray-300"
+                  onClick={togglePanel}
+                >
+                  {!isCollapsed ? <ChevronLeft /> : <ChevronRight />}
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="xs"
+                  className=" hover:bg-gray-300"
+                  onClick={handleDeleteSelected}
+                >
+                  Delete
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="xs"
+                  className=" hover:bg-gray-300"
+                  disabled={!selectedRows.length && !data.length}
+                  onClick={handleCopySelected}
+                >
+                  Copy
+                </Button>
+              </div>
+              <div>
+                <p className="text-sm font-medium">{titleName}</p>
+              </div>
+              <div className="flex gap-2">
+                {addColumn && (
+                  <AddNewColumn>
+                    <Button
+                      variant="secondary"
+                      size="xs"
+                      className="h-7 py-1 text-xs hover:bg-gray-300"
+                    >
+                      Add Column
+                    </Button>
+                  </AddNewColumn>
+                )}
+                <ExportOptions
+                  data={
+                    Object.keys(rowSelection).length > 0
+                      ? Object.keys(rowSelection).map(index => data[Number(index)])
+                      : data
+                  }
+                  onExport={(format: "csv" | "excel") => handleExport(format)}
+                >
+                  <Button
+                    variant="secondary"
+                    size="xs"
+                    className="h-7 py-1 text-xs hover:bg-gray-300"
+                  >
+                    Export
+                  </Button>
+                </ExportOptions>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      <div className="flex flex-col w-full bg-white border overflow-auto">
         <Table
-          className="w-full bg-background border-y [&_td]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b [&_thead]:border-b-0 border-l-0 border-r-0"
-          style={{ minWidth: "100%", width: table.getTotalSize() }}
+          className="!w-full bg-background [&_td]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b [&_thead]:border-b-0 [&_th]:px-4 [&_td]:pl-4 [&_th:has([role=checkbox])]:pr-0 [&_td:first-child]:!px-4 [&_th:first-child]:!px-4"
+          style={{ width: table.getTotalSize() }}
         >
           <TableHeader className="bg-white text-[13px] h-8 sticky top-0 z-10">
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id} className="bg-muted/50">
-                {headerGroup.headers.map((header) => {
+                {headerGroup.headers.map(header => {
                   const { column } = header
                   const isPinned = column.getIsPinned()
                   const isLastLeftPinned = isPinned === "left" && column.getIsLastColumn("left")
@@ -216,12 +351,12 @@ const ChatDataTable = <T extends any>({
                       }
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <span className="truncate w-full">
+                        <span className="truncate w-full flex">
                           {header.isPlaceholder
                             ? null
                             : flexRender(header.column.columnDef.header, header.getContext())}
                         </span>
-                        {!header.isPlaceholder &&
+                        {/* {!header.isPlaceholder &&
                           header.column.getCanPin() &&
                           header.column.columnDef.enableHiding !== false &&
                           (header.column.getIsPinned() ? (
@@ -233,22 +368,51 @@ const ChatDataTable = <T extends any>({
                               aria-label={`Unpin ${
                                 header.column.columnDef.header as string
                               } column`}
+                              title={`Unpin ${header.column.columnDef.header as string} column`}
                             >
                               <PinOffIcon className="opacity-60" size={16} aria-hidden="true" />
                             </Button>
                           ) : (
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="-mr-1 size-5 shadow-none group-hover:opacity-60 opacity-0 hover:opacity-100"
-                              onClick={() => header.column.pin("left")}
-                              aria-label={`Pin ${
-                                header.column.columnDef.header as string
-                              } column to left`}
-                            >
-                              <PinIcon className="opacity-60" size={16} aria-hidden="true" />
-                            </Button>
-                          ))}
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="-mr-1 size-7 shadow-none"
+                                  aria-label={`Pin options for ${
+                                    header.column.columnDef.header as string
+                                  } column`}
+                                  title={`Pin options for ${
+                                    header.column.columnDef.header as string
+                                  } column`}
+                                >
+                                  <EllipsisIcon
+                                    className="opacity-60"
+                                    size={16}
+                                    aria-hidden="true"
+                                  />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => header.column.pin("left")}>
+                                  <ArrowLeftToLineIcon
+                                    size={16}
+                                    className="opacity-60"
+                                    aria-hidden="true"
+                                  />
+                                  Stick to left
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => header.column.pin("right")}>
+                                  <ArrowRightToLineIcon
+                                    size={16}
+                                    className="opacity-60"
+                                    aria-hidden="true"
+                                  />
+                                  Stick to right
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          ))} */}
                         {header.column.getCanResize() && (
                           <div
                             {...{
@@ -264,9 +428,6 @@ const ChatDataTable = <T extends any>({
                     </TableHead>
                   )
                 })}
-                <TableHead className="px-0 max-w-[40px] overflow-auto">
-                  <AddNewColumn />
-                </TableHead>
               </TableRow>
             ))}
           </TableHeader>
@@ -303,15 +464,11 @@ const ChatDataTable = <T extends any>({
                           return (
                             <TableCell
                               key={cell.id}
-                              className="py-2.5 [&[data-pinned][data-last-col]]:border-border data-pinned:bg-background/90 truncate data-pinned:backdrop-blur-xs [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right][data-last-col=right]]:border-l [&:first-child]:border-l-0 border-r border-gray-300"
+                              className="py-2.5 [&[data-pinned][data-last-col]]:border-border data-pinned:bg-background/90 truncate data-pinned:backdrop-blur-xs [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right][data-last-col=right]]:border-l border-r border-gray-300"
                               style={{ ...getPinningStyles(column) }}
                               data-pinned={isPinned || undefined}
                               data-last-col={
-                                isLastLeftPinned
-                                  ? "left"
-                                  : isFirstRightPinned
-                                  ? "right"
-                                  : undefined
+                                isLastLeftPinned ? "left" : isFirstRightPinned ? "right" : undefined
                               }
                             >
                               {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -323,8 +480,18 @@ const ChatDataTable = <T extends any>({
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={columns.length + 1} className="h-24 text-center">
-                      No results.
+                    <TableCell colSpan={investors ? 8 : 5}>
+                      <div className="h-40 text-center text-lg font-medium flex justify-center items-center flex-col shrink-0">
+                        <Image
+                          src="/images/no-data.png"
+                          alt="No data"
+                          width={150}
+                          height={150}
+                          className="shrink-0"
+                          style={{ mixBlendMode: "multiply" }}
+                        />
+                        <p className="text-sm text-muted-foreground"> No results.</p>
+                      </div>
                     </TableCell>
                   </TableRow>
                 )}
@@ -333,6 +500,14 @@ const ChatDataTable = <T extends any>({
           </TableBody>
         </Table>
       </div>
+      {isLoading && data.length > 0 && (
+        <div className="h-20 py-2 flex justify-center items-center bg-white text-center">
+          <Loader className="animate-spin mx-auto" />
+        </div>
+      )}
+      {/* {paginationOption && data.length > 9 && (
+        <DataTablePagination table={table} />
+      )} */}
     </div>
   )
 }

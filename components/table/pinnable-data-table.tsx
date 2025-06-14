@@ -57,6 +57,7 @@ interface IPinnableDataTableProps<T extends any> {
   filterBy?: string
   defaultPinnedColumns?: string[]
   topbarClass?: string
+  noSearch?: boolean
 }
 
 // Helper function to compute pinning styles for columns
@@ -81,6 +82,7 @@ const PinnableDataTable = <T extends any>({
   topbarClass,
   filterBy = "name",
   defaultPinnedColumns = [],
+  noSearch = false,
 }: IPinnableDataTableProps<T>) => {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -185,38 +187,40 @@ const PinnableDataTable = <T extends any>({
 
   return (
     <div className="w-full flex h-full flex-col gap-3">
-      <div
-        className={cn(
-          "flex flex-col md:flex-row md:items-center md:justify-between h-auto md:h-7 gap-2 w-full",
-          topbarClass
-        )}
-      >
-        <div className="flex items-center gap-2 order-1 relative w-full md:w-auto ">
-          <Search size={14} className="absolute text-gray-400 left-2" />
-          <Input
-            placeholder="Search"
-            value={(table.getColumn(filterBy)?.getFilterValue() as string) ?? ""}
-            onChange={event => table.getColumn(filterBy)?.setFilterValue(event.target.value)}
-            className="pl-7 focus-visible:ring-0 bg-white border-gray-300"
-          />
-        </div>
-        {data.length > 0 && (
-          <div className="flex items-center gap-3 order-2 justify-between md:justify-start">
-            <p className="text-gray-500 text-[13px]">
-              Showing <strong className="text-gray-700">{data.length}</strong> record
-              {data.length !== 1 && "s"}.
-            </p>
-            <ExportOptions
-              data={
-                Object.keys(rowSelection).length > 0
-                  ? Object.keys(rowSelection).map(index => data[Number(index)])
-                  : data
-              }
-              onExport={(format: "csv" | "excel") => handleExport(format)}
+      {!noSearch && (
+        <div
+          className={cn(
+            "flex flex-col md:flex-row md:items-center md:justify-between h-auto md:h-7 gap-2 w-full",
+            topbarClass
+          )}
+        >
+          <div className="flex items-center gap-2 order-1 relative w-full md:w-auto ">
+            <Search size={14} className="absolute text-gray-400 left-2" />
+            <Input
+              placeholder="Search"
+              value={(table.getColumn(filterBy)?.getFilterValue() as string) ?? ""}
+              onChange={event => table.getColumn(filterBy)?.setFilterValue(event.target.value)}
+              className="pl-7 focus-visible:ring-0 bg-white border-gray-300"
             />
           </div>
-        )}
-      </div>
+          {data.length > 0 && (
+            <div className="flex items-center gap-3 order-2 justify-between md:justify-start">
+              <p className="text-gray-500 text-[13px]">
+                Showing <strong className="text-gray-700">{data.length}</strong> record
+                {data.length !== 1 && "s"}.
+              </p>
+              <ExportOptions
+                data={
+                  Object.keys(rowSelection).length > 0
+                    ? Object.keys(rowSelection).map(index => data[Number(index)])
+                    : data
+                }
+                onExport={(format: "csv" | "excel") => handleExport(format)}
+              />
+            </div>
+          )}
+        </div>
+      )}
       <div className="flex flex-col w-full bg-white border overflow-auto">
         <Table
           className="!w-full bg-background [&_td]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b [&_thead]:border-b-0 [&_th]:px-4 [&_td]:pl-4 [&_th:has([role=checkbox])]:pr-0 [&_td:first-child]:!px-4 [&_th:first-child]:!px-4"
@@ -249,63 +253,7 @@ const PinnableDataTable = <T extends any>({
                             ? null
                             : flexRender(header.column.columnDef.header, header.getContext())}
                         </span>
-                        {!header.isPlaceholder &&
-                          header.column.getCanPin() &&
-                          header.column.columnDef.enableHiding !== false &&
-                          (header.column.getIsPinned() ? (
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="-mr-1 size-5 shadow-none group-hover:opacity-60 opacity-0 hover:opacity-100"
-                              onClick={() => header.column.pin(false)}
-                              aria-label={`Unpin ${
-                                header.column.columnDef.header as string
-                              } column`}
-                              title={`Unpin ${header.column.columnDef.header as string} column`}
-                            >
-                              <PinOffIcon className="opacity-60" size={16} aria-hidden="true" />
-                            </Button>
-                          ) : (
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  className="-mr-1 size-7 shadow-none"
-                                  aria-label={`Pin options for ${
-                                    header.column.columnDef.header as string
-                                  } column`}
-                                  title={`Pin options for ${
-                                    header.column.columnDef.header as string
-                                  } column`}
-                                >
-                                  <EllipsisIcon
-                                    className="opacity-60"
-                                    size={16}
-                                    aria-hidden="true"
-                                  />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => header.column.pin("left")}>
-                                  <ArrowLeftToLineIcon
-                                    size={16}
-                                    className="opacity-60"
-                                    aria-hidden="true"
-                                  />
-                                  Stick to left
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => header.column.pin("right")}>
-                                  <ArrowRightToLineIcon
-                                    size={16}
-                                    className="opacity-60"
-                                    aria-hidden="true"
-                                  />
-                                  Stick to right
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          ))}
+
                         {header.column.getCanResize() && (
                           <div
                             {...{
@@ -394,7 +342,7 @@ const PinnableDataTable = <T extends any>({
         </Table>
       </div>
       {isLoading && data.length > 0 && (
-        <div className="h-20 py-2 flex justify-center items-center bg-white text-center">
+        <div className="h-20 py-2 -mt-2.5 border border-t-0 flex justify-center items-center bg-white text-center">
           <Loader className="animate-spin mx-auto" />
         </div>
       )}

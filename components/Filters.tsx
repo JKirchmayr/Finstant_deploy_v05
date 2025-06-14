@@ -8,7 +8,8 @@ import { useInvestorFilters } from "@/store/useInvestorFilters"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion"
 import MultipleSelector, { Option } from "./ui/multiselect"
 import CategorizedCountryMultiSelect from "./CategorizedCountryMultiSelect"
-
+import RangeSlider from "react-range-slider-input"
+import "react-range-slider-input/dist/style.css"
 const industryOptions = [
   { value: "Artificial Intelligence", label: "Artificial Intelligence" },
   { value: "Software Development", label: "Software Development" },
@@ -47,7 +48,7 @@ const Filters = () => {
   const pathname = usePathname()
   const isCompanies = pathname.includes("companies")
   const isInvestors = pathname.includes("investors")
-  const { applyFilters, resetFilters } = useCompanyFilters()
+  const { applyFilters, resetFilters, isLoading } = useCompanyFilters()
   const { applyFilters: applyInvestorFilters, resetFilters: resetInvestorFilters } =
     useInvestorFilters()
 
@@ -230,30 +231,62 @@ const Filters = () => {
         ]),
     {
       value: "revenue",
-      title: "Revenue (mEUR)",
+      title: "Preferred Revenue (mEUR)",
       content: () => (
-        <MinMax
-          title=""
-          min={revenueMin}
-          max={revenueMax}
-          onChange={handleMinMaxChange}
-          minKey="revenueMin"
-          maxKey="revenueMax"
-        />
+        <div>
+          <MinMax
+            title=""
+            min={revenueMin}
+            max={revenueMax}
+            onChange={handleMinMaxChange}
+            minKey="revenueMin"
+            maxKey="revenueMax"
+          />
+          <RangeSlider
+            min={0}
+            max={200}
+            step={1}
+            value={[Number(company.revenueMin) || 20, Number(company.revenueMax) || 150]}
+            onInput={(val: number[]) => {
+              setCompany(prev => ({
+                ...prev,
+                revenueMin: val[0].toString(),
+                revenueMax: val[1].toString(),
+              }))
+            }}
+            className="mt-3 mb-3"
+          />
+        </div>
       ),
     },
     {
       value: "ebitda",
-      title: "EBITDA (mEUR)",
+      title: "Preferred EBITDA (mEUR)",
       content: () => (
-        <MinMax
-          title=""
-          min={company.ebitdaMin}
-          max={company.ebitdaMax}
-          onChange={handleMinMaxChange}
-          minKey="ebitdaMin"
-          maxKey="ebitdaMax"
-        />
+        <div>
+          <MinMax
+            title=""
+            min={company.ebitdaMin}
+            max={company.ebitdaMax}
+            onChange={handleMinMaxChange}
+            minKey="ebitdaMin"
+            maxKey="ebitdaMax"
+          />
+          <RangeSlider
+            min={0}
+            max={200}
+            step={1}
+            value={[Number(company.ebitdaMin) || 20, Number(company.ebitdaMax) || 150]}
+            onInput={(val: number[]) => {
+              setCompany(prev => ({
+                ...prev,
+                ebitdaMin: val[0].toString(),
+                ebitdaMax: val[1].toString(),
+              }))
+            }}
+            className="mt-3 mb-3"
+          />
+        </div>
       ),
     },
     {
@@ -313,13 +346,15 @@ const Filters = () => {
         <button
           className="px-6 py-2 bg-gray-900 text-white rounded-sm cursor-pointer"
           onClick={handleSearch}
+          disabled={isLoading}
         >
-          Search
+          {isLoading ? "Searching.." : "Search"}
         </button>
         {shouldShowClear && (
           <button
             className="px-6 py-2 text-gray-800 border border-gray-300 rounded-sm cursor-pointer"
             onClick={handleClear}
+            disabled={isLoading}
           >
             Clear
           </button>
@@ -386,7 +421,7 @@ const MinMax = ({
         value={min}
         onChange={handleMinChange}
       />
-      <span>-</span>
+      <span>to</span>
       <input
         placeholder="Max"
         className="w-full h-full inputStyle"

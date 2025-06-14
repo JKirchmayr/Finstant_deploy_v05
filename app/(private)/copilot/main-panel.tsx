@@ -4,59 +4,45 @@ import { cn } from "@/lib/utils"
 import { useTabPanelStore } from "@/store/tabStore"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 import Chat from "./chat"
-import { Button } from "@/components/ui/button"
-import { ChevronsLeft, ChevronsRight } from "lucide-react"
-import { TabPanel } from "./tab-panel"
+
+import TabPanelNew from "./tab-panel-new"
+import { useSingleTabStore } from "@/store/singleTabStore"
 
 const MainPanel = () => {
-  const { tabList } = useTabPanelStore()
+  const { singleTab, isCollapsed, setIsCollapsed } = useSingleTabStore()
   const tabPanelRef = useRef<any>(null)
   const chatPanelRef = useRef<any>(null)
-  const [isCollapsed, setIsCollapsed] = React.useState(false)
 
   const handleToggle = () => {
     if (isCollapsed) {
-      tabPanelRef.current?.resize(40) // Expand to 40%
+      chatPanelRef.current?.resize(30)
     } else {
-      tabPanelRef.current?.collapse() // Collapse
+      chatPanelRef.current?.collapse() // Collapse
     }
-    setIsCollapsed(prev => !prev)
+    setIsCollapsed(!isCollapsed)
   }
-
   return (
-    <ResizablePanelGroup direction="horizontal" className="flex-1 ">
+    <ResizablePanelGroup direction="horizontal" className="flex-1">
       <ResizablePanel
         ref={chatPanelRef}
-        defaultSize={tabList.length > 0 ? 60 : 100}
+        defaultSize={30}
         minSize={30}
-        className="relative"
+        maxSize={100}
+        collapsible
+        className="relative transition-all duration-300 ease-in-out"
       >
-        {tabList.length > 0 && (
-          <Button
-            variant="secondary"
-            size="icon"
-            className="absolute top-2 -right-1.5 z-10"
-            onClick={handleToggle}
-          >
-            {isCollapsed ? <ChevronsLeft /> : <ChevronsRight />}
-          </Button>
-        )}
         <Chat />
       </ResizablePanel>
-
-      {tabList.length > 0 && (
+      {!!singleTab.id && (
         <>
           <ResizableHandle />
           <ResizablePanel
             ref={tabPanelRef}
-            defaultSize={40}
-            minSize={0}
-            collapsible
-            className={cn("transition-all", {
-              "overflow-hidden": isCollapsed,
-            })}
+            defaultSize={!!singleTab.id ? 60 : 100}
+            minSize={55}
+            className="relative transition-all duration-300 ease-in-out"
           >
-            {!isCollapsed && <TabPanel />}
+            <TabPanelNew togglePanel={handleToggle} />
           </ResizablePanel>
         </>
       )}

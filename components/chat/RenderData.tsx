@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useEffect, useState } from "react"
-import DataTable from "@/components/chat/data-table"
+import DataTable from "@/components/chat/ChatDataTable"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnDef } from "@tanstack/react-table"
 import { ExternalLink } from "lucide-react"
@@ -9,7 +9,7 @@ import Link from "next/link"
 import { useCoPilotStore } from "@/store/copilotStore"
 import { responseToColumns } from "@/utils/transformers/responseToColumns"
 import { useWSStore } from "@/store/wsStore"
-import ChatDataTable from "@/components/chat/data-table"
+import ChatDataTable from "@/components/chat/ChatDataTable"
 
 interface AddColumnContextType {
   query: string
@@ -25,9 +25,7 @@ interface AddColumnContextType {
   setIsOpen: (isOpen: boolean) => void
 }
 
-const AddColumnContext = createContext<AddColumnContextType | undefined>(
-  undefined
-)
+const AddColumnContext = createContext<AddColumnContextType | undefined>(undefined)
 
 export const useAddColumn = () => {
   const context = useContext(AddColumnContext)
@@ -43,9 +41,7 @@ const RenderData = () => {
   const [selectedTool, setSelectedTool] = useState("web")
   const [format, setFormat] = useState("auto")
   const [contextColumn, setContextColumn] = useState("")
-  const [dynamicColumns, setDynamicColumns] = useState<ColumnDef<ICompany>[]>(
-    []
-  )
+  const [dynamicColumns, setDynamicColumns] = useState<ColumnDef<ICompany>[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [searching, setSearching] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -58,9 +54,7 @@ const RenderData = () => {
 
     setQuery("")
 
-    const columnExists = allColumns.some(
-      col => (col as any).accessorKey === columnKey
-    )
+    const columnExists = allColumns.some(col => (col as any).accessorKey === columnKey)
     if (columnExists) {
       return alert("Column already exists")
     }

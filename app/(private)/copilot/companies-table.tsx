@@ -18,38 +18,36 @@ import { useTabPanelStore } from "@/store/tabStore"
 import CompanyProfile from "@/components/CompanyProfile"
 import { GenerateSkeleton } from "./generate-skeleton"
 import Image from "next/image"
-import ChatDataTable from "@/components/chat/data-table"
+import ChatDataTable from "@/components/chat/ChatDataTable"
+import { AddNewColumn } from "@/components/chat/AddNewColumn"
+import CompanySheet from "@/components/CompanySheet"
 
 export type Company = {
-  company_id: string
+  company_id: number
   company_name: string
+  company_logo: string
   company_description: string
-  similarity_score: number
+  company_country: string
+  similarity_score: string
 }
 
-export default function CompaniesData({ companies }: { companies: Company[] }) {
-  const { addTab } = useTabPanelStore()
-
-  // console.log(companies, "companies")
-
-  const isPlaceholder = companies.some(company => company.company_id.includes("placeholder"))
-
-  console.log(isPlaceholder, "isPlaceholder")
-
-  const handleAddTab = (data: any) => {
-    addTab(
-      data?.compay_id || data?.company_name,
-      data?.company_name || "Company",
-      "company-profile",
-      data,
-      data?.company_id
-    )
-  }
+export default function CompaniesData({
+  companies,
+  loading,
+  togglePanel,
+}: {
+  companies: Company[]
+  loading: boolean
+  togglePanel: () => void
+}) {
   const columns: ColumnDef<Company>[] = [
     {
       id: "select",
+      size: 50,
+      minSize: 50,
+      maxSize: 50,
       header: ({ table }) => (
-        <div className="flex items-center w-full justify-center">
+        <div className="flex justify-center items-center w-full gap-2">
           <Checkbox
             checked={
               table.getIsAllPageRowsSelected() ||
@@ -57,98 +55,83 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
             }
             onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
             aria-label="Select all"
-            className="mx-auto"
-            disabled={table
-              .getFilteredRowModel()
-              .rows.some(row => row.original.company_id.includes("placeholder"))}
+            // className="mx-auto"
           />
+          <div className="text-center">#</div>
         </div>
       ),
       cell: ({ row }) => (
-        <div className="flex items-center w-full justify-center">
+        <div className="flex justify-center items-center w-full gap-2">
           <Checkbox
             checked={row.getIsSelected()}
             onCheckedChange={value => row.toggleSelected(!!value)}
             aria-label="Select row"
-            disabled={row.original.company_id.includes("placeholder")}
+            // className="mx-auto"
           />
+          <div className="text-center">{row.index + 1}</div>
         </div>
       ),
-      maxSize: 40,
       enableSorting: false,
       enableHiding: false,
     },
     {
-      id: "index",
-      maxSize: 30,
-      header: ({}) => (
-        <div className="flex items-center justify-center w-full">
-          {isPlaceholder ? "Generating" : "#"}
-        </div>
-      ),
-      enablePinning: false,
-      enableSorting: false,
-      cell: ({ row }) => (
-        <div className="text-center">
-          <GenerateSkeleton
-            isPlaceholder={row.original.company_id.includes("placeholder")}
-            text={(row.index + 1).toString()}
-          />
-        </div>
-      ),
-    },
-    {
       accessorKey: "company_name",
-      header: isPlaceholder ? "Generating" : "Company",
+      header: loading ? "Generating" : "Company",
       cell: ({ row }) => {
         return (
-          <button
-            onClick={() => handleAddTab(row.original)}
-            disabled={row.original.company_id.includes("placeholder")}
-            className="hover:underline items-center inline-flex cursor-pointer hover:font-medium transition-all duration-200 text-left w-full"
-            type="button"
+          <CompanySheet
+            company={{
+              ...row.original,
+              companies_linkedin_logo_url: row.original.company_logo,
+              description: row.original.company_description,
+              companies_LLM_country: row.original.company_country,
+            }}
           >
-            <Image
-              src="https://placehold.co/50x50.png"
-              alt="logo"
-              width={18}
-              height={18}
-              className="mr-1.5 rounded"
-              unoptimized={true}
-            />
-            <GenerateSkeleton
-              isPlaceholder={row.original.company_id.includes("placeholder")}
-              text={row.original.company_name}
-            />
-          </button>
+            <button
+              disabled={loading}
+              className="hover:underline items-center inline-flex cursor-pointer hover:font-medium transition-all duration-200 text-left w-full"
+              type="button"
+            >
+              <Image
+                src={row.original.company_logo || "https://placehold.co/50x50.png"}
+                alt={`${row.original.company_name} logo`}
+                width={18}
+                height={18}
+                className="mr-1.5 rounded"
+                unoptimized={true}
+              />
+              <GenerateSkeleton isPlaceholder={loading} text={row.original.company_name} />
+            </button>
+          </CompanySheet>
         )
       },
     },
     {
       accessorKey: "company_description",
-      header: isPlaceholder ? "Generating" : "Description",
+      header: loading ? "Generating" : "Description",
       cell: ({ row }) => (
-        <GenerateSkeleton
-          isPlaceholder={row.original.company_id.includes("placeholder")}
-          text={row.original.company_description}
-        />
+        <GenerateSkeleton isPlaceholder={loading} text={row.original.company_description} />
+      ),
+    },
+    {
+      accessorKey: "company_country",
+      header: loading ? "Generating" : "Country",
+      cell: ({ row }) => (
+        <GenerateSkeleton isPlaceholder={loading} text={row.original.company_country} />
       ),
     },
     {
       accessorKey: "similarity_score",
-      header: isPlaceholder ? "Generating" : "Similarity",
+      header: loading ? "Generating" : "Similarity",
       cell: ({ row }) => (
-        <GenerateSkeleton
-          isPlaceholder={row.original.company_id.includes("placeholder")}
-          text={row.original.similarity_score.toString()}
-        />
+        <GenerateSkeleton isPlaceholder={loading} text={row.original.similarity_score} />
       ),
     },
   ]
 
   return (
     <div className="h-full flex flex-col bg-white w-full pt-1.5 ">
-      <PinnableDataTable
+      <ChatDataTable
         data={companies ? companies : []}
         columns={columns}
         isLoading={false}
@@ -157,6 +140,8 @@ export default function CompaniesData({ companies }: { companies: Company[] }) {
         filterBy="company_name"
         topbarClass="px-1.5 mb-1.5"
         defaultPinnedColumns={["index", "select", "company_name"]}
+        titleName="Companies List"
+        togglePanel={togglePanel}
       />
     </div>
   )

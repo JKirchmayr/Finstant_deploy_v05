@@ -144,28 +144,60 @@ const InvestorFilters = () => {
       value: "ebitda",
       title: "Preferred EBITDA (mEUR)",
       content: () => (
-        <MinMax
-          title=""
-          min={investor.ebitdaMin}
-          max={investor.ebitdaMax}
-          onChange={handleMinMaxChange}
-          minKey="ebitdaMin"
-          maxKey="ebitdaMax"
-        />
+        <div>
+          <MinMax
+            title=""
+            min={investor.ebitdaMin}
+            max={investor.ebitdaMax}
+            onChange={handleMinMaxChange}
+            minKey="ebitdaMin"
+            maxKey="ebitdaMax"
+          />
+          <RangeSlider
+            min={0}
+            max={200}
+            step={1}
+            value={[Number(investor.ebitdaMin) || 20, Number(investor.ebitdaMax) || 150]}
+            onInput={(val: number[]) => {
+              setInvestor(prev => ({
+                ...prev,
+                ebitdaMin: val[0].toString(),
+                ebitdaMax: val[1].toString(),
+              }))
+            }}
+            className="mt-3 mb-3"
+          />
+        </div>
       ),
     },
     {
       value: "revenue",
       title: "Preferred Revenue (mEUR)",
       content: () => (
-        <MinMax
-          title=""
-          min={investor.revenueMin}
-          max={investor.revenueMax}
-          onChange={handleMinMaxChange}
-          minKey="revenueMin"
-          maxKey="revenueMax"
-        />
+        <div>
+          <MinMax
+            title=""
+            min={investor.revenueMin}
+            max={investor.revenueMax}
+            onChange={handleMinMaxChange}
+            minKey="revenueMin"
+            maxKey="revenueMax"
+          />
+          <RangeSlider
+            min={0}
+            max={200}
+            step={1}
+            value={[Number(investor.revenueMin) || 20, Number(investor.revenueMax) || 150]}
+            onInput={(val: number[]) => {
+              setInvestor(prev => ({
+                ...prev,
+                revenueMin: val[0].toString(),
+                revenueMax: val[1].toString(),
+              }))
+            }}
+            className="mt-3 mb-3"
+          />
+        </div>
       ),
     },
   ]
@@ -244,7 +276,7 @@ const InvestorFilters = () => {
           disabled={isLoading}
           type="button"
         >
-          {isLoading ? "Seaching.." : "Search"}
+          {isLoading ? "Searching.." : "Search"}
         </button>
         {isInvestorFilterApplied && (
           <button

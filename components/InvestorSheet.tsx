@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react"
 import {
   Sheet,
   SheetContent,
@@ -6,12 +6,12 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
-import Link from "next/link";
-import { useInvestorStore } from "@/store/useInvestorStore";
-import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
+} from "@/components/ui/sheet"
+import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react"
+import Link from "next/link"
+import { useInvestorStore } from "@/store/useInvestorStore"
+import { Badge } from "@/components/ui/badge"
+import Image from "next/image"
 import {
   Table,
   TableBody,
@@ -19,53 +19,54 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+} from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 
 interface IInvestor {
-  id?: number;
-  name?: string;
-  website?: string;
-  investor_website?: string;
-  description?: string;
-  type?: string;
-  asset_classes?: string;
-  strategy?: string;
-  investment_criteria_description?: string;
-  investor_linkedin_logo?: string;
-  linkedin_url?: string;
-  linkedin_employees?: number;
-  country?: string;
-  hq_city?: string;
-  founded_year?: number;
-  industry?: string;
-  linkedin_description?: string;
-  investment_focus?: string[];
-  investor_name?: string;
-  investor_linkedin_city?: string;
-  investor_LLM_country?: string;
-  investor_linkedin_founded?: number;
-  investor_type?: string;
-  investor_asset_classes?: string;
-  investor_industry?: string;
-  investor_linkedin_description?: string;
+  id?: number
+  investor_id?: number
+  name?: string
+  website?: string
+  investor_website?: string
+  description?: string
+  type?: string
+  asset_classes?: string
+  strategy?: string
+  investment_criteria_description?: string
+  investor_linkedin_logo?: string
+  linkedin_url?: string
+  linkedin_employees?: number
+  country?: string
+  hq_city?: string
+  founded_year?: number
+  industry?: string
+  linkedin_description?: string
+  investment_focus?: string[]
+  investor_name?: string
+  investor_linkedin_city?: string
+  investor_LLM_country?: string
+  investor_linkedin_founded?: number
+  investor_type?: string
+  investor_asset_classes?: string
+  investor_industry?: string
+  investor_linkedin_description?: string
 }
 
 interface IDeal {
-  company: string;
-  city: string;
-  industry: string;
-  website: string;
-  description: string;
+  company: string
+  city: string
+  industry: string
+  website: string
+  description: string
 }
 
 interface IPerson {
-  name: string;
-  location: string;
-  position: string;
-  email: string;
-  description: string;
+  name: string
+  location: string
+  position: string
+  email: string
+  description: string
 }
 
 const dummyInvestor = {
@@ -87,20 +88,43 @@ const dummyInvestor = {
       description: "Team member description",
     },
   ],
-};
+}
 
 const InvestorSheet = ({
   children,
   investor,
 }: {
-  children: React.ReactNode;
-  investor: IInvestor;
+  children: React.ReactNode
+  investor: IInvestor
 }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
+
+  const [profileData, setProfileData] = useState(null)
+
+  const fetchdata = async () => {
+    try {
+      const res = await fetch(`/api/profile/investor_profile/${investor.investor_id}`)
+      const resdata = await res.json()
+      if (resdata.success) {
+        setProfileData(resdata.data)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  useEffect(() => {
+    if (investor.investor_id && !profileData && open) {
+      fetchdata()
+    }
+  }, [open, investor, profileData])
+  // console.log(profileData, "resdata")
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger className="cursor-pointer text-left whitespace-nowrap">{children}</SheetTrigger>
       <SheetContent className="min-w-[900px] p-0 overflow-hidden">
+        <SheetTitle hidden />
+
         <div className="h-full flex flex-col">
           {/* Header Section */}
           <div className="p-8 bg-gradient-to-r from-slate-50 to-gray-50 border-b">
@@ -287,7 +311,7 @@ const InvestorSheet = ({
         </div>
       </SheetContent>
     </Sheet>
-  );
-};
+  )
+}
 
-export default InvestorSheet;
+export default InvestorSheet

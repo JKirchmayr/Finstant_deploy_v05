@@ -245,13 +245,14 @@ body {
     background-position: 0% 50%, 50% 50%, 100% 100%;
   }
 }
-
 .range-slider{
-  height: 5px;
+  height: 5px !important;
 }
-.range-slider__thumb{
-height: 16px;
-width: 16px;
-border-radius: 50%;
-background-color: black;
+.range-slider .range-slider__thumb {
+  width: 18px !important;
+  height: 18px !important;
+  background: rgb(0, 0, 0) !important;
+}
+.range-slider .range-slider__range{
+  background: black !important;
 }

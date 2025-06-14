@@ -1,12 +1,12 @@
-"use client";
+"use client"
 
-import type React from "react";
-import { useState } from "react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { ExternalLink, MapPin, Globe, Calendar, Users, DollarSign } from "lucide-react";
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
+import type React from "react"
+import { useEffect, useState } from "react"
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { ExternalLink, MapPin, Globe, Calendar, Users, DollarSign } from "lucide-react"
+import Link from "next/link"
+import { Badge } from "@/components/ui/badge"
+import Image from "next/image"
 import {
   Table,
   TableBody,
@@ -14,8 +14,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Separator } from "@/components/ui/separator";
+} from "@/components/ui/table"
+import { Separator } from "@/components/ui/separator"
 
 const dummyCompany = {
   name: "Company Name",
@@ -71,44 +71,67 @@ const dummyCompany = {
       description: "Short bio Lorem Ipsum.",
     },
   ],
-};
+}
 
 interface ICompany {
-  company_id?: number;
-  investor_id?: number;
-  Investor_name?: string;
-  company_investor_status?: string;
-  company_investor_entry_year?: string;
-  company_name?: string;
-  company_website?: string;
-  companies_LLM_description?: string;
-  linkedin_page?: string;
-  companies_linkedin_last_scraped_at?: string;
-  companies_linkedin_city?: string;
-  companies_LLM_country?: string;
-  companies_linkedin_about?: string;
-  companies_linkedin_company_size?: number;
-  companies_linkedin_founded?: number;
-  companies_linkedin_specialties?: string;
-  companies_linkedin_logo_url?: string;
-  companies_linkedin_company_type?: string;
-  companies_linkedin_employee_range_MIN?: number;
-  companies_linkedin_employee_range_MAX?: number;
-  companies_linkedin_industries?: string;
-  companies_revenue_estimate_meur?: number | null;
-  companies_EBITDA_estimate_meur?: number | null;
-  description?: string;
-  entry_year?: number;
-  ebitda_in_meur?: number | null;
+  company_id?: number
+  investor_id?: number
+  Investor_name?: string
+  company_investor_status?: string
+  company_investor_entry_year?: string
+  company_name?: string
+  company_website?: string
+  companies_LLM_description?: string
+  linkedin_page?: string
+  companies_linkedin_last_scraped_at?: string
+  companies_linkedin_city?: string
+  companies_LLM_country?: string
+  companies_linkedin_about?: string
+  companies_linkedin_company_size?: number
+  companies_linkedin_founded?: number
+  companies_linkedin_specialties?: string
+  companies_linkedin_logo_url?: string
+  companies_linkedin_company_type?: string
+  companies_linkedin_employee_range_MIN?: number
+  companies_linkedin_employee_range_MAX?: number
+  companies_linkedin_industries?: string
+  companies_revenue_estimate_meur?: number | null
+  companies_EBITDA_estimate_meur?: number | null
+  description?: string
+  entry_year?: number
+  ebitda_in_meur?: number | null
 }
 
 const CompanySheet = ({ children, company }: { children: React.ReactNode; company: ICompany }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
+
+  const [profileData, setProfileData] = useState(null)
+
+  const fetchdata = async () => {
+    try {
+      const res = await fetch(`/api/profile/company_profile/${company.investor_id}`)
+      const resdata = await res.json()
+      if (resdata.success) {
+        setProfileData(resdata.data)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  useEffect(() => {
+    if (company.investor_id && !profileData && open) {
+      fetchdata()
+    }
+  }, [open, company, profileData])
+  // console.log(profileData, "resdata")
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger className="cursor-pointer text-left whitespace-nowrap">{children}</SheetTrigger>
+      <SheetTrigger className="cursor-pointer text-left whitespace-nowrap h-full " asChild>
+        {children}
+      </SheetTrigger>
       <SheetContent className="min-w-[900px] p-0 overflow-hidden">
+        <SheetTitle hidden />
         <div className="h-full flex flex-col">
           {/* Header Section */}
           <div className="p-8 bg-gradient-to-r from-slate-50 to-gray-50 border-b">
@@ -319,7 +342,7 @@ const CompanySheet = ({ children, company }: { children: React.ReactNode; compan
         </div>
       </SheetContent>
     </Sheet>
-  );
-};
+  )
+}
 
-export default CompanySheet;
+export default CompanySheet

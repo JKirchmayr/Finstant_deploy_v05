@@ -20,7 +20,13 @@ import { Label } from "../ui/label"
 import { Textarea } from "../ui/textarea"
 import { cn } from "@/lib/utils"
 
-export const AddNewColumn = () => {
+export const AddNewColumn = ({
+  children,
+  isDisabled,
+}: {
+  children?: React.ReactNode
+  isDisabled?: boolean
+}) => {
   const {
     query,
     setQuery,
@@ -42,7 +48,7 @@ export const AddNewColumn = () => {
 
   const handleFieldSelection = (field: string) => {
     if (selectedFields.includes(field)) {
-      setSelectedFields(selectedFields.filter((f) => f !== field))
+      setSelectedFields(selectedFields.filter(f => f !== field))
     } else {
       setSelectedFields([...selectedFields, field])
     }
@@ -50,14 +56,12 @@ export const AddNewColumn = () => {
   const isSelected = (field: string) => selectedFields.includes(field)
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <DropdownMenuTrigger
-        disabled={disabled}
-        asChild
-        className="h-full min-w-full rounded-none bg-blue-400/20 hover:bg-blue-400/30"
-      >
-        <Button variant="outline" size="icon" className="h-full w-full">
-          <PlusIcon className="h-4 w-4" />
-        </Button>
+      <DropdownMenuTrigger disabled={disabled || isDisabled} asChild>
+        {children ?? (
+          <Button variant="outline" size="icon" className="h-full w-full">
+            <PlusIcon className="h-4 w-4" />
+          </Button>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className="h-full border shadow border-blue-200"
@@ -78,7 +82,7 @@ export const AddNewColumn = () => {
                 id="switch-data"
                 className="cursor-pointer"
                 checked={isWeb}
-                onCheckedChange={(checked) => setIsWeb(checked)}
+                onCheckedChange={checked => setIsWeb(checked)}
               />
               <label htmlFor="switch-data" className="flex items-center gap-1 cursor-pointer">
                 <Globe className="w-4 h-4" />
@@ -93,7 +97,7 @@ export const AddNewColumn = () => {
             <div>
               <Textarea
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={e => setQuery(e.target.value)}
                 placeholder="What do you want to search?"
                 className="w-full rounded-xl border h-40 border-gray-300 px-2.5 py-2"
               />
@@ -110,7 +114,7 @@ export const AddNewColumn = () => {
 
           {!isWeb && (
             <div className="space-y-2">
-              {fieldButtons.map((label) => (
+              {fieldButtons.map(label => (
                 <Button
                   key={label}
                   variant="outline"

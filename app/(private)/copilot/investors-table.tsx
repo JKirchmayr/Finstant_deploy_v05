@@ -1,42 +1,50 @@
 "use client"
-
 import { ColumnDef } from "@tanstack/react-table"
-import PinnableDataTable from "@/components/table/pinnable-data-table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { useTabPanelStore } from "@/store/tabStore"
 import { GenerateSkeleton } from "./generate-skeleton"
 import Image from "next/image"
-import ChatDataTable from "@/components/chat/data-table"
-import { ExpandableCell } from "@/components/table/epandable-cell"
-import { AddColumnProvider, useAddColumn } from "@/context/newColumn"
+import ChatDataTable from "@/components/chat/ChatDataTable"
+import InvestorSheet from "@/components/InvestorSheet"
 
 export type InvestorsProps = {
   investor_id: string
   investor_name?: string
   investor_description?: string
+  investor_website?: string
+  investor_type?: string
+  investor_country?: string
+  investor_city?: string
+  investor_founded_year?: number
+  investor_strategy?: string
+  investor_sector_focus?: string
+  investor_investment_criteria?: string
   similarity_score?: number
+  investor_logo?: string
+  investor_selected_investments?: {
+    company_id: number
+    company_name: string
+    company_logo: string
+    investment_year: number | null
+  }[]
 }
 
-export default function InvestorsResponseData({ investors }: { investors: InvestorsProps[] }) {
-  const { addTab } = useTabPanelStore()
-
-  const isPlaceholder = investors.some(investor => investor.investor_id?.includes("placeholder"))
-
-  const handleAddTab = (data: any) => {
-    addTab(
-      data?.investor_id || data?.investor_name,
-      data?.investor_name || "Investor",
-      "investor-profile",
-      data,
-      data?.investor_id
-    )
-  }
-
+export default function InvestorsResponseData({
+  investors,
+  loading,
+  togglePanel,
+}: {
+  investors: InvestorsProps[]
+  loading: boolean
+  togglePanel: () => void
+}) {
   const columns: ColumnDef<InvestorsProps>[] = [
     {
       id: "select",
+      size: 60,
+      minSize: 60,
+      maxSize: 50,
       header: ({ table }) => (
-        <div className="flex items-center">
+        <div className="flex justify-center items-center w-full gap-2">
           <Checkbox
             checked={
               table.getIsAllPageRowsSelected() ||
@@ -44,102 +52,140 @@ export default function InvestorsResponseData({ investors }: { investors: Invest
             }
             onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
             aria-label="Select all"
-            className=""
-            disabled={table
-              .getFilteredRowModel()
-              .rows.some(row => row.original.investor_id?.includes("placeholder"))}
           />
+          <div className="text-center">#</div>
         </div>
       ),
       cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={value => row.toggleSelected(!!value)}
-          aria-label="Select row"
-          className=""
-          disabled={row.original.investor_id?.includes("placeholder")}
-        />
+        <div className="flex justify-center items-center w-full gap-2">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={value => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+          <div className="text-center">{row.index + 1}</div>
+        </div>
       ),
-      maxSize: 45,
       enableSorting: false,
       enableHiding: false,
     },
     {
-      id: "index",
-      maxSize: 45,
-
-      header: () => <div className="flex items-center justify-center w-full"> #</div>,
-      enablePinning: false,
-      cell: ({ row }) => (
-        <GenerateSkeleton
-          isPlaceholder={row.original.investor_id?.includes("placeholder")}
-          text={(row.index + 1).toString()}
-          className="text-center"
-        />
-      ),
-    },
-    {
       accessorKey: "investor_name",
-      header: isPlaceholder ? "Generating" : "Investor",
-      cell: ({ row }) => (
-        <button
-          onClick={() => handleAddTab(row.original)}
-          disabled={row.original.investor_id?.includes("placeholder")}
-          className="hover:underline items-center cursor-pointer inline-flex hover:font-medium transition-all duration-200 text-left w-full"
-          type="button"
-        >
-          <Image
-            src="https://placehold.co/50x50.png"
-            alt="logo"
-            width={18}
-            height={18}
-            className="mr-1.5 rounded"
-            unoptimized={true}
-          />
-          <GenerateSkeleton
-            isPlaceholder={row.original.investor_id?.includes("placeholder")}
-            text={row.original.investor_name || ""}
-          />
-        </button>
-      ),
+      header: loading ? "Generating" : "Investor Name",
+      cell: ({ row }) => {
+        return (
+          <InvestorSheet
+            investor={{
+              ...row.original,
+              id: Number(row.original.investor_id),
+              name: row.original.investor_name,
+              investor_linkedin_logo: row.original.investor_logo,
+              description: row.original.investor_description,
+            }}
+          >
+            <button
+              disabled={loading}
+              className="hover:underline items-center inline-flex cursor-pointer hover:font-medium transition-all duration-200 text-left w-full"
+              type="button"
+            >
+              <Image
+                src={row.original.investor_logo || "https://placehold.co/50x50.png"}
+                alt={`${row.original.investor_name} logo`}
+                width={18}
+                height={18}
+                className="mr-1.5 rounded"
+                unoptimized={true}
+              />
+              <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_name} />
+            </button>
+          </InvestorSheet>
+        )
+      },
     },
     {
       accessorKey: "investor_description",
-      header: isPlaceholder ? "Generating" : "Description",
-      cell: ({ row }) =>
-        row.original.investor_id?.includes("placeholder") ? (
-          <GenerateSkeleton
-            isPlaceholder={row.original.investor_id?.includes("placeholder")}
-            text={row.original.investor_description || ""}
-          />
-        ) : (
-          <ExpandableCell>{row.original.investor_description || ""}</ExpandableCell>
-        ),
+      header: loading ? "Generating" : "Description",
+      cell: ({ row }) => (
+        <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_description} />
+      ),
+    },
+    {
+      accessorKey: "investor_website",
+      header: loading ? "Generating" : "Website",
+      cell: ({ row }) => (
+        <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_website} />
+      ),
+    },
+    {
+      accessorKey: "investor_country",
+      header: loading ? "Generating" : "Location",
+      cell: ({ row }) => (
+        <GenerateSkeleton
+          isPlaceholder={loading}
+          text={`${row.original.investor_city}, ${row.original.investor_country}`}
+        />
+      ),
+    },
+    {
+      accessorKey: "investor_founded_year",
+      header: loading ? "Generating" : "Founded",
+      cell: ({ row }) => (
+        <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_founded_year} />
+      ),
+    },
+    {
+      accessorKey: "investor_type",
+      header: loading ? "Generating" : "Type",
+      cell: ({ row }) => (
+        <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_type} />
+      ),
+    },
+    {
+      accessorKey: "investor_strategy",
+      header: loading ? "Generating" : "Strategy",
+      cell: ({ row }) => (
+        <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_strategy} />
+      ),
+    },
+    {
+      accessorKey: "investor_sector_focus",
+      header: loading ? "Generating" : "Sector Focus",
+      cell: ({ row }) => (
+        <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_sector_focus} />
+      ),
+    },
+    {
+      accessorKey: "investor_investment_criteria",
+      header: loading ? "Generating" : "Investment Criteria",
+      cell: ({ row }) => (
+        <GenerateSkeleton
+          isPlaceholder={loading}
+          text={row.original.investor_investment_criteria}
+        />
+      ),
     },
     {
       accessorKey: "similarity_score",
-      header: isPlaceholder ? "Generating" : "Similarity",
+      header: loading ? "Generating" : "Similarity",
       cell: ({ row }) => (
-        <GenerateSkeleton
-          isPlaceholder={row.original.investor_id?.includes("placeholder")}
-          text={row.original.similarity_score?.toString() || ""}
-        />
+        <GenerateSkeleton isPlaceholder={loading} text={row.original.similarity_score} />
       ),
     },
   ]
 
-  const { query, setQuery, handleSearch } = useAddColumn()
-
   return (
     <div className="h-full flex flex-col bg-white w-full pt-1.5 ">
       <ChatDataTable
-        data={investors || []}
+        data={investors}
         columns={columns}
-        isLoading={false}
+        isLoading={loading}
         hasMoreData={false}
-        loadMoreData={() => console.log("loadmore")}
+        loadMoreData={() => {}}
         filterBy="investor_name"
         topbarClass="px-1.5 mb-1.5"
+        defaultPinnedColumns={["select", "investor_name"]}
+        titleName="Investors List"
+        togglePanel={togglePanel}
       />
     </div>
   )

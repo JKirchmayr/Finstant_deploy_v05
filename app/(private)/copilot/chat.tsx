@@ -4,19 +4,15 @@ import { cn } from "@/lib/utils"
 import { useChat } from "ai/react"
 import { ArrowUp, CircleSmall, Loader2, Loader2Icon } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
-import ReactMarkdown from "react-markdown"
-import { useWSStore, WSCompany } from "@/store/wsStore"
-import { WSMessage } from "@/types/wsMessages"
-import ListBuilder from "@/components/ListBuilder"
-import RenderData from "@/components/chat/RenderData"
-import axios from "axios"
+
 import { Markdown } from "@/components/markdown"
-import GradientBorderBox from "@/components/ui/gradient-border"
 import Image from "next/image"
 import { useTabPanelStore } from "@/store/tabStore"
-import CompaniesData from "./companies-table"
 import TextareaAutosize from "react-textarea-autosize"
-import InvestorsResponseData from "./investors-table"
+import { useAuth } from "@/hooks/useAuth"
+import CompanyProfile from "@/components/CompanyProfile"
+import { useSingleTabStore } from "@/store/singleTabStore"
+import { ChatProfileCard } from "@/components/ChatProfileCard"
 
 type Company = {
   company_name: string
@@ -27,18 +23,19 @@ type Company = {
 const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL! || ""
 
 const Chat = () => {
+  const { user, loading } = useAuth()
+
   const userId = "aa227293-c91c-4b03-91db-0d2048ee73e7"
-  const socketUrl = `wss://ai-agents-backend-zwa0.onrender.com/chat`
 
   const { messages, input, handleInputChange, append, setInput } = useChat()
-
+  const { setSingleTab } = useSingleTabStore()
+  const [sessionId, setSessionId] = useState<string | null>(null)
   const [isStreaming, setIsStreaming] = useState(false)
   const [connectionError, setConnectionError] = useState(false)
   const hasAddedPlaceholders = useRef(false)
   const lastPromptRef = useRef<string | null>(null)
   const hasSentPromptRef = useRef<boolean>(false)
   const bottomRef = useRef<undefined>(undefined)
-  const { addTab, appendData, closeTabByID, tabList, setActiveTabId } = useTabPanelStore()
 
   const endRef = useRef<HTMLDivElement>(null)
 
@@ -63,10 +60,7 @@ const Chat = () => {
     hasAddedPlaceholders.current = false
 
     // Append user message first
-    append({
-      role: "user",
-      content: promptToSend,
-    })
+    append({ role: "user", content: promptToSend })
 
     // Clear input and scroll after message is appended
     setInput("")
@@ -76,142 +70,215 @@ const Chat = () => {
     try {
       const response = await fetch(`${backendURL}/chat`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_prompt: promptToSend,
-          user_id: userId,
-          session_id: null,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_prompt: promptToSend, user_id: userId, session_id: sessionId }),
       })
 
       if (!response.ok) {
-        throw new Error("Network response was not ok")
+        throw new Error("Network response was not ok.")
       }
 
       const reader = response.body?.getReader()
       if (!reader) {
-        throw new Error("No reader available")
+        throw new Error("No reader available.")
       }
 
       const decoder = new TextDecoder()
-      let accumulatedJSONChunks: any[] = []
-      const initID = `tab-${new Date().getTime()}`
+      let accumulatedJSONChunks = []
+      let investors = []
+      let processingBuffer = ""
+      let comapanyProfile
+      let investorProfile
 
       while (true) {
         console.log("%cStarted reading stream!", "color: green; font-weight: bold")
         const { done, value } = await reader.read()
 
         if (done) {
+          if (processingBuffer) {
+            append({ role: "assistant", content: processingBuffer })
+          }
           setIsStreaming(false)
           console.log("%cFinished reading stream!", "color: red; font-weight: bold")
+
           break
         }
-
         const rawChunk = decoder.decode(value, { stream: true })
         const events = rawChunk.split("\n\n")
-        let companiesData = []
-        let investorsData = []
-
+        let buffer = ""
         for (const event of events) {
           if (!event.trim()) continue
+
+          const lines = rawChunk.split("\n")
+
+          console.log(lines, "lines")
+
+          // for (const line of lines) {
+          //   if (line.startsWith("data:")) {
+          //     buffer += line.replace(/^data:\s*/, "")
+          //   }
+          //   // An empty line signals the end of the event
+          //   if (line.trim() === "") {
+          //     if (buffer) {
+          //       try {
+          //         const parsed = JSON.parse(buffer)
+          //         if (parsed?.event === "investor_list" && parsed?.data?.investor_list) {
+          //           console.log("Received investor list:", parsed.data.investor_list)
+          //         }
+          //       } catch (err) {
+          //         console.error("Error parsing event data:", err)
+          //       }
+          //       buffer = ""
+          //     }
+          //   }
+          // }
 
           if (event.startsWith("data:")) {
             const cleaned = event.replace(/^data:\s*/, "").trim()
 
             try {
+              // Only log cleaned data events for debugging
               const parsed = JSON.parse(cleaned)
               accumulatedJSONChunks.push(parsed)
 
-              if (parsed?.type === "meta") {
-                // ------------For company data-----------
-                // const cPlaceholders: any = Array.from({
-                //   length: 10,
-                // }).map((_, i) => ({
-                //   company_id: `placeholder-${i}`,
-                //   company_name: "Generating...",
-                //   company_description: "Analyzing semantic vectors...",
-                //   similarity_score: "generating...",
-                // }))
-                // console.log(initID, "initID")
-                // addTab(initID, "Loading", "companies", cPlaceholders)
+              // console.log(parsed)
 
-                // ---------For investor data------------------
-                const iPlaceholders: any = Array.from({
-                  length: 10,
-                }).map((_, i) => ({
-                  investor_id: `placeholder-${i}`,
-                  investor_name: "Generating...",
-                  investor_description: "Analyzing semantic vectors...",
-                  similarity_score: "generating...",
+              // Extract companies array safely
+
+              if (parsed?.event === "company_list" && parsed?.data?.meta?.stage !== "final") {
+                const dummyCompanies = Array.from({ length: 5 }, (_, index) => ({
+                  company_id: Math.floor(Math.random() * 1000) + 1,
+                  company_name: "Generating...",
+                  company_logo: `https://example.com/logo${index + 1}.png`,
+                  company_description: `Generating...`,
+                  company_country: "Generating...",
+                  similarity_score: "Generating...",
                 }))
-                // console.log(initID, "initID")
-                addTab(initID, "Generating", "investors", iPlaceholders)
+                append({ role: "assistant", content: parsed?.data?.text })
+                setSingleTab("comp", "companies", dummyCompanies, "initial")
+              }
+              if (parsed?.event === "company_list" && parsed?.data?.meta?.stage === "final") {
+                const companiesArray = parsed?.data?.company_list || []
+                // Store it in state
+                append({ role: "assistant", content: parsed?.data?.text })
+                setSingleTab("comp", "companies", companiesArray, "final")
+                // console.log("Company List Saved!", companiesArray)
               }
 
-              if (parsed?.type === "response") {
-                const responseText = parsed?.data?.text
-                if (responseText) {
+              if (parsed?.event === "investor_list" && parsed?.data?.meta?.stage !== "final") {
+                const dummyInvestors = Array.from({ length: 5 }, (_, index) => ({
+                  investor_id: Math.floor(Math.random() * 1000) + 1,
+                  investor_name: "Generating...",
+                  investor_logo: `https://example.com/logo${index + 1}.png`,
+                  investor_description: `Generating...`,
+                  investor_country: "Generating...",
+                  similarity_score: "Generating...",
+                }))
+                append({ role: "assistant", content: parsed?.data?.text })
+                setSingleTab("inv", "investors", dummyInvestors, "initial")
+              }
+              if (parsed?.event === "investor_list" && parsed?.data?.meta?.stage === "final") {
+                const investorsArray = parsed?.data?.investor_list || []
+                // Store it in state
+                append({ role: "assistant", content: parsed?.data?.text })
+                setSingleTab("inv", "investors", investorsArray, "final")
+                // console.log("Investor List Saved!", investorsArray)
+              }
+
+              if (parsed?.event === "done") {
+                if (comapanyProfile) {
+                  console.log(CompanyProfile, "company")
+
                   append({
-                    role: "assistant",
-                    content: responseText,
+                    role: "data",
+                    content: JSON.stringify({ type: "company_profile", comapanyProfile }),
                   })
                   scrollToBottom()
                 }
+                if (investorProfile) {
+                  // console.log(CompanyProfile, "company")
+
+                  append({
+                    role: "data",
+                    content: JSON.stringify({ type: "investor_profile", investorProfile }),
+                  })
+                  scrollToBottom()
+                  // console.log(investorProfile, "investor")
+                }
+              }
+              if (parsed?.event === "investor_list" && parsed?.data?.meta?.stage === "final") {
+                const investorList = parsed?.data?.investor_list || []
+                if (!investorList.length) {
+                  append({
+                    role: "assistant",
+                    content: parsed?.data?.text,
+                  })
+                }
+              }
+              if (parsed?.event === "company_list" && parsed?.data?.meta?.stage === "final") {
+                const companyList = parsed?.data?.company_list || []
+                if (!companyList.length) {
+                  append({
+                    role: "assistant",
+                    content: parsed?.data?.text,
+                  })
+                }
               }
 
-              if (parsed?.type === "company") {
-                const companyData = parsed?.data
-                if (companyData) {
-                  const company: any = {
-                    company_id: companyData.company_id,
-                    company_name: companyData.company_name,
-                    company_description: companyData.company_description,
-                    similarity_score: companyData.similarity_score,
-                  }
-                  appendData(initID, company)
-                  scrollToBottom()
+              if (parsed?.event === "text" && parsed?.data?.meta?.stage === "processing") {
+                processingBuffer += parsed?.data?.text
+              } else if (
+                parsed?.event === "entity_profile" &&
+                parsed?.data?.meta?.stage === "final"
+              ) {
+                // First, if we have processingBuffer filled, we append it first
+                if (processingBuffer) {
+                  append({ role: "assistant", content: processingBuffer })
+                  processingBuffer = ""
                 }
-              }
-              if (parsed?.type === "investor") {
-                const investorData = parsed?.data
-                if (investorData) {
-                  const investor = {
-                    investor_id: investorData.investor_id || investorData.investor_name,
-                    investor_name: investorData.investor_name || "-",
-                    investor_description: investorData.investor_description || "-",
-                    similarity_score: investorData.similarity_score || "-",
+                const profileData = parsed?.data
+                if (profileData?.type === "company_profile") {
+                  comapanyProfile = {
+                    company_id: profileData.company_id || 0,
+                    company_name: profileData.company_name || "Unknown Company",
+                    company_description: profileData.company_description || "-",
+                    company_logo: profileData.company_logo || null,
+                    company_location:
+                      profileData.company_city && profileData.company_country
+                        ? `${profileData.company_city}, ${profileData.company_country}`
+                        : "Location unknown",
                   }
-                  appendData(initID, investor)
-                  scrollToBottom()
+                  // console.log(comapanyProfile, "company")
                 }
-              }
+                if (profileData?.type === "investor_profile") {
+                  investorProfile = {
+                    investor_id: profileData.investor_id || 0,
+                    investor_name: profileData.investor_name || "Unknown Investor",
+                    investor_description: profileData.investor_description || "-",
+                    investor_logo: profileData.investor_logo || null,
+                    investor_location:
+                      profileData.investor_city && profileData.investor_country
+                        ? `${profileData.investor_city}, ${profileData.investor_country}`
+                        : "Location unknown",
+                  }
+                }
 
-              if (parsed?.type === "done") {
-                if (!parsed.data?.companies?.length && !parsed.data?.investors?.length) {
-                  console.log("no dattttttttttta")
-                  closeTabByID(initID)
-                  setActiveTabId(tabList.length ? tabList[tabList.length - 1].tabId : "")
+                // If there is additional text, we can append it afterwards
+                if (parsed?.data?.text) {
+                  append({ role: "assistant", content: parsed?.data?.text })
                 }
-                setIsStreaming(false)
-                // Final scroll to bottom
-                scrollToBottom()
               }
             } catch (err) {
-              // closeTabByID(initID)
               console.error("Error parsing cleaned chunk:", err, cleaned)
             }
           }
         }
       }
-
       console.log("Full JSON chunks received:", accumulatedJSONChunks)
     } catch (error) {
-      append({
-        role: "assistant",
-        content: "An error occurred while processing your request.",
-      })
+      append({ role: "assistant", content: "An error occurred while processing your request." })
+      setSingleTab("comp", "companies", [], "final")
+      setSingleTab("inv", "investors", [], "initial")
       console.error("Error during streaming:", error)
       setIsStreaming(false)
     }
@@ -242,12 +309,13 @@ const Chat = () => {
               >
                 <div
                   className={cn("max-w-full text-sm leading-relaxed px-3 py-1 rounded-md", {
-                    "ml-auto text-gray-700 border border-gray-200 rounded-full bg-white [font_weight:400]":
+                    "ml-auto text-gray-700 border border-gray-200 rounded-full bg-white shadow-sm [font_weight:400]":
                       isUser,
                     "text-gray-800 mr-auto border-none rounded-md": isAssistant,
                   })}
                 >
-                  <Markdown>{m.content}</Markdown>
+                  {m.role === "data" && <ChatProfileCard data={JSON.parse(m.content)} />}
+                  <Markdown>{m.role !== "data" && m.content}</Markdown>
                 </div>
               </div>
             )
@@ -261,13 +329,7 @@ const Chat = () => {
             </div>
           )}
 
-          {connectionError && (
-            <div className="ml-auto text-red-200 text-sm px-4 mt-2">
-              ❌ WebSocket connection failed.{" "}
-              <button className="underline text-blue-500 ml-2">Retry</button>
-            </div>
-          )}
-          <div className={cn("h-5 opacity-0", { "h-10": messages.length > 1 })} ref={endRef} />
+          <div className={cn("h-5 opacity-0", { "h-20": messages.length > 1 })} ref={endRef} />
         </div>
         <div
           className={cn("flex justify-center items-center")}
