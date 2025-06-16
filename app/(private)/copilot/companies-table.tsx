@@ -93,7 +93,7 @@ export default function CompaniesData({
               type="button"
             >
               <Image
-                src={row.original.company_logo || "https://placehold.co/50x50.png"}
+                src={row.original.company_logo ?? "https://placehold.co/50x50.png"}
                 alt={`${row.original.company_name} logo`}
                 width={18}
                 height={18}
@@ -105,6 +105,7 @@ export default function CompaniesData({
           </CompanySheet>
         )
       },
+      enableSorting: true,
     },
     {
       accessorKey: "company_description",
@@ -119,6 +120,7 @@ export default function CompaniesData({
       cell: ({ row }) => (
         <GenerateSkeleton isPlaceholder={loading} text={row.original.company_country} />
       ),
+      enableSorting: true,
     },
     {
       accessorKey: "similarity_score",
@@ -126,6 +128,7 @@ export default function CompaniesData({
       cell: ({ row }) => (
         <GenerateSkeleton isPlaceholder={loading} text={row.original.similarity_score} />
       ),
+      enableSorting: true,
     },
   ]
 

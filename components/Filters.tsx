@@ -10,6 +10,7 @@ import MultipleSelector, { Option } from "./ui/multiselect"
 import CategorizedCountryMultiSelect from "./CategorizedCountryMultiSelect"
 import RangeSlider from "react-range-slider-input"
 import "react-range-slider-input/dist/style.css"
+import { cn } from "@/lib/utils"
 const industryOptions = [
   { value: "Artificial Intelligence", label: "Artificial Intelligence" },
   { value: "Software Development", label: "Software Development" },
@@ -246,7 +247,7 @@ const Filters = () => {
             min={0}
             max={200}
             step={1}
-            value={[Number(company.revenueMin) || 20, Number(company.revenueMax) || 150]}
+            value={[Number(company.revenueMin) || 0, Number(company.revenueMax) || 200]}
             onInput={(val: number[]) => {
               setCompany(prev => ({
                 ...prev,
@@ -276,7 +277,7 @@ const Filters = () => {
             min={0}
             max={200}
             step={1}
-            value={[Number(company.ebitdaMin) || 20, Number(company.ebitdaMax) || 150]}
+            value={[Number(company.ebitdaMin) || 0, Number(company.ebitdaMax) || 200]}
             onInput={(val: number[]) => {
               setCompany(prev => ({
                 ...prev,
@@ -371,15 +372,25 @@ const DiscriptionFilter = ({
   value: string
   onChange: (value: string) => void
 }) => {
+  const [isFocused, setIsFocused] = useState(false)
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 relative">
       <textarea
         placeholder="Describe the company you are looking for..."
         className="w-full h-full bg-white border border-gray-300 rounded-sm p-2 text-gray-700"
         value={value}
         onChange={e => onChange(e.target.value)}
         rows={4}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
       />
+      <span
+        className={cn("absolute bottom-1 right-1 text-xs p-0.5 rounded-sm animate-pulse hidden", {
+          "opacity-100 block": isFocused,
+        })}
+      >
+        Enter
+      </span>
     </div>
   )
 }

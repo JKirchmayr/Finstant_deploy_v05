@@ -157,7 +157,7 @@ const InvestorFilters = () => {
             min={0}
             max={200}
             step={1}
-            value={[Number(investor.ebitdaMin) || 20, Number(investor.ebitdaMax) || 150]}
+            value={[Number(investor.ebitdaMin) || 0, Number(investor.ebitdaMax) || 200]}
             onInput={(val: number[]) => {
               setInvestor(prev => ({
                 ...prev,
@@ -187,7 +187,7 @@ const InvestorFilters = () => {
             min={0}
             max={200}
             step={1}
-            value={[Number(investor.revenueMin) || 20, Number(investor.revenueMax) || 150]}
+            value={[Number(investor.revenueMin) || 0, Number(investor.revenueMax) || 200]}
             onInput={(val: number[]) => {
               setInvestor(prev => ({
                 ...prev,
@@ -220,7 +220,7 @@ const InvestorFilters = () => {
             </div>
           ))}
           <div className="mb-1">
-            <h1 className="font-semibold text-lg">Target Filters</h1>
+            <h1 className="font-semibold text-base">Target Filters</h1>
           </div>
           <div className="pb-2">
             <div className="hover:no-underline hover:cursor-pointer pb-1 font-medium">

@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { Database } from "@/types/supabase"
+import { OpenAI } from "openai"
 
 export async function GET(req: NextRequest) {
   type CompanyRow = Database["development"]["Tables"]["companies"]["Row"]
-
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY!,
+  })
   const url = req.nextUrl
   const from = parseInt(url.searchParams.get("from") || "0")
   const to = parseInt(url.searchParams.get("to") || "30")
@@ -15,6 +18,7 @@ export async function GET(req: NextRequest) {
   const ebitdaMin = url.searchParams.get("ebitdaMin")
   const revenueMax = url.searchParams.get("revenueMax")
   const revenueMin = url.searchParams.get("revenueMin")
+  const description = url.searchParams.get("description") || ""
   // Select only allowed fields (exclude vector fields)
   const allowedFields = Object.keys({} as CompanyRow)
     .filter(
@@ -50,6 +54,34 @@ export async function GET(req: NextRequest) {
 
     if (revenueMin) {
       query = query.gt("companies_revenue_estimate_mEUR", revenueMin)
+    }
+
+    if (description.trim()) {
+      const embeddingRes = await openai.embeddings.create({
+        model: "text-embedding-ada-002",
+        input: description,
+      })
+
+      const embedding = embeddingRes.data[0].embedding
+
+      const { data, error } = await supabase.rpc("match_companies", {
+        // @ts-ignore
+        query_embedding: embedding,
+        match_threshold: 0.75,
+        match_count: 20,
+      })
+      console.log(data)
+
+      if (error) {
+        console.error("❌ Supabase match_companies error:", error.message)
+        return NextResponse.json({ error: "Semantic search failed" }, { status: 500 })
+      }
+
+      return NextResponse.json({
+        success: true,
+        data,
+        message: "Semantic search results",
+      })
     }
 
     // Pagination

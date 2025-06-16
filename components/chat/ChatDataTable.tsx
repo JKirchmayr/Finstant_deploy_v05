@@ -16,6 +16,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import {
+  ArrowDownUp,
   ArrowLeftToLineIcon,
   ArrowRightToLineIcon,
   ChevronLeft,
@@ -50,6 +51,7 @@ import { ExportOptions } from "../table/export-options"
 import { AddNewColumn } from "./AddNewColumn"
 import { toast } from "sonner"
 import { useSingleTabStore } from "@/store/singleTabStore"
+import { ChevronDown, ChevronUp } from "lucide-react"
 
 interface IChatDataTableProps<T extends any> {
   data: T[]
@@ -102,7 +104,6 @@ const ChatDataTable = <T extends any>({
 
   const pathname = usePathname()
   const investors = pathname === "/investors"
-  const companies = pathname === "/companies"
 
   const table = useReactTable({
     data,
@@ -324,7 +325,7 @@ const ChatDataTable = <T extends any>({
           </div>
         </div>
       )}
-      <div className="flex flex-col w-full bg-white border overflow-auto">
+      <div className="flex flex-col w-full bg-white border border-l-0 overflow-auto overflow-x-auto">
         <Table
           className="!w-full bg-background [&_td]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b [&_thead]:border-b-0 [&_th]:px-4 [&_td]:pl-4 [&_th:has([role=checkbox])]:pr-0 [&_td:first-child]:!px-4 [&_th:first-child]:!px-4"
           style={{ width: table.getTotalSize() }}
@@ -356,6 +357,15 @@ const ChatDataTable = <T extends any>({
                             ? null
                             : flexRender(header.column.columnDef.header, header.getContext())}
                         </span>
+                        {!!header.column.columnDef.enableSorting && header.column.getCanSort() && (
+                          <Button
+                            variant="ghost"
+                            size="xs"
+                            onClick={header.column.getToggleSortingHandler()}
+                          >
+                            <ArrowDownUp className="size-4" />
+                          </Button>
+                        )}
                         {/* {!header.isPlaceholder &&
                           header.column.getCanPin() &&
                           header.column.columnDef.enableHiding !== false &&
@@ -382,8 +392,7 @@ const ChatDataTable = <T extends any>({
                                   aria-label={`Pin options for ${
                                     header.column.columnDef.header as string
                                   } column`}
-                                  title={`Pin options for ${
-                                    header.column.columnDef.header as string
+                                  title={`Pin options for ${header.column.columnDef.header as string
                                   } column`}
                                 >
                                   <EllipsisIcon
@@ -480,7 +489,7 @@ const ChatDataTable = <T extends any>({
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={investors ? 8 : 5}>
+                    <TableCell colSpan={titleName.includes("Investors") ? 8 : 5}>
                       <div className="h-40 text-center text-lg font-medium flex justify-center items-center flex-col shrink-0">
                         <Image
                           src="/images/no-data.png"

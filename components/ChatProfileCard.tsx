@@ -111,7 +111,7 @@ export function ChatProfileCard({ data }: { data: ProfileData }) {
         </div>
       </CardHeader>
       <CardContent className="p-2">
-        <p className="text-sm text-zinc-700 dark:text-zinc-300 mb-4 whitespace-normal break-words">
+        <p className="text-sm text-zinc-700 dark:text-zinc-300 mb-4 whitespace-normal break-words line-clamp-4">
           {description}
         </p>
 

@@ -1,14 +1,14 @@
 "use client"
 import DataTable from "@/components/table/data-table"
-import React from "react"
+import React, { useEffect } from "react"
 import { getColumnsForData } from "./columns"
 import { useCompanies } from "@/hooks/useCompanies"
 import { useCompanyFilters } from "@/store/useCompanyFilters"
 import PinnableDataTable from "@/components/table/pinnable-data-table"
 
 const Data = () => {
-  const { appliedFilters } = useCompanyFilters()
-  // console.log(appliedFilters, "appliedFilters")
+  const { appliedFilters, setLoading } = useCompanyFilters()
+  console.log(appliedFilters, "appliedFilters")
 
   const [from, setFrom] = React.useState(1)
   const [to, setTo] = React.useState(30)
@@ -17,6 +17,7 @@ const Data = () => {
     from,
     to,
   })
+
   const [moreData, setMoreData] = React.useState<any[]>([])
   const [hasMoreData, setHasMoreData] = React.useState(false)
 

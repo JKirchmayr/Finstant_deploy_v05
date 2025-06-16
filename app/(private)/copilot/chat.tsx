@@ -48,6 +48,7 @@ const Chat = () => {
       }
     }, 100)
   }
+  let processingBuffer = ""
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -86,7 +87,6 @@ const Chat = () => {
       const decoder = new TextDecoder()
       let accumulatedJSONChunks = []
       let investors = []
-      let processingBuffer = ""
       let comapanyProfile
       let investorProfile
 
@@ -149,7 +149,7 @@ const Chat = () => {
                 const dummyCompanies = Array.from({ length: 5 }, (_, index) => ({
                   company_id: Math.floor(Math.random() * 1000) + 1,
                   company_name: "Generating...",
-                  company_logo: `https://example.com/logo${index + 1}.png`,
+                  company_logo: "https://placehold.co/50x50.png",
                   company_description: `Generating...`,
                   company_country: "Generating...",
                   similarity_score: "Generating...",
@@ -169,7 +169,7 @@ const Chat = () => {
                 const dummyInvestors = Array.from({ length: 5 }, (_, index) => ({
                   investor_id: Math.floor(Math.random() * 1000) + 1,
                   investor_name: "Generating...",
-                  investor_logo: `https://example.com/logo${index + 1}.png`,
+                  investor_logo: "https://placehold.co/50x50.png",
                   investor_description: `Generating...`,
                   investor_country: "Generating...",
                   similarity_score: "Generating...",
@@ -206,24 +206,6 @@ const Chat = () => {
                   // console.log(investorProfile, "investor")
                 }
               }
-              if (parsed?.event === "investor_list" && parsed?.data?.meta?.stage === "final") {
-                const investorList = parsed?.data?.investor_list || []
-                if (!investorList.length) {
-                  append({
-                    role: "assistant",
-                    content: parsed?.data?.text,
-                  })
-                }
-              }
-              if (parsed?.event === "company_list" && parsed?.data?.meta?.stage === "final") {
-                const companyList = parsed?.data?.company_list || []
-                if (!companyList.length) {
-                  append({
-                    role: "assistant",
-                    content: parsed?.data?.text,
-                  })
-                }
-              }
 
               if (parsed?.event === "text" && parsed?.data?.meta?.stage === "processing") {
                 processingBuffer += parsed?.data?.text
@@ -233,7 +215,7 @@ const Chat = () => {
               ) {
                 // First, if we have processingBuffer filled, we append it first
                 if (processingBuffer) {
-                  append({ role: "assistant", content: processingBuffer })
+                  // append({ role: "assistant", content: processingBuffer })
                   processingBuffer = ""
                 }
                 const profileData = parsed?.data
@@ -242,7 +224,7 @@ const Chat = () => {
                     company_id: profileData.company_id || 0,
                     company_name: profileData.company_name || "Unknown Company",
                     company_description: profileData.company_description || "-",
-                    company_logo: profileData.company_logo || null,
+                    company_logo: profileData.company_logo || "https://placehold.co/50x50.png",
                     company_location:
                       profileData.company_city && profileData.company_country
                         ? `${profileData.company_city}, ${profileData.company_country}`
@@ -255,7 +237,7 @@ const Chat = () => {
                     investor_id: profileData.investor_id || 0,
                     investor_name: profileData.investor_name || "Unknown Investor",
                     investor_description: profileData.investor_description || "-",
-                    investor_logo: profileData.investor_logo || null,
+                    investor_logo: profileData.investor_logo || "https://placehold.co/50x50.png",
                     investor_location:
                       profileData.investor_city && profileData.investor_country
                         ? `${profileData.investor_city}, ${profileData.investor_country}`
@@ -314,6 +296,7 @@ const Chat = () => {
                     "text-gray-800 mr-auto border-none rounded-md": isAssistant,
                   })}
                 >
+                  {processingBuffer}
                   {m.role === "data" && <ChatProfileCard data={JSON.parse(m.content)} />}
                   <Markdown>{m.role !== "data" && m.content}</Markdown>
                 </div>
@@ -505,7 +488,7 @@ const PromptField = ({
                 onClick={internalHandleSend}
               >
                 {isLoading ? (
-                  <Loader2 className="animate-spin w-5 h-5 text-black" />
+                  <Loader2 className="animate-spin w-5 h-5 text-black [animation-duration:0.3s]" />
                 ) : (
                   <ArrowUp size={20} />
                 )}

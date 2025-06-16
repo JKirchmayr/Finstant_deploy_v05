@@ -40,9 +40,9 @@ export default function InvestorsResponseData({
   const columns: ColumnDef<InvestorsProps>[] = [
     {
       id: "select",
-      size: 60,
-      minSize: 60,
-      maxSize: 50,
+      size: 65,
+      minSize: 65,
+      maxSize: 65,
       header: ({ table }) => (
         <div className="flex justify-center items-center w-full gap-2">
           <Checkbox
@@ -76,11 +76,15 @@ export default function InvestorsResponseData({
         return (
           <InvestorSheet
             investor={{
-              ...row.original,
               id: Number(row.original.investor_id),
               name: row.original.investor_name,
               investor_linkedin_logo: row.original.investor_logo,
               description: row.original.investor_description,
+              investor_LLM_country: row.original.investor_country,
+              investor_linkedin_city: row.original.investor_city,
+              investor_linkedin_description: row.original.investor_description,
+              founded_year: row.original.investor_founded_year,
+              investment_criteria_description: row.original.investor_investment_criteria,
             }}
           >
             <button
@@ -130,7 +134,10 @@ export default function InvestorsResponseData({
       accessorKey: "investor_founded_year",
       header: loading ? "Generating" : "Founded",
       cell: ({ row }) => (
-        <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_founded_year} />
+        <GenerateSkeleton
+          isPlaceholder={loading}
+          text={row.original.investor_founded_year?.toString()}
+        />
       ),
     },
     {
@@ -168,7 +175,10 @@ export default function InvestorsResponseData({
       accessorKey: "similarity_score",
       header: loading ? "Generating" : "Similarity",
       cell: ({ row }) => (
-        <GenerateSkeleton isPlaceholder={loading} text={row.original.similarity_score} />
+        <GenerateSkeleton
+          isPlaceholder={loading}
+          text={row.original.similarity_score?.toString()}
+        />
       ),
     },
   ]
