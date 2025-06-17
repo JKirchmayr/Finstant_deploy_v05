@@ -1,5 +1,5 @@
 "use client"
-import { ListFilterPlus } from "lucide-react"
+import { ListFilterPlus, Loader2 } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
 import { Checkbox } from "./ui/checkbox"
@@ -8,6 +8,7 @@ import MultipleSelector, { Option } from "./ui/multiselect"
 import CategorizedCountryMultiSelect from "./CategorizedCountryMultiSelect"
 import RangeSlider from "react-range-slider-input"
 import "react-range-slider-input/dist/style.css"
+import { cn } from "@/lib/utils"
 
 const industryOptions = [
   { value: "Artificial Intelligence", label: "Artificial Intelligence" },
@@ -46,6 +47,7 @@ const InvestorFilters = () => {
     applyFilters: applyInvestorFilters,
     resetFilters: resetInvestorFilters,
     isLoading,
+    setLoading,
   } = useInvestorFilters()
 
   const [investor, setInvestor] = useState({
@@ -60,7 +62,7 @@ const InvestorFilters = () => {
   })
 
   const handleMinMaxChange = (key: string, value: string) => {
-    setInvestor(prev => ({ ...prev, [key]: value }))
+    setInvestor((prev) => ({ ...prev, [key]: value }))
   }
 
   const handleSearch = () => {
@@ -79,24 +81,25 @@ const InvestorFilters = () => {
       description: "",
     })
     resetInvestorFilters()
+    setLoading(false)
   }
 
   const handleInvestorChange = (selected: string[]) => {
-    setInvestor(prev => ({
+    setInvestor((prev) => ({
       ...prev,
       investorType: selected,
     }))
   }
 
   const handleSelectCountries = (countries: string[]) => {
-    setInvestor(prev => ({
+    setInvestor((prev) => ({
       ...prev,
       investorLocation: countries,
     }))
   }
 
   const handleSelectIndustries = (industries: string[]) => {
-    setInvestor(prev => ({
+    setInvestor((prev) => ({
       ...prev,
       industry: industries,
     }))
@@ -157,7 +160,7 @@ const InvestorFilters = () => {
             step={1}
             value={[Number(investor.ebitdaMin) || 0, Number(investor.ebitdaMax) || 200]}
             onInput={(val: number[]) => {
-              setInvestor(prev => ({
+              setInvestor((prev) => ({
                 ...prev,
                 ebitdaMin: val[0].toString(),
                 ebitdaMax: val[1].toString(),
@@ -187,7 +190,7 @@ const InvestorFilters = () => {
             step={1}
             value={[Number(investor.revenueMin) || 0, Number(investor.revenueMax) || 200]}
             onInput={(val: number[]) => {
-              setInvestor(prev => ({
+              setInvestor((prev) => ({
                 ...prev,
                 revenueMin: val[0].toString(),
                 revenueMax: val[1].toString(),
@@ -202,20 +205,20 @@ const InvestorFilters = () => {
 
   return (
     <div className="flex flex-col bg-[#fbfbfb] h-full overflow-hidden relative border-r border-gray-200 transition-transform ease-in-out duration-300">
-      {/* <div className="flex bg-white items-center gap-1 border-b border-gray-300 px-4 py-1 min-h-[40px]">
-        <h1 className="text-sm font-medium -ml-1"> Filters</h1>
+      <div className="flex bg-white items-center gap-1 border-b border-gray-300 px-4 py-1 min-h-[40px]">
         <ListFilterPlus size={14} />
-      </div> */}
+        <h1 className="text-sm font-medium text-gray-700">Investor Filters</h1>
+      </div>
 
       <div className="flex flex-col gap-3 overflow-y-auto  flex-1">
         <div className="w-full space-y-2 ">
-          <div className="my-1">
+          {/* <div className="my-1">
             <h1 className="font-semibold text-sm py-0.5 px-3 bg-muted-foreground/10">
               Investor Filters
             </h1>
-          </div>
+          </div> */}
           <div className="p-3 pt-1">
-            {accordionItemsConfig.map(item => (
+            {accordionItemsConfig.map((item) => (
               <div key={item.value} className="pb-2">
                 <div className="hover:no-underline hover:cursor-pointer pb-1 font-medium">
                   {item.title}
@@ -230,13 +233,20 @@ const InvestorFilters = () => {
             </h1>
           </div>
           <div className="pb-2 p-3 pt-1">
-            <div className="hover:no-underline hover:cursor-pointer font-medium">
+            <div className="hover:no-underline hover:cursor-pointer font-medium mb-2">
               Target Description
             </div>
             <div className="overflow-visible z-10">
               <DiscriptionFilter
                 value={investor.description}
-                onChange={val => setInvestor(prev => ({ ...prev, description: val }))}
+                onChange={(val) => setInvestor((prev) => ({ ...prev, description: val }))}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault()
+                    handleSearch()
+                  }
+                }}
+                isLoading={isLoading}
               />
             </div>
           </div>
@@ -247,7 +257,7 @@ const InvestorFilters = () => {
             <div className="overflow-visible z-10">
               <CategorizedCountryMultiSelect
                 onSelecCountries={(countries: Option[]) =>
-                  handleSelectCountries(countries.map(c => c.label))
+                  handleSelectCountries(countries.map((c) => c.label))
                 }
               />
             </div>
@@ -263,7 +273,7 @@ const InvestorFilters = () => {
                   commandProps={{
                     label: "Select Industry",
                   }}
-                  onChange={v => handleSelectIndustries(v.map(i => i.value))}
+                  onChange={(v) => handleSelectIndustries(v.map((i) => i.value))}
                   defaultOptions={industryOptions}
                   placeholder="Select Industry"
                   hidePlaceholderWhenSelected
@@ -283,13 +293,16 @@ const InvestorFilters = () => {
           disabled={isLoading}
           type="button"
         >
-          {isLoading ? "Searching.." : "Search"}
+          {isLoading && !investor.description ? (
+            <Loader2 className="animate-spin w-5 h-5" />
+          ) : (
+            "Search"
+          )}
         </button>
         {isInvestorFilterApplied && (
           <button
             className="px-6 py-2 text-gray-800 border border-gray-300 rounded-sm cursor-pointer"
             onClick={handleClear}
-            disabled={isLoading}
           >
             Clear
           </button>
@@ -301,19 +314,46 @@ const InvestorFilters = () => {
 const DiscriptionFilter = ({
   value,
   onChange,
+  onKeyDown,
+  isLoading = false,
 }: {
   value: string
   onChange: (value: string) => void
+  onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void
+  isLoading: boolean
 }) => {
+  const [isFocused, setIsFocused] = useState(false)
+  const [isEnterPressed, setIsEnterPressed] = useState(false)
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter") {
+      setIsEnterPressed(true)
+      onKeyDown(e)
+    }
+  }
+  useEffect(() => {
+    if (!isLoading && value.length > 0) {
+      setIsEnterPressed(false)
+    }
+  }, [isLoading, value.length])
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 relative">
       <textarea
         placeholder="Describe the company you are looking for..."
         className="w-full h-full max-h-24 bg-white border border-gray-300 rounded-sm p-2 text-gray-700"
         value={value}
-        onChange={e => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         rows={4}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        onKeyDown={handleKeyDown}
       />
+      <span
+        className={cn("absolute bottom-1 right-1 text-xs p-0.5 rounded-sm animate-pulse hidden", {
+          "opacity-100 block": isFocused,
+        })}
+      >
+        {isEnterPressed ? <Loader2 className="animate-spin w-4 h-4 text-gray-800" /> : "Enter"}
+      </span>
     </div>
   )
 }
@@ -382,7 +422,7 @@ interface InvestorsProps {
 const InvestorsFilter: React.FC<InvestorsProps> = ({ options, selectedInvestors, onChange }) => {
   const handleCheckboxChange = (value: string) => {
     const newInvestor = selectedInvestors.includes(value)
-      ? selectedInvestors.filter(item => item !== value)
+      ? selectedInvestors.filter((item) => item !== value)
       : [...selectedInvestors, value]
     onChange(newInvestor)
   }
@@ -390,12 +430,12 @@ const InvestorsFilter: React.FC<InvestorsProps> = ({ options, selectedInvestors,
   return (
     <div className="flex flex-col justify-between gap-2 ">
       <div className="flex flex-col gap-1 ">
-        {options.map(option => (
+        {options.map((option) => (
           <div className="flex items-center space-x-2" key={option.value}>
             <Checkbox
               id={option.value}
               checked={selectedInvestors.includes(option.value)}
-              onCheckedChange={checked => handleCheckboxChange(option.value)}
+              onCheckedChange={(checked) => handleCheckboxChange(option.value)}
             />
             <label
               htmlFor={option.value}

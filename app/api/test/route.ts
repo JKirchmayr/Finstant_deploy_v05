@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
     const supabase = await createClient()
     let { data: companies, error } = await supabase
       .schema("development")
-      .from("companies")
+      .from("investments")
       .select("*")
 
     return NextResponse.json({

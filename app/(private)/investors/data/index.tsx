@@ -1,18 +1,18 @@
 "use client"
 import DataTable from "@/components/table/data-table"
-import React from "react"
+import React, { useEffect } from "react"
 import { getColumnsForData } from "./columns"
 import { useInvestors } from "@/hooks/useInvestors"
 import { useInvestorFilters } from "@/store/useInvestorFilters"
 import PinnableDataTable from "@/components/table/pinnable-data-table"
 const InvestorData = () => {
-  const { appliedFilters } = useInvestorFilters()
+  const { appliedFilters, setLoading } = useInvestorFilters()
   console.log(appliedFilters, "appliedFilters")
 
   const [from, setFrom] = React.useState(1)
   const [to, setTo] = React.useState(30)
 
-  const { data, isPending } = useInvestors({
+  const { data, isPending, isSuccess, isError } = useInvestors({
     ...(appliedFilters || {}),
     from,
     to,
@@ -25,7 +25,7 @@ const InvestorData = () => {
     if (data && from === 1) {
       setMoreData(data)
     } else if (data && from > 1) {
-      setMoreData(prev => [...prev, ...data])
+      setMoreData((prev) => [...prev, ...data])
     }
     if (data && data.length < to - from + 1) {
       setHasMoreData(false)
@@ -36,10 +36,16 @@ const InvestorData = () => {
 
   const loadMoreData = () => {
     if (!isPending && hasMoreData) {
-      setFrom(prev => prev + (to - from + 1))
-      setTo(prev => prev + (to - from + 1))
+      setFrom((prev) => prev + (to - from + 1))
+      setTo((prev) => prev + (to - from + 1))
     }
   }
+
+  useEffect(() => {
+    if (isSuccess || !isPending || isError) {
+      setLoading(false)
+    }
+  }, [isSuccess, isPending, isError])
 
   // console.log(moreData)
 

@@ -1,5 +1,5 @@
 "use client"
-import { ListFilterPlus, Sparkles } from "lucide-react"
+import { ListFilterPlus, Loader2, Sparkles } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import { useCompanyFilters } from "@/store/useCompanyFilters"
 import { usePathname } from "next/navigation"
@@ -83,23 +83,23 @@ const Filters = () => {
 
   const handleMinMaxChange = (key: string, value: string) => {
     if (isCompanies) {
-      setCompany(prev => ({ ...prev, [key]: value }))
+      setCompany((prev) => ({ ...prev, [key]: value }))
     } else {
-      setInvestor(prev => ({ ...prev, [key]: value }))
+      setInvestor((prev) => ({ ...prev, [key]: value }))
     }
   }
 
   const handleMultiChange = (key: string, values: string[]) => {
     if (isCompanies) {
-      setCompany(prev => ({ ...prev, [key]: values }))
+      setCompany((prev) => ({ ...prev, [key]: values }))
     } else {
-      setInvestor(prev => ({ ...prev, [key]: values }))
+      setInvestor((prev) => ({ ...prev, [key]: values }))
     }
   }
 
   const handleSearch = () => {
     if (isCompanies) {
-      setLoading(true)
+      // setLoading(true)
       applyFilters(company)
     } else {
       applyInvestorFilters(investor)
@@ -117,6 +117,7 @@ const Filters = () => {
         industry: [],
         hqCountry: [],
       })
+
       resetFilters()
     } else {
       setInvestor({
@@ -130,10 +131,11 @@ const Filters = () => {
       })
       resetInvestorFilters()
     }
+    setLoading(false)
   }
 
   const handleInvestorChange = (selected: string[]) => {
-    setInvestor(prev => ({
+    setInvestor((prev) => ({
       ...prev,
       investorType: selected,
     }))
@@ -141,9 +143,9 @@ const Filters = () => {
   const handleSelectCountries = (countries: string[]) => {
     console.log(countries)
     if (isCompanies) {
-      setCompany(prev => ({ ...prev, hqCountry: countries }))
+      setCompany((prev) => ({ ...prev, hqCountry: countries }))
     }
-    setInvestor(prev => ({
+    setInvestor((prev) => ({
       ...prev,
       investorLocation: countries,
     }))
@@ -151,9 +153,9 @@ const Filters = () => {
 
   const handleSelectIndustries = (industries: string[]) => {
     if (isCompanies) {
-      setCompany(prev => ({ ...prev, industry: industries }))
+      setCompany((prev) => ({ ...prev, industry: industries }))
     }
-    setInvestor(prev => ({
+    setInvestor((prev) => ({
       ...prev,
       investorType: industries,
     }))
@@ -213,7 +215,16 @@ const Filters = () => {
             content: () => (
               <DiscriptionFilter
                 value={company.description}
-                onChange={val => setCompany(prev => ({ ...prev, description: val }))}
+                onChange={(val) => {
+                  setCompany((prev) => ({ ...prev, description: val }))
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault()
+                    handleSearch()
+                  }
+                }}
+                isLoading={isLoading}
               />
             ),
           },
@@ -250,7 +261,7 @@ const Filters = () => {
             step={1}
             value={[Number(company.revenueMin) || 0, Number(company.revenueMax) || 200]}
             onInput={(val: number[]) => {
-              setCompany(prev => ({
+              setCompany((prev) => ({
                 ...prev,
                 revenueMin: val[0].toString(),
                 revenueMax: val[1].toString(),
@@ -280,7 +291,7 @@ const Filters = () => {
             step={1}
             value={[Number(company.ebitdaMin) || 0, Number(company.ebitdaMax) || 200]}
             onInput={(val: number[]) => {
-              setCompany(prev => ({
+              setCompany((prev) => ({
                 ...prev,
                 ebitdaMin: val[0].toString(),
                 ebitdaMax: val[1].toString(),
@@ -301,7 +312,7 @@ const Filters = () => {
             commandProps={{
               label: "Select Industry",
             }}
-            onChange={v => handleSelectIndustries(v.map(i => i.value))}
+            onChange={(v) => handleSelectIndustries(v.map((i) => i.value))}
             defaultOptions={industryOptions}
             placeholder="Select Industry"
             hidePlaceholderWhenSelected
@@ -317,7 +328,7 @@ const Filters = () => {
       content: () => (
         <CategorizedCountryMultiSelect
           onSelecCountries={(countries: Option[]) =>
-            handleSelectCountries(countries.map(c => c.label))
+            handleSelectCountries(countries.map((c) => c.label))
           }
         />
       ),
@@ -328,12 +339,12 @@ const Filters = () => {
     <div className="flex flex-col bg-[#fbfbfb] h-full overflow-hidden relative border-r border-gray-200 transition-transform ease-in-out duration-300">
       <div className="flex bg-white items-center gap-1 border-b border-gray-300 px-4 py-1 min-h-[40px]">
         <ListFilterPlus size={14} />
-        <h1 className="text-sm font-medium text-gray-700">Filters</h1>
+        <h1 className="text-sm font-medium text-gray-700">Company Filters</h1>
       </div>
 
       <div className="flex flex-col gap-3 overflow-y-auto p-3 flex-1">
         <div className="w-full space-y-3 ">
-          {accordionItemsConfig.map(item => (
+          {accordionItemsConfig.map((item) => (
             <div key={item.value} className="pb-3">
               <div className="hover:no-underline hover:cursor-pointer pb-1 font-medium">
                 {item.title}
@@ -346,17 +357,20 @@ const Filters = () => {
 
       <div className="relative z-50 border-t border-gray-300 px-3 py-2 min-h-[50px] grid grid-cols-2 gap-3">
         <button
-          className="px-6 py-2 bg-gray-900 text-white rounded-sm cursor-pointer"
+          className="px-6 py-2 bg-gray-900 text-white rounded-sm cursor-pointer flex items-center justify-center"
           onClick={handleSearch}
           disabled={isLoading}
         >
-          {isLoading ? "Searching.." : "Search"}
+          {isLoading && !company.description ? (
+            <Loader2 className="animate-spin w-5 h-5" />
+          ) : (
+            "Search"
+          )}
         </button>
         {shouldShowClear && (
           <button
             className="px-6 py-2 text-gray-800 border border-gray-300 rounded-sm cursor-pointer"
             onClick={handleClear}
-            disabled={isLoading}
           >
             Clear
           </button>
@@ -369,28 +383,46 @@ const Filters = () => {
 const DiscriptionFilter = ({
   value,
   onChange,
+  onKeyDown,
+  isLoading = false,
 }: {
   value: string
   onChange: (value: string) => void
+  onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void
+  isLoading: boolean
 }) => {
   const [isFocused, setIsFocused] = useState(false)
+  const [isEnterPressed, setIsEnterPressed] = useState(false)
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter") {
+      setIsEnterPressed(true)
+      onKeyDown(e)
+    }
+  }
+  useEffect(() => {
+    if (!isLoading && value.length > 0) {
+      setIsEnterPressed(false)
+    }
+  }, [isLoading, value.length])
+
   return (
     <div className="flex flex-col gap-2 relative">
       <textarea
         placeholder="Describe the company you are looking for..."
         className="w-full h-full bg-white border border-gray-300 rounded-sm p-2 text-gray-700"
         value={value}
-        onChange={e => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value)}
         rows={4}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
+        onKeyDown={handleKeyDown}
       />
       <span
         className={cn("absolute bottom-1 right-1 text-xs p-0.5 rounded-sm animate-pulse hidden", {
           "opacity-100 block": isFocused,
         })}
       >
-        Enter
+        {isEnterPressed ? <Loader2 className="animate-spin w-4 h-4 text-gray-800" /> : "Enter"}
       </span>
     </div>
   )
@@ -467,7 +499,7 @@ interface InvestorsProps {
 const InvestorsFilter: React.FC<InvestorsProps> = ({ options, selectedInvestors, onChange }) => {
   const handleCheckboxChange = (value: string) => {
     const newInvestor = selectedInvestors.includes(value)
-      ? selectedInvestors.filter(item => item !== value)
+      ? selectedInvestors.filter((item) => item !== value)
       : [...selectedInvestors, value]
     onChange(newInvestor)
   }
@@ -475,12 +507,12 @@ const InvestorsFilter: React.FC<InvestorsProps> = ({ options, selectedInvestors,
   return (
     <div className="flex flex-col justify-between gap-2 ">
       <div className="flex flex-col gap-1 ">
-        {options.map(option => (
+        {options.map((option) => (
           <div className="flex items-center space-x-2" key={option.value}>
             <Checkbox
               id={option.value}
               checked={selectedInvestors.includes(option.value)}
-              onCheckedChange={checked => handleCheckboxChange(option.value)}
+              onCheckedChange={(checked) => handleCheckboxChange(option.value)}
             />
             <label
               htmlFor={option.value}

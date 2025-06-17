@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
   // Select only allowed fields (exclude vector fields)
   const allowedFields = Object.keys({} as CompanyRow)
     .filter(
-      key =>
+      (key) =>
         !["company_name_vector_embedding", "company_description_vector_embedding"].includes(key)
     )
     .join(",")
@@ -58,23 +58,26 @@ export async function GET(req: NextRequest) {
 
     if (description.trim()) {
       const embeddingRes = await openai.embeddings.create({
-        model: "text-embedding-ada-002",
+        model: "text-embedding-3-small",
         input: description,
       })
 
       const embedding = embeddingRes.data[0].embedding
-
-      const { data, error } = await supabase.rpc("match_companies", {
-        // @ts-ignore
-        query_embedding: embedding,
-        match_threshold: 0.75,
-        match_count: 20,
-      })
-      console.log(data)
+      const { data, error } = await supabase
+        .schema("development")
+        .rpc("semantic_match_companies", {
+          // @ts-ignore
+          query_embedding: embedding,
+          match_threshold: 0.1,
+          match_count: 10,
+        })
 
       if (error) {
         console.error("❌ Supabase match_companies error:", error.message)
-        return NextResponse.json({ error: "Semantic search failed" }, { status: 500 })
+        return NextResponse.json(
+          { error: "Semantic search failed", message: error.message },
+          { status: 500 }
+        )
       }
 
       return NextResponse.json({

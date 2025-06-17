@@ -8,11 +8,10 @@ import PinnableDataTable from "@/components/table/pinnable-data-table"
 
 const Data = () => {
   const { appliedFilters, setLoading } = useCompanyFilters()
-  console.log(appliedFilters, "appliedFilters")
 
   const [from, setFrom] = React.useState(1)
   const [to, setTo] = React.useState(30)
-  const { data, isPending } = useCompanies({
+  const { data, isPending, isSuccess } = useCompanies({
     ...(appliedFilters || {}),
     from,
     to,
@@ -25,22 +24,28 @@ const Data = () => {
     if (data && from === 1) {
       setMoreData(data)
     } else if (data && from > 1) {
-      setMoreData(prev => [...prev, ...data])
-      setLoading(false)
+      setMoreData((prev) => [...prev, ...data])
+      // setLoading(false)
     }
     if (data && data.length < to - from + 1) {
       setHasMoreData(false)
     } else if (data && data.length === to - from + 1) {
-      setHasMoreData(true)
+      // setHasMoreData(true)
     }
   }, [data, from, to])
 
   const loadMoreData = () => {
     if (!isPending && hasMoreData) {
-      setFrom(prev => prev + (to - from + 1))
-      setTo(prev => prev + (to - from + 1))
+      setFrom((prev) => prev + (to - from + 1))
+      setTo((prev) => prev + (to - from + 1))
     }
   }
+
+  useEffect(() => {
+    if (isSuccess || !isPending) {
+      setLoading(false)
+    }
+  }, [isSuccess, isPending])
   // console.log(moreData, "moreData")
 
   return (
