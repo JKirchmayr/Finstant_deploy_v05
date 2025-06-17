@@ -40,7 +40,6 @@
     "lucide-react": "^0.487.0",
     "next": "15.2.4",
     "openai": "^4.104.0",
-    "parse-json": "^8.3.0",
     "query-string": "^9.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
