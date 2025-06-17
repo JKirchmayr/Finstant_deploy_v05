@@ -11,6 +11,7 @@ import LogoShowcase from "@/components/ui/LogoShowcase"
 import CompanySheet from "@/components/CompanySheet"
 import { useState, useCallback } from "react"
 import { ExpandableCell } from "@/components/table/epandable-cell"
+import { Button } from "@/components/ui/button"
 
 export type InvestorsProps = {
   investor_id: string
@@ -116,6 +117,7 @@ export default function InvestorsResponseData({
               disabled={loading}
               className="hover:underline items-center inline-flex cursor-pointer hover:font-medium transition-all duration-200 text-left w-full"
               type="button"
+
             >
               <Image
                 src={row.original.investor_logo || "https://placehold.co/50x50.png"}
@@ -189,9 +191,8 @@ export default function InvestorsResponseData({
             id: investment.company_id.toString(),
             src: investment.company_logo || "https://placehold.co/400x400.png",
             alt: `${investment.company_name} logo`,
-            name: `${investment.company_name}${
-              investment.investment_year ? ` (${investment.investment_year})` : ""
-            }`,
+            name: `${investment.company_name}${investment.investment_year ? ` (${investment.investment_year})` : ""
+              }`,
           })) || []
 
         return (
@@ -240,7 +241,7 @@ export default function InvestorsResponseData({
         isLoading={loading}
         togglePanel={togglePanel}
         closeTabPanel={closeTabPanel}
-        loadMoreData={() => {}}
+        loadMoreData={() => { }}
         hasMoreData={false}
         titleName="Investors List"
       />

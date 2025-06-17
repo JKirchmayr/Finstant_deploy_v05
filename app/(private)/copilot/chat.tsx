@@ -13,7 +13,6 @@ import { useAuth } from "@/hooks/useAuth"
 import CompanyProfile from "@/components/CompanyProfile"
 import { useSingleTabStore } from "@/store/singleTabStore"
 import { ChatProfileCard } from "@/components/ChatProfileCard"
-import parseJson, { JSONError } from "parse-json"
 
 type Company = {
   company_name: string
@@ -33,6 +32,10 @@ const Chat = () => {
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [isStreaming, setIsStreaming] = useState(false)
   const [connectionError, setConnectionError] = useState(false)
+  const [entityProfileStage, setEntityProfileStage] = useState<
+    "init" | "processing" | "final" | null
+  >(null)
+  const [listStage, setListStage] = useState<"init" | "processing" | "final" | null>(null)
   const hasAddedPlaceholders = useRef(false)
   const lastPromptRef = useRef<string | null>(null)
   const hasSentPromptRef = useRef<boolean>(false)
@@ -62,6 +65,8 @@ const Chat = () => {
     lastPromptRef.current = promptToSend
     hasSentPromptRef.current = false
     hasAddedPlaceholders.current = false
+    setEntityProfileStage(null)
+    setListStage(null)
 
     // Append user message first
     append({ role: "user", content: promptToSend })
@@ -103,6 +108,8 @@ const Chat = () => {
             append({ role: "assistant", content: processingBuffer })
           }
           setIsStreaming(false)
+          setEntityProfileStage(null)
+          setListStage(null)
           console.log("%cFinished reading stream!", "color: red; font-weight: bold")
 
           break
@@ -134,13 +141,71 @@ const Chat = () => {
                 // Handle other escaped characters
                 cleanedData = cleanedData.replace(/\\([^u])/g, "$1")
 
+                // Handle square brackets in company names by escaping them
+                cleanedData = cleanedData.replace(/"company_name":\s*"([^"]*)\[([^"]*)\[([^"]*)"/g, 
+                  '"company_name": "$1\\[$2\\[$3"')
+
+                // Handle special characters in investor descriptions and criteria
+                cleanedData = cleanedData.replace(/"investor_description":\s*"([^"]*)"/g, (match, p1) => {
+                  return `"investor_description": "${p1.replace(/"/g, '\\"').replace(/\u20ac/g, '€').replace(/\n/g, ' ')}"`
+                })
+                cleanedData = cleanedData.replace(/"investor_investment_criteria":\s*"([^"]*)"/g, (match, p1) => {
+                  return `"investor_investment_criteria": "${p1.replace(/"/g, '\\"').replace(/\u20ac/g, '€').replace(/\n/g, ' ')}"`
+                })
+
+                // Handle special characters in company descriptions
+                cleanedData = cleanedData.replace(/"company_description":\s*"([^"]*)"/g, (match, p1) => {
+                  return `"company_description": "${p1.replace(/"/g, '\\"').replace(/\u20ac/g, '€').replace(/\n/g, ' ')}"`
+                })
+
+                // Handle special characters in investor strategy and sector focus
+                cleanedData = cleanedData.replace(/"investor_strategy":\s*"([^"]*)"/g, (match, p1) => {
+                  return `"investor_strategy": "${p1.replace(/"/g, '\\"').replace(/\u20ac/g, '€').replace(/\n/g, ' ')}"`
+                })
+                cleanedData = cleanedData.replace(/"investor_sector_focus":\s*"([^"]*)"/g, (match, p1) => {
+                  return `"investor_sector_focus": "${p1.replace(/"/g, '\\"').replace(/\u20ac/g, '€').replace(/\n/g, ' ')}"`
+                })
+
+                // Handle empty arrays and null values
+                cleanedData = cleanedData.replace(/"investor_list":\s*\[\s*\]/g, '"investor_list": []')
+                cleanedData = cleanedData.replace(/"company_list":\s*\[\s*\]/g, '"company_list": []')
+                cleanedData = cleanedData.replace(/"selected_investments":\s*\[\s*\]/g, '"selected_investments": []')
+
+                // Handle null values in numeric fields
+                cleanedData = cleanedData.replace(/"investment_year":\s*null/g, '"investment_year": null')
+                cleanedData = cleanedData.replace(/"investor_founded_year":\s*null/g, '"investor_founded_year": null')
+
+                // Remove any trailing commas in arrays and objects
+                cleanedData = cleanedData.replace(/,(\s*[}\]])/g, '$1')
+
                 // Ensure the JSON string is properly terminated
                 if (!cleanedData.trim().endsWith("}")) {
                   cleanedData = cleanedData.trim() + "}"
                 }
 
-                parsed = JSON.parse(cleanedData)
-                accumulatedJSONChunks.push(parsed)
+                // Additional validation before parsing
+                if (!cleanedData.startsWith("{") || !cleanedData.endsWith("}")) {
+                  console.error("Invalid JSON structure:", cleanedData)
+                  continue
+                }
+
+                try {
+                  parsed = JSON.parse(cleanedData)
+                  accumulatedJSONChunks.push(parsed)
+                } catch (parseError) {
+                  console.error("JSON Parse Error:", parseError)
+                  console.error("Problematic JSON string:", cleanedData)
+                  // Try to fix common JSON issues
+                  try {
+                    // Remove any invalid control characters
+                    cleanedData = cleanedData.replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+                    parsed = JSON.parse(cleanedData)
+                    accumulatedJSONChunks.push(parsed)
+                  } catch (retryError) {
+                    console.error("Failed to parse even after cleanup:", retryError)
+                    continue
+                  }
+                }
               } catch (error) {
                 console.error("Error parsing JSON chunk:", error)
                 console.log("Problematic JSON string:", cleaned)
@@ -150,13 +215,24 @@ const Chat = () => {
 
               const { data, event } = parsed
 
+              // Handle entity profile stages
+              if (event === "entity_profile") {
+                setEntityProfileStage(data?.meta?.stage || null)
+              }
+
+              // Handle list stages (investor_list and company_list)
+              if (event === "investor_list" || event === "company_list") {
+                setListStage(data?.meta?.stage || null)
+              }
+
               //-------------------Staging Responses----------------------
               if (data?.meta?.stage !== "final" && event !== "text") {
-                if (event === "entity_profile") {
-                  append({
-                    role: "assistant",
-                    content: data?.text,
-                  })
+                if (
+                  event === "entity_profile" ||
+                  event === "investor_list" ||
+                  event === "company_list"
+                ) {
+                  // Don't append text for these events
                 }
               }
 
@@ -171,13 +247,14 @@ const Chat = () => {
                     company_country: "Generating...",
                     similarity_score: "Generating...",
                   }))
-                  append({ role: "assistant", content: data?.text })
                   setSingleTab("comp", "companies", dummyCompanies, "initial")
                 }
                 if (data?.meta?.stage === "final") {
                   const companiesArray = data?.company_list || []
-                  append({ role: "assistant", content: data?.text })
-                  setSingleTab("comp", "companies", companiesArray, "final")
+                  if (data?.text) {
+                    append({ role: "assistant", content: data?.text })
+                  }
+                  setSingleTab("comp_" + new Date().getTime(), "companies", companiesArray, "final")
                 }
               }
               //----------------------Parsing investor list------------------------------
@@ -196,16 +273,15 @@ const Chat = () => {
                     investor_strategy: "Generating...",
                     investor_selected_investments: [],
                   }))
-                  append({ role: "assistant", content: data?.text })
                   setSingleTab("inv", "investors", dummyInvestors, "initial")
                 }
 
                 if (data?.meta?.stage === "final") {
                   const investorsArray = data?.investor_list || []
-                  if (investorsArray.length > 0) {
+                  if (data?.text) {
                     append({ role: "assistant", content: data?.text })
-                    setSingleTab("inv", "investors", investorsArray, "final")
                   }
+                  setSingleTab("inv_"+ new Date().getTime(), "investors", investorsArray, "final")
                 }
               }
 
@@ -299,10 +375,12 @@ const Chat = () => {
       console.log("Full JSON chunks received:", accumulatedJSONChunks)
     } catch (error) {
       append({ role: "assistant", content: "An error occurred while processing your request." })
-      // setSingleTab("comp", "companies", [], "final")
-      // setSingleTab("inv", "investors", [], "initial")
+      setSingleTab(null, "companies", [], "final")
+      setSingleTab(null, "investors", [], "initial")
       console.error("Error during streaming:", error)
       setIsStreaming(false)
+      setEntityProfileStage(null)
+      setListStage(null)
     }
   }
 
@@ -346,7 +424,27 @@ const Chat = () => {
           {isStreaming && (
             <div className="flex justify-start">
               <div className="rounded-2xl text-sm text-gray-600 max-w-[75%]">
-                <TypingDots />
+                {entityProfileStage ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="animate-spin w-4 h-4 [animation-duration:0.2s]" />
+                    <span>
+                      {entityProfileStage === "init" && "Processing your request..."}
+                      {entityProfileStage === "processing" && "Retrieving profile..."}
+                      {entityProfileStage === "final" && "Found profile!"}
+                    </span>
+                  </div>
+                ) : listStage ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="animate-spin w-4 h-4 [animation-duration:0.2s]" />
+                    <span>
+                      {listStage === "init" && "Processing your request..."}
+                      {listStage === "processing" && "Generating list..."}
+                      {listStage === "final" && "List generated!"}
+                    </span>
+                  </div>
+                ) : (
+                  <TypingDots />
+                )}
               </div>
             </div>
           )}

@@ -4,9 +4,12 @@ import { cn } from "@/lib/utils"
 import { useTabPanelStore } from "@/store/tabStore"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 import Chat from "./chat"
+import { Button } from "@/components/ui/button"
+import { ChevronLeft } from "lucide-react"
 
 import TabPanelNew from "./tab-panel-new"
 import { useSingleTabStore } from "@/store/singleTabStore"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 const MainPanel = () => {
   const { singleTab, isCollapsed, setIsCollapsed } = useSingleTabStore()
@@ -22,6 +25,7 @@ const MainPanel = () => {
     }
     setIsCollapsed(!isCollapsed)
   }
+
   const closeTabPanel = () => {
     if (tabCollapse) return
     tabPanelRef.current?.resize(0) // Set width to 0
@@ -29,12 +33,18 @@ const MainPanel = () => {
     setTabCollapse(true)
   }
 
+  const openTabPanel = () => {
+    tabPanelRef.current?.resize(60)
+    chatPanelRef.current?.resize(30)
+    setTabCollapse(false)
+  }
+
+  // Open tab panel when singleTab.id changes
   useEffect(() => {
-    if (!!singleTab.id && tabCollapse) {
-      tabPanelRef.current?.resize(60)
-      setTabCollapse(false)
+    if (!!singleTab.id) {
+      openTabPanel()
     }
-  }, [singleTab.id, tabCollapse])
+  }, [singleTab.id])
 
   console.log(singleTab.id)
   return (
@@ -55,11 +65,29 @@ const MainPanel = () => {
           <ResizablePanel
             ref={tabPanelRef}
             defaultSize={!!singleTab.id ? 60 : 100}
+            minSize={0}
             className="relative transition-all duration-300 ease-in-out"
           >
             <TabPanelNew togglePanel={handleToggle} closeTabPanel={closeTabPanel} />
           </ResizablePanel>
         </>
+      )}
+      {tabCollapse && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={openTabPanel}
+              variant="outline"
+              size="xs"
+              className="absolute right-4 top-4 z-50 !px-[6px] border border-gray-300 text-blue-700 hover:bg-gray-300"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="left" align="center">
+            <p>Open Table Panel</p>
+          </TooltipContent>
+        </Tooltip>
       )}
     </ResizablePanelGroup>
   )

@@ -122,7 +122,7 @@ export function ChatProfileCard({ data }: { data: ProfileData }) {
                   <CardDescription hidden />
                   <Badge
                     variant="outline"
-                    className="flex items-center gap-1 px-2 py-1 text-xs font-normal"
+                    className="flex items-center gap-1 px-2 py-1 text-xs font-normal border-blue-200 bg-blue-50 text-blue-800 truncate"
                   >
                     <MapPin className="h-3 w-3" />
                     {location}

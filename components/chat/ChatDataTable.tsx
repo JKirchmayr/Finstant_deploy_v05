@@ -53,6 +53,7 @@ import { AddNewColumn } from "./AddNewColumn"
 import { toast } from "sonner"
 import { useSingleTabStore } from "@/store/singleTabStore"
 import { ChevronDown, ChevronUp } from "lucide-react"
+import { Tooltip, TooltipContent,  TooltipTrigger } from "../ui/tooltip"
 
 interface IChatDataTableProps<T extends any> {
   data: T[]
@@ -195,9 +196,8 @@ const ChatDataTable = <T extends any>({
   const selectedRows = table.getSelectedRowModel().rows.map(row => row.original)
   const handleExport = (format: "csv" | "excel") => {
     const exportData = selectedRows.length ? selectedRows : data
-    const filename = `${selectedRows.length ? "selected" : "all"}-data.${
-      format === "csv" ? "csv" : "xlsx"
-    }`
+    const filename = `${selectedRows.length ? "selected" : "all"}-data.${format === "csv" ? "csv" : "xlsx"
+      }`
 
     format === "csv" ? exportToCSV(exportData, filename) : exportToExcel(exportData, filename)
   }
@@ -227,40 +227,7 @@ const ChatDataTable = <T extends any>({
 
   return (
     <div className="w-full flex h-full flex-col gap-3">
-      {/* {!noSearch && (
-        <div
-          className={cn(
-            "flex flex-col md:flex-row md:items-center md:justify-between h-auto md:h-7 gap-2 w-full",
-            topbarClass
-          )}
-        >
-          <div className="flex items-center gap-2 order-1 relative w-full md:w-auto ">
-            <Search size={14} className="absolute text-gray-400 left-2" />
-            <Input
-              placeholder="Search"
-              value={(table.getColumn(filterBy)?.getFilterValue() as string) ?? ""}
-              onChange={event => table.getColumn(filterBy)?.setFilterValue(event.target.value)}
-              className="pl-7 focus-visible:ring-0 bg-white border-gray-300"
-            />
-          </div>
-          {data.length > 0 && (
-            <div className="flex items-center gap-3 order-2 justify-between md:justify-start">
-              <p className="text-gray-500 text-[13px]">
-                Showing <strong className="text-gray-700">{data.length}</strong> record
-                {data.length !== 1 && "s"}.
-              </p>
-              <ExportOptions
-                data={
-                  Object.keys(rowSelection).length > 0
-                    ? Object.keys(rowSelection).map(index => data[Number(index)])
-                    : data
-                }
-                onExport={(format: "csv" | "excel") => handleExport(format)}
-              />
-            </div>
-          )}
-        </div>
-      )} */}
+
       {!noHeader && (
         <div className="">
           <div className="p-2 space-y-1">
@@ -296,41 +263,48 @@ const ChatDataTable = <T extends any>({
                 <p className="text-sm font-medium">{titleName}</p>
               </div>
               <div className="flex gap-2">
-                <Button
-                  variant="secondary"
-                  size="xs"
-                  className="!px-[6px] hover:bg-gray-300"
-                  onClick={closeTabPanel}
-                >
-                  <X />
-                </Button>
-                {addColumn && (
-                  <AddNewColumn>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      size="xs"
+                      className="!px-[6px] hover:bg-gray-300"
+                      onClick={closeTabPanel}
+                    >
+                      <X />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left" align="center">
+                    <p>Close This Panel</p>
+                  </TooltipContent>
+                  </Tooltip>
+                  {addColumn && (
+                    <AddNewColumn>
+                      <Button
+                        variant="secondary"
+                        size="xs"
+                        className="h-7 py-1 text-xs hover:bg-gray-300"
+                      >
+                        Add Column
+                      </Button>
+                    </AddNewColumn>
+                  )}
+                  <ExportOptions
+                    data={
+                      Object.keys(rowSelection).length > 0
+                        ? Object.keys(rowSelection).map(index => data[Number(index)])
+                        : data
+                    }
+                    onExport={(format: "csv" | "excel") => handleExport(format)}
+                  >
                     <Button
                       variant="secondary"
                       size="xs"
                       className="h-7 py-1 text-xs hover:bg-gray-300"
                     >
-                      Add Column
+                      Export
                     </Button>
-                  </AddNewColumn>
-                )}
-                <ExportOptions
-                  data={
-                    Object.keys(rowSelection).length > 0
-                      ? Object.keys(rowSelection).map(index => data[Number(index)])
-                      : data
-                  }
-                  onExport={(format: "csv" | "excel") => handleExport(format)}
-                >
-                  <Button
-                    variant="secondary"
-                    size="xs"
-                    className="h-7 py-1 text-xs hover:bg-gray-300"
-                  >
-                    Export
-                  </Button>
-                </ExportOptions>
+                  </ExportOptions>
               </div>
             </div>
           </div>

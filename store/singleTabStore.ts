@@ -10,7 +10,7 @@ type SingleTab = {
 type SingleTabStore = {
   singleTab: SingleTab
   setSingleTab: (
-    id: string,
+    id: string | null,
     type: "companies" | "investors" | null,
     data: any[],
     stage: "initial" | "loading" | "final"

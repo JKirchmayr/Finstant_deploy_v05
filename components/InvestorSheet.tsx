@@ -146,7 +146,7 @@ const InvestorSheet = ({
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger className="cursor-pointer text-left whitespace-nowrap">{children}</SheetTrigger>
+      <SheetTrigger className="cursor-pointer text-left whitespace-nowrap" asChild>{children}</SheetTrigger>
       <SheetContent className="min-w-[900px] p-0 overflow-hidden">
         <SheetTitle hidden />
 
