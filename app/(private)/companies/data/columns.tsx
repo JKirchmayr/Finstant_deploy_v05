@@ -8,6 +8,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { ExternalLink } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { useState } from "react"
 
 const allColumns: ColumnDef<any>[] = [
   {
@@ -75,8 +76,14 @@ const allColumns: ColumnDef<any>[] = [
       return <div className="text-left">Company Name</div>
     },
     cell: ({ row }) => {
+      const [isCompanySheetOpen, setIsCompanySheetOpen] = useState(false)
+
       return (
-        <CompanySheet company={row.original}>
+        <CompanySheet
+          company={row.original}
+          open={isCompanySheetOpen}
+          onOpenChange={setIsCompanySheetOpen}
+        >
           <div className="inline-flex items-center hover:font-semibold transition-all duration-200">
             <Image
               src={row.original.companies_linkedin_logo_url || "https://placehold.co/50x50.png"}

@@ -36,6 +36,7 @@ interface ProfileData {
   type: "company_profile" | "investor_profile"
   comapanyProfile?: CompanyProfile
   investorProfile?: InvestorProfile
+  isLoading?: boolean
 }
 
 interface ICompany {
@@ -57,6 +58,7 @@ interface IInvestor {
 export function ChatProfileCard({ data }: { data: ProfileData }) {
   const isCompany = data.type === "company_profile"
   const profile = isCompany ? data.comapanyProfile : data.investorProfile
+  const isLoading = data.isLoading || false
 
   if (!profile) return null
 
@@ -72,8 +74,6 @@ export function ChatProfileCard({ data }: { data: ProfileData }) {
   const location = isCompany
     ? (profile as CompanyProfile).company_location
     : (profile as InvestorProfile).investor_location
-
-  // console.log(name, description, logo, location)
 
   const mappedProfile: ICompany | IInvestor = isCompany
     ? {
@@ -92,44 +92,57 @@ export function ChatProfileCard({ data }: { data: ProfileData }) {
       }
 
   const content = (
-    <Card className="overflow-hidden p-2 border gap-2 max-w-md transition-all hover:shadow-md cursor-pointer">
+    <Card className="overflow-hidden p-2 border-border gap-2 min-w-80 max-w-md transition-all shadow-none  hover:shadow-md cursor-pointer">
       <CardHeader className="px-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="relative h-12 w-12 overflow-hidden rounded-md border border-zinc-200 dark:border-zinc-800 bg-white">
-              <Image
-                src={logo || "/placeholder.svg"}
-                alt={`${name} logo`}
-                fill
-                className="object-contain p-1"
-              />
+              {isLoading ? (
+                <div className="animate-pulse w-full h-full bg-gray-200 dark:bg-gray-700" />
+              ) : (
+                <Image
+                  src={logo || "/placeholder.svg"}
+                  alt={`${name} logo`}
+                  fill
+                  className="object-contain p-1"
+                />
+              )}
             </div>
             <div>
-              <CardTitle className="text-lg font-semibold">{name ?? "Not Available"}</CardTitle>
+              {isLoading ? (
+                <>
+                  <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
+                  <div className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </>
+              ) : (
+                <>
+                  <CardTitle className="text-lg font-semibold truncate">
+                    {name ?? "Not Available"}
+                  </CardTitle>
+                  <CardDescription hidden />
+                  <Badge
+                    variant="outline"
+                    className="flex items-center gap-1 px-2 py-1 text-xs font-normal"
+                  >
+                    <MapPin className="h-3 w-3" />
+                    {location}
+                  </Badge>
+                </>
+              )}
             </div>
+            <CardContent hidden />
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-2">
-        <p className="text-sm text-zinc-700 dark:text-zinc-300 mb-4 whitespace-normal break-words line-clamp-4">
-          {description}
-        </p>
-
-        <div className="flex flex-wrap gap-3">
-          <Badge
-            variant="outline"
-            className="flex items-center gap-1 px-2 py-1 text-xs font-normal"
-          >
-            <MapPin className="h-3 w-3" />
-            {location}
-          </Badge>
-        </div>
-      </CardContent>
     </Card>
   )
 
+  const [open, setOpen] = useState(false)
+
   return isCompany ? (
-    <CompanySheet company={mappedProfile as ICompany}>{content}</CompanySheet>
+    <CompanySheet open={open} onOpenChange={setOpen} company={mappedProfile as ICompany}>
+      {content}
+    </CompanySheet>
   ) : (
     <InvestorSheet investor={mappedProfile as IInvestor}>{content}</InvestorSheet>
   )

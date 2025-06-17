@@ -118,7 +118,7 @@ const NonMemoizedMarkdown = ({ children }: NonMemoizedMarkdownProps) => {
     },
     p({ node, children, ...props }: any) {
       return (
-        <p className="[&:not(:first-child)]:my-3 text-sm leading-6 " {...props}>
+        <p className=" text-sm leading-6 " {...props}>
           {children}
         </p>
       )

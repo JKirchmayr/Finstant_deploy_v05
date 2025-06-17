@@ -1,5 +1,5 @@
 "use client"
-import React, { useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { useTabPanelStore } from "@/store/tabStore"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
@@ -10,6 +10,7 @@ import { useSingleTabStore } from "@/store/singleTabStore"
 
 const MainPanel = () => {
   const { singleTab, isCollapsed, setIsCollapsed } = useSingleTabStore()
+  const [tabCollapse, setTabCollapse] = useState(false)
   const tabPanelRef = useRef<any>(null)
   const chatPanelRef = useRef<any>(null)
 
@@ -21,6 +22,21 @@ const MainPanel = () => {
     }
     setIsCollapsed(!isCollapsed)
   }
+  const closeTabPanel = () => {
+    if (tabCollapse) return
+    tabPanelRef.current?.resize(0) // Set width to 0
+    chatPanelRef.current?.resize(100) // Set width to 0
+    setTabCollapse(true)
+  }
+
+  useEffect(() => {
+    if (!!singleTab.id && tabCollapse) {
+      tabPanelRef.current?.resize(60)
+      setTabCollapse(false)
+    }
+  }, [singleTab.id, tabCollapse])
+
+  console.log(singleTab.id)
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-1">
       <ResizablePanel
@@ -39,10 +55,9 @@ const MainPanel = () => {
           <ResizablePanel
             ref={tabPanelRef}
             defaultSize={!!singleTab.id ? 60 : 100}
-            minSize={55}
             className="relative transition-all duration-300 ease-in-out"
           >
-            <TabPanelNew togglePanel={handleToggle} />
+            <TabPanelNew togglePanel={handleToggle} closeTabPanel={closeTabPanel} />
           </ResizablePanel>
         </>
       )}

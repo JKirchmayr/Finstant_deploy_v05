@@ -37,10 +37,8 @@ const industryOptions = [
 
 const investorOptions = [
   { value: "Private Equity", label: "Private Equity" },
-  { value: "Fund Manager", label: "Fund Manager" },
-  { value: "Real Estate", label: "Real Estate" },
-  { value: "Corporate", label: "Corporate" },
-  { value: "Credit", label: "Credit" },
+  { value: "Venture Capital", label: "Venture Capital" },
+  { value: "Corporate (Strategic)", label: "Corporate (Strategic)" },
 ]
 
 const InvestorFilters = () => {
@@ -204,26 +202,35 @@ const InvestorFilters = () => {
 
   return (
     <div className="flex flex-col bg-[#fbfbfb] h-full overflow-hidden relative border-r border-gray-200 transition-transform ease-in-out duration-300">
-      <div className="flex bg-white items-center gap-1 border-b border-gray-300 px-4 py-1 min-h-[40px]">
-        <h1 className="text-sm font-medium -ml-1">Investor Filters</h1>
+      {/* <div className="flex bg-white items-center gap-1 border-b border-gray-300 px-4 py-1 min-h-[40px]">
+        <h1 className="text-sm font-medium -ml-1"> Filters</h1>
         <ListFilterPlus size={14} />
-      </div>
+      </div> */}
 
-      <div className="flex flex-col gap-3 overflow-y-auto p-3 flex-1">
+      <div className="flex flex-col gap-3 overflow-y-auto  flex-1">
         <div className="w-full space-y-2 ">
-          {accordionItemsConfig.map(item => (
-            <div key={item.value} className="pb-2">
-              <div className="hover:no-underline hover:cursor-pointer pb-1 font-medium">
-                {item.title}
-              </div>
-              <div className="overflow-visible z-10">{item.content()}</div>
-            </div>
-          ))}
-          <div className="mb-1">
-            <h1 className="font-semibold text-base">Target Filters</h1>
+          <div className="my-1">
+            <h1 className="font-semibold text-sm py-0.5 px-3 bg-muted-foreground/10">
+              Investor Filters
+            </h1>
           </div>
-          <div className="pb-2">
-            <div className="hover:no-underline hover:cursor-pointer pb-1 font-medium">
+          <div className="p-3 pt-1">
+            {accordionItemsConfig.map(item => (
+              <div key={item.value} className="pb-2">
+                <div className="hover:no-underline hover:cursor-pointer pb-1 font-medium">
+                  {item.title}
+                </div>
+                <div className="overflow-visible z-10">{item.content()}</div>
+              </div>
+            ))}
+          </div>
+          <div className="mb-1">
+            <h1 className="font-semibold text-sm py-0.5 px-3 bg-muted-foreground/10">
+              Target Filters
+            </h1>
+          </div>
+          <div className="pb-2 p-3 pt-1">
+            <div className="hover:no-underline hover:cursor-pointer font-medium">
               Target Description
             </div>
             <div className="overflow-visible z-10">
@@ -233,7 +240,7 @@ const InvestorFilters = () => {
               />
             </div>
           </div>
-          <div className="pb-2">
+          <div className="pb-2 px-3">
             <div className="hover:no-underline hover:cursor-pointer pb-1 font-medium">
               Target Country
             </div>
@@ -245,7 +252,7 @@ const InvestorFilters = () => {
               />
             </div>
           </div>
-          <div className="pb-2">
+          <div className="pb-2 px-3">
             <div className="hover:no-underline hover:cursor-pointer pb-1 font-medium">
               Target Industry
             </div>

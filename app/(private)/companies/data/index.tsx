@@ -26,6 +26,7 @@ const Data = () => {
       setMoreData(data)
     } else if (data && from > 1) {
       setMoreData(prev => [...prev, ...data])
+      setLoading(false)
     }
     if (data && data.length < to - from + 1) {
       setHasMoreData(false)

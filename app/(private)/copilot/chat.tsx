@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/useAuth"
 import CompanyProfile from "@/components/CompanyProfile"
 import { useSingleTabStore } from "@/store/singleTabStore"
 import { ChatProfileCard } from "@/components/ChatProfileCard"
+import parseJson, { JSONError } from "parse-json"
 
 type Company = {
   company_name: string
@@ -28,7 +29,7 @@ const Chat = () => {
   const userId = "aa227293-c91c-4b03-91db-0d2048ee73e7"
 
   const { messages, input, handleInputChange, append, setInput } = useChat()
-  const { setSingleTab } = useSingleTabStore()
+  const { setSingleTab, clearSingleTab } = useSingleTabStore()
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [isStreaming, setIsStreaming] = useState(false)
   const [connectionError, setConnectionError] = useState(false)
@@ -36,6 +37,7 @@ const Chat = () => {
   const lastPromptRef = useRef<string | null>(null)
   const hasSentPromptRef = useRef<boolean>(false)
   const bottomRef = useRef<undefined>(undefined)
+  const [stage, setStage] = useState<boolean>(false)
 
   const endRef = useRef<HTMLDivElement>(null)
 
@@ -48,6 +50,7 @@ const Chat = () => {
       }
     }, 100)
   }
+
   let processingBuffer = ""
 
   const handleSend = async (e: React.FormEvent) => {
@@ -89,6 +92,7 @@ const Chat = () => {
       let investors = []
       let comapanyProfile
       let investorProfile
+      let parsed
 
       while (true) {
         console.log("%cStarted reading stream!", "color: green; font-weight: bold")
@@ -105,150 +109,168 @@ const Chat = () => {
         }
         const rawChunk = decoder.decode(value, { stream: true })
         const events = rawChunk.split("\n\n")
-        let buffer = ""
+        // let buffer = ""
         for (const event of events) {
           if (!event.trim()) continue
-
-          const lines = rawChunk.split("\n")
-
-          console.log(lines, "lines")
-
-          // for (const line of lines) {
-          //   if (line.startsWith("data:")) {
-          //     buffer += line.replace(/^data:\s*/, "")
-          //   }
-          //   // An empty line signals the end of the event
-          //   if (line.trim() === "") {
-          //     if (buffer) {
-          //       try {
-          //         const parsed = JSON.parse(buffer)
-          //         if (parsed?.event === "investor_list" && parsed?.data?.investor_list) {
-          //           console.log("Received investor list:", parsed.data.investor_list)
-          //         }
-          //       } catch (err) {
-          //         console.error("Error parsing event data:", err)
-          //       }
-          //       buffer = ""
-          //     }
-          //   }
-          // }
 
           if (event.startsWith("data:")) {
             const cleaned = event.replace(/^data:\s*/, "").trim()
 
             try {
               // Only log cleaned data events for debugging
-              const parsed = JSON.parse(cleaned)
-              accumulatedJSONChunks.push(parsed)
-
-              // console.log(parsed)
-
-              // Extract companies array safely
-
-              if (parsed?.event === "company_list" && parsed?.data?.meta?.stage !== "final") {
-                const dummyCompanies = Array.from({ length: 5 }, (_, index) => ({
-                  company_id: Math.floor(Math.random() * 1000) + 1,
-                  company_name: "Generating...",
-                  company_logo: "https://placehold.co/50x50.png",
-                  company_description: `Generating...`,
-                  company_country: "Generating...",
-                  similarity_score: "Generating...",
-                }))
-                append({ role: "assistant", content: parsed?.data?.text })
-                setSingleTab("comp", "companies", dummyCompanies, "initial")
-              }
-              if (parsed?.event === "company_list" && parsed?.data?.meta?.stage === "final") {
-                const companiesArray = parsed?.data?.company_list || []
-                // Store it in state
-                append({ role: "assistant", content: parsed?.data?.text })
-                setSingleTab("comp", "companies", companiesArray, "final")
-                // console.log("Company List Saved!", companiesArray)
+              try {
+                parsed = JSON.parse(cleaned)
+                accumulatedJSONChunks.push(parsed)
+              } catch (error) {
+                append({
+                  role: "assistant",
+                  content: "An error occurred while processing your request.",
+                })
+                setSingleTab("", "investors", [], "initial")
+                console.log("error parsing chunk", error, cleaned)
               }
 
-              if (parsed?.event === "investor_list" && parsed?.data?.meta?.stage !== "final") {
-                const dummyInvestors = Array.from({ length: 5 }, (_, index) => ({
-                  investor_id: Math.floor(Math.random() * 1000) + 1,
-                  investor_name: "Generating...",
-                  investor_logo: "https://placehold.co/50x50.png",
-                  investor_description: `Generating...`,
-                  investor_country: "Generating...",
-                  similarity_score: "Generating...",
-                }))
-                append({ role: "assistant", content: parsed?.data?.text })
-                setSingleTab("inv", "investors", dummyInvestors, "initial")
-              }
-              if (parsed?.event === "investor_list" && parsed?.data?.meta?.stage === "final") {
-                const investorsArray = parsed?.data?.investor_list || []
-                // Store it in state
-                append({ role: "assistant", content: parsed?.data?.text })
-                setSingleTab("inv", "investors", investorsArray, "final")
-                // console.log("Investor List Saved!", investorsArray)
+              const { data, event } = parsed
+
+              //-------------------Staging Responses----------------------
+              if (data?.meta?.stage !== "final" && event !== "text") {
+                if (event === "entity_profile") {
+                  append({
+                    role: "assistant",
+                    content: data?.text,
+                  })
+                }
               }
 
-              if (parsed?.event === "done") {
+              // ---------------Parsing company list------------------------------
+              if (event === "company_list") {
+                if (data?.meta?.stage !== "final") {
+                  const dummyCompanies = Array.from({ length: 5 }, (_, index) => ({
+                    company_id: Math.floor(Math.random() * 1000) + 1,
+                    company_name: "Generating...",
+                    company_logo: "https://placehold.co/50x50.png",
+                    company_description: `Generating...`,
+                    company_country: "Generating...",
+                    similarity_score: "Generating...",
+                  }))
+                  append({ role: "assistant", content: data?.text })
+                  setSingleTab("comp", "companies", dummyCompanies, "initial")
+                }
+                if (data?.meta?.stage === "final") {
+                  const companiesArray = data?.company_list || []
+                  append({ role: "assistant", content: data?.text })
+                  setSingleTab("comp", "companies", companiesArray, "final")
+                }
+              }
+              //----------------------Parsing investor list------------------------------
+              if (event === "investor_list") {
+                if (data?.meta?.stage !== "final") {
+                  const dummyInvestors = Array.from({ length: 5 }, (_, index) => ({
+                    investor_id: Math.floor(Math.random() * 1000) + 1,
+                    investor_name: "Generating...",
+                    investor_logo: "https://placehold.co/50x50.png",
+                    investor_description: "Generating...",
+                    investor_website: "Generating...",
+                    investor_type: "Generating...",
+                    investor_country: "Generating...",
+                    investor_city: "Generating...",
+                    investor_founded_year: null,
+                    investor_strategy: "Generating...",
+                    investor_selected_investments: [],
+                  }))
+                  append({ role: "assistant", content: data?.text })
+                  setSingleTab("inv", "investors", dummyInvestors, "initial")
+                }
+
+                if (data?.meta?.stage === "final") {
+                  const investorsArray = data?.investor_list || []
+                  if (investorsArray.length > 0) {
+                    append({ role: "assistant", content: data?.text })
+                    setSingleTab("inv", "investors", investorsArray, "final")
+                  }
+                }
+              }
+
+              if (event === "done") {
+                setStage(false)
+                //------------- setting company profile in chat-----------------------------
                 if (comapanyProfile) {
-                  console.log(CompanyProfile, "company")
-
+                  // console.log(comapanyProfile, "company")
                   append({
                     role: "data",
-                    content: JSON.stringify({ type: "company_profile", comapanyProfile }),
+                    content: JSON.stringify({
+                      type: "company_profile",
+                      comapanyProfile,
+                      isLoading: false,
+                    }),
                   })
                   scrollToBottom()
                 }
+                //------------- setting investor profile in chat-----------------------------
                 if (investorProfile) {
-                  // console.log(CompanyProfile, "company")
-
+                  // console.log(investorProfile, "investor")
                   append({
                     role: "data",
-                    content: JSON.stringify({ type: "investor_profile", investorProfile }),
+                    content: JSON.stringify({
+                      type: "investor_profile",
+                      investorProfile,
+                      isLoading: false,
+                    }),
                   })
                   scrollToBottom()
-                  // console.log(investorProfile, "investor")
                 }
               }
 
-              if (parsed?.event === "text" && parsed?.data?.meta?.stage === "processing") {
-                processingBuffer += parsed?.data?.text
-              } else if (
-                parsed?.event === "entity_profile" &&
-                parsed?.data?.meta?.stage === "final"
-              ) {
-                // First, if we have processingBuffer filled, we append it first
+              // Handle text streaming during processing
+              if (event === "text" && data?.meta?.stage === "processing") {
+                processingBuffer += data?.text
+              }
+              // Handle entity profile data when complete
+              else if (event === "entity_profile" && data?.meta?.stage === "final") {
+                // Clear any existing processing buffer
                 if (processingBuffer) {
-                  // append({ role: "assistant", content: processingBuffer })
                   processingBuffer = ""
                 }
+
                 const profileData = parsed?.data
+
+                // Handle company profile data
                 if (profileData?.type === "company_profile") {
                   comapanyProfile = {
                     company_id: profileData.company_id || 0,
                     company_name: profileData.company_name || "Unknown Company",
                     company_description: profileData.company_description || "-",
                     company_logo: profileData.company_logo || "https://placehold.co/50x50.png",
-                    company_location:
-                      profileData.company_city && profileData.company_country
-                        ? `${profileData.company_city}, ${profileData.company_country}`
-                        : "Location unknown",
+                    company_location: formatLocation(
+                      profileData.company_city,
+                      profileData.company_country
+                    ),
                   }
-                  // console.log(comapanyProfile, "company")
                 }
+
+                // Handle investor profile data
                 if (profileData?.type === "investor_profile") {
                   investorProfile = {
                     investor_id: profileData.investor_id || 0,
                     investor_name: profileData.investor_name || "Unknown Investor",
                     investor_description: profileData.investor_description || "-",
                     investor_logo: profileData.investor_logo || "https://placehold.co/50x50.png",
-                    investor_location:
-                      profileData.investor_city && profileData.investor_country
-                        ? `${profileData.investor_city}, ${profileData.investor_country}`
-                        : "Location unknown",
+                    investor_location: formatLocation(
+                      profileData.investor_city,
+                      profileData.investor_country
+                    ),
                   }
                 }
 
-                // If there is additional text, we can append it afterwards
-                if (parsed?.data?.text) {
-                  append({ role: "assistant", content: parsed?.data?.text })
+                // Append any additional text content
+                if (data?.text) {
+                  append({ role: "assistant", content: data?.text })
                 }
+              }
+              scrollToBottom()
+              // Helper function to format location string
+              function formatLocation(city?: string, country?: string) {
+                return city && country ? `${city}, ${country}` : "Location unknown"
               }
             } catch (err) {
               console.error("Error parsing cleaned chunk:", err, cleaned)
@@ -259,8 +281,8 @@ const Chat = () => {
       console.log("Full JSON chunks received:", accumulatedJSONChunks)
     } catch (error) {
       append({ role: "assistant", content: "An error occurred while processing your request." })
-      setSingleTab("comp", "companies", [], "final")
-      setSingleTab("inv", "investors", [], "initial")
+      // setSingleTab("comp", "companies", [], "final")
+      // setSingleTab("inv", "investors", [], "initial")
       console.error("Error during streaming:", error)
       setIsStreaming(false)
     }
@@ -276,7 +298,7 @@ const Chat = () => {
           }
         )}
       >
-        <div className={cn("overflow-y-auto px-4 pt-4 m space-y-4 noscroll")}>
+        <div className={cn("overflow-y-auto px-4 pt-4 m space-y-2 noscroll")}>
           {messages.map((m, i) => {
             const isUser = m.role === "user"
             const isAssistant = m.role === "assistant"
@@ -291,12 +313,11 @@ const Chat = () => {
               >
                 <div
                   className={cn("max-w-full text-sm leading-relaxed px-3 py-1 rounded-md", {
-                    "ml-auto text-gray-700 border border-gray-200 rounded-full bg-white shadow-sm [font_weight:400]":
+                    "ml-auto text-gray-700 border px-4 py-1 rounded-2xl rounded-tr-md max-w-xs bg-gray-50 [font_weight:500]":
                       isUser,
                     "text-gray-800 mr-auto border-none rounded-md": isAssistant,
                   })}
                 >
-                  {processingBuffer}
                   {m.role === "data" && <ChatProfileCard data={JSON.parse(m.content)} />}
                   <Markdown>{m.role !== "data" && m.content}</Markdown>
                 </div>

@@ -1,9 +1,9 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { ExternalLink, MapPin, Globe, Calendar, Users, DollarSign } from "lucide-react"
+import { ExternalLink, MapPin, Globe, Calendar, Users, DollarSign, Linkedin } from "lucide-react"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
@@ -16,117 +16,82 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Separator } from "@/components/ui/separator"
-
-const dummyCompany = {
-  name: "Company Name",
-  city: "City, Region, Country",
-  countryFlag: "🇮🇹",
-  website: "www.companywebsite.com",
-  description: "Brief description of the company lorem ipsum lorem ipsum lorem ipsum.",
-  industry: "Software",
-  foundedYear: "2005",
-  employees: "250+",
-  revenue: "€50M+",
-  ebitda: "€10M+",
-  ownership: "Private",
-  ceo: "John Doe (Joined 2018)",
-  estimatedEV: "€200M",
-  headquarters: "Milan, Italy",
-  imageUrl: "https://placehold.co/600x400/png",
-  ceoYearJoined: "2018",
-  tags: ["B2B SaaS", "Fintech", "AI"],
-  endMarketAndGeography:
-    "Our primary markets include the financial, healthcare, and e-commerce industries, serving enterprise clients across North America, Europe, and Asia. We have a strong presence in key technology hubs such as Silicon Valley, London, and Singapore, with expansion plans targeting emerging markets in Latin America and the Middle East.",
-  productsAndServices:
-    "We provide a suite of software solutions for financial institutions, healthcare providers, and e-commerce platforms. Our products are designed to streamline operations, improve customer engagement, and drive revenue growth for our clients.",
-  projects: [
-    {
-      title: "Project Alpha",
-      industry: "Finance",
-      status: "Active",
-      website: "#",
-      description: "Project description Lorem Ipsum.",
-    },
-    {
-      title: "Project Beta",
-      industry: "Healthcare",
-      status: "Completed",
-      website: "#",
-      description: "Project description Lorem Ipsum.",
-    },
-  ],
-  team: [
-    {
-      name: "John Smith",
-      role: "CEO",
-      location: "Germany",
-      email: "john@example.com",
-      description: "Short bio Lorem Ipsum.",
-    },
-    {
-      name: "Alice Johnson",
-      role: "CTO",
-      location: "Sweden",
-      email: "alice@example.com",
-      description: "Short bio Lorem Ipsum.",
-    },
-  ],
-}
+import { Skeleton } from "./ui/skeleton"
 
 interface ICompany {
   company_id?: number
-  investor_id?: number
-  Investor_name?: string
-  company_investor_status?: string
-  company_investor_entry_year?: string
   company_name?: string
-  company_website?: string
-  companies_LLM_description?: string
-  linkedin_page?: string
-  companies_linkedin_last_scraped_at?: string
   companies_linkedin_city?: string
   companies_LLM_country?: string
-  companies_linkedin_about?: string
-  companies_linkedin_company_size?: number
-  companies_linkedin_founded?: number
-  companies_linkedin_specialties?: string
+  company_website?: string
+  linkedin_page?: string
   companies_linkedin_logo_url?: string
-  companies_linkedin_company_type?: string
-  companies_linkedin_employee_range_MIN?: number
-  companies_linkedin_employee_range_MAX?: number
-  companies_linkedin_industries?: string
-  companies_revenue_estimate_meur?: number | null
-  companies_EBITDA_estimate_meur?: number | null
-  description?: string
-  entry_year?: number
-  ebitda_in_meur?: number | null
 }
 
-const CompanySheet = ({ children, company }: { children: React.ReactNode; company: ICompany }) => {
-  const [open, setOpen] = useState(false)
+interface ICompanyProfile {
+  company_name: string
+  companies_linkedin_city: string
+  companies_LLM_country: string
+  company_website: string
+  linkedin_page?: string
+  companies_linkedin_about: string
+  companies_linkedin_company_size: number
+  companies_linkedin_founded: number
+  companies_linkedin_specialties: string
+  companies_linkedin_logo_url: string
+  companies_linkedin_company_type: string
+  companies_linkedin_employee_range_MIN: number
+  companies_linkedin_employee_range_MAX: number
+  companies_linkedin_industries: string
+  companies_revenue_estimate_meur: number
+  companies_revenue_estimate_mEUR: number
+  companies_EBITDA_estimate_meur: number
+  companies_EBITDA_estimate_mEUR: number
+  companies_linkedin_last_scraped_at?: string
+  companies_LLM_description?: string
+  company_description_vector_embedding?: string
+}
 
-  const [profileData, setProfileData] = useState(null)
+const CompanySheet = ({
+  children,
+  company,
+  open,
+  onOpenChange,
+}: {
+  children: React.ReactNode
+  company: ICompany
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) => {
+  const [isLoading, setIsLoading] = useState(false)
+  const [profileData, setProfileData] = useState<ICompanyProfile | null>(null)
 
-  const fetchdata = async () => {
+  const fetchdata = useCallback(async () => {
+    if (!company.company_id) return
+    
     try {
-      const res = await fetch(`/api/profile/company_profile/${company.investor_id}`)
+      setIsLoading(true)
+      const res = await fetch(`/api/profile/company_profile/${company.company_id}`)
       const resdata = await res.json()
       if (resdata.success) {
         setProfileData(resdata.data)
       }
     } catch (error) {
       console.log(error)
+    } finally {
+      setIsLoading(false)
     }
-  }
+  }, [company.company_id])
+
   useEffect(() => {
-    if (company.investor_id && !profileData && open) {
+    if (open && !profileData) {
       fetchdata()
     }
-  }, [open, company, profileData])
-  // console.log(profileData, "resdata")
+  }, [open, profileData, fetchdata])
 
+  // Rest of the component remains the same...
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetTrigger className="cursor-pointer text-left whitespace-nowrap h-full " asChild>
         {children}
       </SheetTrigger>
@@ -138,36 +103,87 @@ const CompanySheet = ({ children, company }: { children: React.ReactNode; compan
             <div className="flex items-start gap-6">
               <div className="w-20 h-20 relative flex-shrink-0">
                 <Image
-                  src={company.companies_linkedin_logo_url || "/placeholder.svg?height=80&width=80"}
+                  src={company.companies_linkedin_logo_url || "https://placehold.co/50x50.png"}
                   alt={`${company.company_name} Logo`}
                   fill
                   className="rounded-xl object-cover border shadow-sm"
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">{company.company_name}</h1>
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                  {company.company_name ?? profileData?.company_name ?? (
+                    <Skeleton className="h-7 w-3/4 mb-2" />
+                  )}
+                </h1>
+
                 <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
-                    {company.companies_linkedin_city}, {company.companies_LLM_country}
-                  </div>
-                  {company.company_website && (
-                    <a
-                      href={company.company_website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors"
-                    >
-                      <Globe className="w-4 h-4" />
-                      Website
-                    </a>
+                  {isLoading ? (
+                    <Skeleton className="h-5 w-20" />
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4" />
+                      {profileData?.companies_linkedin_city ?? "-"},{" "}
+                      {profileData?.companies_LLM_country ?? "-"}
+                    </div>
+                  )}
+                  {isLoading ? (
+                    <Skeleton className="h-5 w-20" />
+                  ) : (
+                    profileData?.company_website && (
+                      <Link
+                        href={profileData.company_website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors"
+                      >
+                        <Globe className="w-4 h-4" />
+                        Website
+                      </Link>
+                    )
+                  )}
+                  {isLoading ? (
+                    <Skeleton className="h-5 w-20" />
+                  ) : (
+                    profileData?.linkedin_page && (
+                      <Link
+                        href={profileData?.linkedin_page}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors"
+                      >
+                        <Linkedin className="w-4 h-4" />
+                        LinkedIn
+                      </Link>
+                    )
                   )}
                 </div>
-                {company.companies_linkedin_industries && (
-                  <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
-                    {company.companies_linkedin_industries}
-                  </Badge>
-                )}
+                <div className="flex space-x-2">
+                  {isLoading ? (
+                    <Skeleton className="h-6 w-40" />
+                  ) : (
+                    profileData?.companies_linkedin_industries && (
+                      <Badge
+                        variant="secondary"
+                        className="bg-blue-50 text-blue-700 border-blue-200"
+                      >
+                        {profileData?.companies_linkedin_industries}
+                      </Badge>
+                    )
+                  )}
+
+                  {isLoading ? (
+                    <Skeleton className="h-6 w-40" />
+                  ) : (
+                    profileData?.companies_linkedin_company_type && (
+                      <Badge
+                        variant="secondary"
+                        className="bg-purple-50 text-purple-700 border-purple-200"
+                      >
+                        {profileData?.companies_linkedin_company_type}
+                      </Badge>
+                    )
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -180,9 +196,14 @@ const CompanySheet = ({ children, company }: { children: React.ReactNode; compan
                 {/* Company Description */}
                 <div className="space-y-3">
                   <h2 className="text-lg font-semibold text-gray-900">About</h2>
-                  <p className="text-gray-700 leading-relaxed">
-                    {company.description || company.companies_linkedin_about}
-                  </p>
+                  {isLoading ? (
+                    <Skeleton className="h-24 w-full" />
+                  ) : (
+                    <p className="text-gray-700 leading-relaxed">
+                      {profileData?.companies_linkedin_about ||
+                        profileData?.companies_LLM_description}
+                    </p>
+                  )}
                 </div>
 
                 {/* Key Metrics */}
@@ -194,41 +215,61 @@ const CompanySheet = ({ children, company }: { children: React.ReactNode; compan
                         <Users className="w-4 h-4" />
                         <span>Employees</span>
                       </div>
-                      <p className="font-medium">{dummyCompany.employees}</p>
+                      {isLoading ? (
+                        <Skeleton className="h-5 w-3/4" />
+                      ) : (
+                        <p className="font-medium">
+                          {profileData?.companies_linkedin_company_size ?? "Not Available"}
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Calendar className="w-4 h-4" />
                         <span>Founded</span>
                       </div>
-                      <p className="font-medium">{company.entry_year}</p>
+                      {isLoading ? (
+                        <Skeleton className="h-5 w-3/4" />
+                      ) : (
+                        <p className="font-medium">
+                          {profileData?.companies_linkedin_founded ?? "Not Available"}
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <DollarSign className="w-4 h-4" />
                         <span>Revenue</span>
                       </div>
-                      <p className="font-medium">{dummyCompany.revenue}</p>
+                      {isLoading ? (
+                        <Skeleton className="h-5 w-3/4" />
+                      ) : (
+                        <p className="font-medium">
+                          €{profileData?.companies_revenue_estimate_mEUR ? profileData.companies_revenue_estimate_mEUR + "M" : "Not Available"}
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <DollarSign className="w-4 h-4" />
                         <span>EBITDA</span>
                       </div>
-                      <p className="font-medium">
-                        {company.ebitda_in_meur
-                          ? `€${company.ebitda_in_meur}M`
-                          : dummyCompany.ebitda}
-                      </p>
+                      {isLoading ? (
+                        <Skeleton className="h-5 w-3/4" />
+                      ) : (
+                        <p className="font-medium">
+                          {profileData?.companies_EBITDA_estimate_mEUR
+                            ? `€${profileData?.companies_EBITDA_estimate_mEUR}M`
+                            : '-'}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <Separator />
-
               {/* Business Details */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="space-y-3">
                   <h2 className="text-lg font-semibold text-gray-900">Products & Services</h2>
                   <p className="text-gray-700 leading-relaxed">
@@ -242,12 +283,10 @@ const CompanySheet = ({ children, company }: { children: React.ReactNode; compan
                     {dummyCompany.endMarketAndGeography}
                   </p>
                 </div>
-              </div>
-
-              <Separator />
+              </div> */}
 
               {/* Projects Section */}
-              <div className="space-y-4">
+              {/* <div className="space-y-4">
                 <h2 className="text-lg font-semibold text-gray-900">Projects</h2>
                 <div className="bg-gray-50 rounded-lg overflow-hidden">
                   <Table>
@@ -294,10 +333,10 @@ const CompanySheet = ({ children, company }: { children: React.ReactNode; compan
                     </TableBody>
                   </Table>
                 </div>
-              </div>
+              </div> */}
 
               {/* Team Section */}
-              <div className="space-y-4">
+              {/* <div className="space-y-4">
                 <h2 className="text-lg font-semibold text-gray-900">Team</h2>
                 <div className="bg-gray-50 rounded-lg overflow-hidden">
                   <Table>
@@ -336,7 +375,7 @@ const CompanySheet = ({ children, company }: { children: React.ReactNode; compan
                     </TableBody>
                   </Table>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

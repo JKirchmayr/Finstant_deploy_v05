@@ -8,9 +8,10 @@ import InvestorsResponseData from "./investors-table"
 
 type Props = {
   togglePanel: () => void
+  closeTabPanel: () => void
 }
 
-export default function TabPanelNew({ togglePanel }: Props) {
+export default function TabPanelNew({ togglePanel, closeTabPanel }: Props) {
   const { singleTab } = useSingleTabStore()
 
   return (
@@ -22,6 +23,7 @@ export default function TabPanelNew({ togglePanel }: Props) {
             companies={singleTab.data}
             loading={singleTab.stage === "initial"}
             togglePanel={togglePanel}
+            closeTabPanel={closeTabPanel}
           />
         )}
         {singleTab.type === "investors" && (
@@ -29,6 +31,7 @@ export default function TabPanelNew({ togglePanel }: Props) {
             investors={singleTab.data}
             loading={singleTab.stage === "initial"}
             togglePanel={togglePanel}
+            closeTabPanel={closeTabPanel}
           />
         )}
       </div>

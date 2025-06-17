@@ -176,11 +176,11 @@ body {
   background: transparent; /* Optional: just make scrollbar invisible */
   height: 0;
 }
-*::-webkit-scrollbar {
-  width: 1; /* Remove scrollbar space */
-  background: transparent; /* Optional: just make scrollbar invisible */
+/* *::-webkit-scrollbar {
+  width: 1; 
+  background: transparent; 
   height: 0;
-}
+} */
 /* Optional: show position indicator in red */
 /* .noscroll::-webkit-scrollbar-thumb {
   background: #ff0000;
@@ -246,11 +246,11 @@ body {
   }
 }
 .range-slider{
-  height: 5px !important;
+  height: 4px !important;
 }
 .range-slider .range-slider__thumb {
-  width: 18px !important;
-  height: 18px !important;
+  width: 15px !important;
+  height: 15px !important;
   background: rgb(0, 0, 0) !important;
 }
 .range-slider .range-slider__range{

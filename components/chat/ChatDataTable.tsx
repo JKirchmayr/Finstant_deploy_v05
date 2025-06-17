@@ -26,6 +26,7 @@ import {
   PinIcon,
   PinOffIcon,
   Search,
+  X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -65,6 +66,7 @@ interface IChatDataTableProps<T extends any> {
   topbarClass?: string
   noSearch?: boolean
   togglePanel: () => void
+  closeTabPanel: () => void
   titleName: string
   noHeader?: boolean
   addColumn?: boolean
@@ -96,6 +98,7 @@ const ChatDataTable = <T extends any>({
   togglePanel,
   titleName,
   addColumn = true,
+  closeTabPanel,
 }: IChatDataTableProps<T>) => {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -293,6 +296,14 @@ const ChatDataTable = <T extends any>({
                 <p className="text-sm font-medium">{titleName}</p>
               </div>
               <div className="flex gap-2">
+                <Button
+                  variant="secondary"
+                  size="xs"
+                  className="!px-[6px] hover:bg-gray-300"
+                  onClick={closeTabPanel}
+                >
+                  <X />
+                </Button>
                 {addColumn && (
                   <AddNewColumn>
                     <Button

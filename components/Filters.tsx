@@ -49,7 +49,7 @@ const Filters = () => {
   const pathname = usePathname()
   const isCompanies = pathname.includes("companies")
   const isInvestors = pathname.includes("investors")
-  const { applyFilters, resetFilters, isLoading } = useCompanyFilters()
+  const { applyFilters, resetFilters, isLoading, setLoading } = useCompanyFilters()
   const { applyFilters: applyInvestorFilters, resetFilters: resetInvestorFilters } =
     useInvestorFilters()
 
@@ -99,6 +99,7 @@ const Filters = () => {
 
   const handleSearch = () => {
     if (isCompanies) {
+      setLoading(true)
       applyFilters(company)
     } else {
       applyInvestorFilters(investor)
@@ -232,7 +233,7 @@ const Filters = () => {
         ]),
     {
       value: "revenue",
-      title: "Preferred Revenue (mEUR)",
+      title: "Revenue (mEUR)",
       content: () => (
         <div>
           <MinMax
@@ -262,7 +263,7 @@ const Filters = () => {
     },
     {
       value: "ebitda",
-      title: "Preferred EBITDA (mEUR)",
+      title: "EBITDA (mEUR)",
       content: () => (
         <div>
           <MinMax

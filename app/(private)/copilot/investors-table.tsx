@@ -5,6 +5,12 @@ import { GenerateSkeleton } from "./generate-skeleton"
 import Image from "next/image"
 import ChatDataTable from "@/components/chat/ChatDataTable"
 import InvestorSheet from "@/components/InvestorSheet"
+import { Globe } from "lucide-react"
+import Link from "next/link"
+import LogoShowcase from "@/components/ui/LogoShowcase"
+import CompanySheet from "@/components/CompanySheet"
+import { useState } from "react"
+import { ExpandableCell } from "@/components/table/epandable-cell"
 
 export type InvestorsProps = {
   investor_id: string
@@ -32,11 +38,21 @@ export default function InvestorsResponseData({
   investors,
   loading,
   togglePanel,
+  closeTabPanel,
 }: {
   investors: InvestorsProps[]
   loading: boolean
   togglePanel: () => void
+  closeTabPanel: () => void
 }) {
+  const [selectedCompany, setSelectedCompany] = useState<{
+    id: string
+    src: string
+    alt: string
+    name: string
+  } | null>(null)
+  const [isCompanySheetOpen, setIsCompanySheetOpen] = useState(false)
+
   const columns: ColumnDef<InvestorsProps>[] = [
     {
       id: "select",
@@ -72,6 +88,7 @@ export default function InvestorsResponseData({
     {
       accessorKey: "investor_name",
       header: loading ? "Generating" : "Investor Name",
+      minSize: 200,
       cell: ({ row }) => {
         return (
           <InvestorSheet
@@ -105,41 +122,105 @@ export default function InvestorsResponseData({
           </InvestorSheet>
         )
       },
+      enableSorting: true,
     },
-    {
-      accessorKey: "investor_description",
-      header: loading ? "Generating" : "Description",
-      cell: ({ row }) => (
-        <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_description} />
-      ),
-    },
+
     {
       accessorKey: "investor_website",
       header: loading ? "Generating" : "Website",
+      size: 100,
       cell: ({ row }) => (
-        <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_website} />
+        <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_website}>
+          <Link
+            href={row.original.investor_website ?? "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors"
+          >
+            <Globe className="w-4 h-4" />
+            Website
+          </Link>
+        </GenerateSkeleton>
       ),
     },
     {
       accessorKey: "investor_country",
-      header: loading ? "Generating" : "Location",
+      header: loading ? "Generating" : "City",
       cell: ({ row }) => (
         <GenerateSkeleton
           isPlaceholder={loading}
           text={`${row.original.investor_city}, ${row.original.investor_country}`}
         />
       ),
+      enableSorting: true,
+    },
+    {
+      accessorKey: "investor_description",
+      header: loading ? "Generating" : "Description",
+      cell: ({ row, column }) => {
+        const width = column.getSize()
+        return (
+          <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_description}>
+            <ExpandableCell
+              className={`w-${width}px`}
+              TriggerCell={<p>{row.original.investor_description}</p>}
+            >
+              {row.original.investor_description}
+            </ExpandableCell>
+          </GenerateSkeleton>
+        )
+      },
+    },
+    {
+      accessorKey: "similar_investments",
+      header: loading ? "Generating" : "Similar Investments",
+      minSize: 160,
+      cell: ({ row }) => {
+        const investments =
+          row.original.investor_selected_investments?.map(investment => ({
+            id: investment.company_id.toString(),
+            src: investment.company_logo || "https://placehold.co/400x400.png",
+            alt: `${investment.company_name} logo`,
+            name: `${investment.company_name}${
+              investment.investment_year ? ` (${investment.investment_year})` : ""
+            }`,
+          })) || []
+
+        return (
+          <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_description}>
+            <div className="overflow-x-auto">
+              <CompanySheet
+                company={{
+                  company_id: selectedCompany?.id ? Number(selectedCompany.id) : undefined,
+                  companies_linkedin_logo_url: selectedCompany?.src,
+                  company_name: selectedCompany?.name ?? "",
+                }}
+                open={isCompanySheetOpen}
+                onOpenChange={setIsCompanySheetOpen}
+              >
+                <LogoShowcase
+                  className="flex-nowrap"
+                  logos={investments}
+                  onLogoClick={comp => {
+                    setSelectedCompany(comp)
+                    setIsCompanySheetOpen(true)
+                  }}
+                />
+              </CompanySheet>
+            </div>
+          </GenerateSkeleton>
+        )
+      },
     },
     {
       accessorKey: "investor_founded_year",
       header: loading ? "Generating" : "Founded",
       cell: ({ row }) => (
-        <GenerateSkeleton
-          isPlaceholder={loading}
-          text={row.original.investor_founded_year?.toString()}
-        />
+        <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_description} />
       ),
+      enableSorting: true,
     },
+
     {
       accessorKey: "investor_type",
       header: loading ? "Generating" : "Type",
@@ -152,33 +233,6 @@ export default function InvestorsResponseData({
       header: loading ? "Generating" : "Strategy",
       cell: ({ row }) => (
         <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_strategy} />
-      ),
-    },
-    {
-      accessorKey: "investor_sector_focus",
-      header: loading ? "Generating" : "Sector Focus",
-      cell: ({ row }) => (
-        <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_sector_focus} />
-      ),
-    },
-    {
-      accessorKey: "investor_investment_criteria",
-      header: loading ? "Generating" : "Investment Criteria",
-      cell: ({ row }) => (
-        <GenerateSkeleton
-          isPlaceholder={loading}
-          text={row.original.investor_investment_criteria}
-        />
-      ),
-    },
-    {
-      accessorKey: "similarity_score",
-      header: loading ? "Generating" : "Similarity",
-      cell: ({ row }) => (
-        <GenerateSkeleton
-          isPlaceholder={loading}
-          text={row.original.similarity_score?.toString()}
-        />
       ),
     },
   ]
@@ -196,6 +250,7 @@ export default function InvestorsResponseData({
         defaultPinnedColumns={["select", "investor_name"]}
         titleName="Investors List"
         togglePanel={togglePanel}
+        closeTabPanel={closeTabPanel}
       />
     </div>
   )

@@ -221,7 +221,7 @@ const PinnableDataTable = <T extends any>({
           )}
         </div>
       )}
-      <div className="flex flex-col w-full bg-white border overflow-auto">
+      <div className="flex flex-col w-full bg-white border overflow-x-scroll">
         <Table
           className="!w-full bg-background [&_td]:border-border table-fixed border-separate border-spacing-0 [&_tfoot_td]:border-t [&_tr]:border-none [&_tr:not(:last-child)_td]:border-b [&_thead]:border-b-0 [&_th]:px-4 [&_td]:pl-4 [&_th:has([role=checkbox])]:pr-0 [&_td:first-child]:!px-4 [&_th:first-child]:!px-4"
           style={{ width: table.getTotalSize() }}

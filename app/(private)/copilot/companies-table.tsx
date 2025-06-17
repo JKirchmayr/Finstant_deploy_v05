@@ -35,10 +35,12 @@ export default function CompaniesData({
   companies,
   loading,
   togglePanel,
+  closeTabPanel,
 }: {
   companies: Company[]
   loading: boolean
   togglePanel: () => void
+  closeTabPanel: () => void
 }) {
   const columns: ColumnDef<Company>[] = [
     {
@@ -78,12 +80,14 @@ export default function CompaniesData({
       accessorKey: "company_name",
       header: loading ? "Generating" : "Company",
       cell: ({ row }) => {
+        const [open, setOpen] = useState(false)
         return (
           <CompanySheet
+            open={open}
+            onOpenChange={setOpen}
             company={{
               ...row.original,
               companies_linkedin_logo_url: row.original.company_logo,
-              description: row.original.company_description,
               companies_LLM_country: row.original.company_country,
             }}
           >
@@ -92,14 +96,16 @@ export default function CompaniesData({
               className="hover:underline items-center inline-flex cursor-pointer hover:font-medium transition-all duration-200 text-left w-full"
               type="button"
             >
-              <Image
-                src={row.original.company_logo ?? "https://placehold.co/50x50.png"}
-                alt={`${row.original.company_name} logo`}
-                width={18}
-                height={18}
-                className="mr-1.5 rounded"
-                unoptimized={true}
-              />
+              {row.original.company_logo && (
+                <Image
+                  src={row.original.company_logo ?? "https://placehold.co/50x50.png"}
+                  alt={`${row.original.company_name} logo`}
+                  width={18}
+                  height={18}
+                  className="mr-1.5 rounded"
+                  unoptimized={true}
+                />
+              )}
               <GenerateSkeleton isPlaceholder={loading} text={row.original.company_name} />
             </button>
           </CompanySheet>
@@ -145,6 +151,7 @@ export default function CompaniesData({
         defaultPinnedColumns={["index", "select", "company_name"]}
         titleName="Companies List"
         togglePanel={togglePanel}
+        closeTabPanel={closeTabPanel}
       />
     </div>
   )
