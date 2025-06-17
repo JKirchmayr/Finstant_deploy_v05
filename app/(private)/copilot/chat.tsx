@@ -119,15 +119,33 @@ const Chat = () => {
             try {
               // Only log cleaned data events for debugging
               try {
-                parsed = JSON.parse(cleaned)
+                let cleanedData = cleaned
+
+                // First, handle any potential line breaks or special characters
+                cleanedData = cleanedData.replace(/[\n\r]/g, "")
+
+                // Handle escaped unicode characters
+                if (cleanedData.includes("\\u")) {
+                  cleanedData = cleanedData.replace(/\\u([0-9a-fA-F]{4})/g, (match, p1) => {
+                    return String.fromCharCode(parseInt(p1, 16))
+                  })
+                }
+
+                // Handle other escaped characters
+                cleanedData = cleanedData.replace(/\\([^u])/g, "$1")
+
+                // Ensure the JSON string is properly terminated
+                if (!cleanedData.trim().endsWith("}")) {
+                  cleanedData = cleanedData.trim() + "}"
+                }
+
+                parsed = JSON.parse(cleanedData)
                 accumulatedJSONChunks.push(parsed)
               } catch (error) {
-                append({
-                  role: "assistant",
-                  content: "An error occurred while processing your request.",
-                })
-                setSingleTab("", "investors", [], "initial")
-                console.log("error parsing chunk", error, cleaned)
+                console.error("Error parsing JSON chunk:", error)
+                console.log("Problematic JSON string:", cleaned)
+                // Continue processing without this chunk
+                continue
               }
 
               const { data, event } = parsed

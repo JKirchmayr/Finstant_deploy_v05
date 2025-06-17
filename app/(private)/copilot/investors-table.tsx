@@ -9,7 +9,7 @@ import { Globe } from "lucide-react"
 import Link from "next/link"
 import LogoShowcase from "@/components/ui/LogoShowcase"
 import CompanySheet from "@/components/CompanySheet"
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { ExpandableCell } from "@/components/table/epandable-cell"
 
 export type InvestorsProps = {
@@ -52,6 +52,14 @@ export default function InvestorsResponseData({
     name: string
   } | null>(null)
   const [isCompanySheetOpen, setIsCompanySheetOpen] = useState(false)
+
+  const handleCompanyClick = useCallback(
+    (comp: { id: string; src: string; alt: string; name: string }) => {
+      setSelectedCompany(comp)
+      setIsCompanySheetOpen(true)
+    },
+    []
+  )
 
   const columns: ColumnDef<InvestorsProps>[] = [
     {
@@ -189,24 +197,11 @@ export default function InvestorsResponseData({
         return (
           <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_description}>
             <div className="overflow-x-auto">
-              <CompanySheet
-                company={{
-                  company_id: selectedCompany?.id ? Number(selectedCompany.id) : undefined,
-                  companies_linkedin_logo_url: selectedCompany?.src,
-                  company_name: selectedCompany?.name ?? "",
-                }}
-                open={isCompanySheetOpen}
-                onOpenChange={setIsCompanySheetOpen}
-              >
-                <LogoShowcase
-                  className="flex-nowrap"
-                  logos={investments}
-                  onLogoClick={comp => {
-                    setSelectedCompany(comp)
-                    setIsCompanySheetOpen(true)
-                  }}
-                />
-              </CompanySheet>
+              <LogoShowcase
+                className="flex-nowrap"
+                logos={investments}
+                onLogoClick={handleCompanyClick}
+              />
             </div>
           </GenerateSkeleton>
         )
@@ -238,20 +233,30 @@ export default function InvestorsResponseData({
   ]
 
   return (
-    <div className="h-full flex flex-col bg-white w-full pt-1.5 ">
-      <ChatDataTable
+    <>
+      <ChatDataTable<InvestorsProps>
         data={investors}
         columns={columns}
         isLoading={loading}
-        hasMoreData={false}
-        loadMoreData={() => {}}
-        filterBy="investor_name"
-        topbarClass="px-1.5 mb-1.5"
-        defaultPinnedColumns={["select", "investor_name"]}
-        titleName="Investors List"
         togglePanel={togglePanel}
         closeTabPanel={closeTabPanel}
+        loadMoreData={() => {}}
+        hasMoreData={false}
+        titleName="Investors List"
       />
-    </div>
+      {selectedCompany && (
+        <CompanySheet
+          company={{
+            company_id: Number(selectedCompany.id),
+            companies_linkedin_logo_url: selectedCompany.src,
+            company_name: selectedCompany.name,
+          }}
+          open={isCompanySheetOpen}
+          onOpenChange={setIsCompanySheetOpen}
+        >
+          <div />
+        </CompanySheet>
+      )}
+    </>
   )
 }

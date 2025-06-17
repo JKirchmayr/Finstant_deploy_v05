@@ -83,11 +83,16 @@ const CompanySheet = ({
     }
   }, [company.company_id])
 
+  // Clear profileData when company changes
   useEffect(() => {
-    if (open && !profileData) {
+    setProfileData(null)
+  }, [company.company_id])
+
+  useEffect(() => {
+    if (open && !profileData && company.company_id) {
       fetchdata()
     }
-  }, [open, profileData, fetchdata])
+  }, [open, company.company_id, fetchdata, profileData])
 
   // Rest of the component remains the same...
   return (
