@@ -55,7 +55,7 @@ const Chat = () => {
   }
 
   let processingBuffer = ""
-
+  const [streamingMessage, setStreamingMessage] = useState<string>("")
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -67,6 +67,7 @@ const Chat = () => {
     hasAddedPlaceholders.current = false
     setEntityProfileStage(null)
     setListStage(null)
+    setStreamingMessage("")
 
     // Append user message first
     append({ role: "user", content: promptToSend })
@@ -104,140 +105,66 @@ const Chat = () => {
         const { done, value } = await reader.read()
 
         if (done) {
-          if (processingBuffer) {
-            append({ role: "assistant", content: processingBuffer })
+          if (streamingMessage) {
+            append({ role: "assistant", content: streamingMessage })
           }
           setIsStreaming(false)
           setEntityProfileStage(null)
           setListStage(null)
           console.log("%cFinished reading stream!", "color: red; font-weight: bold")
-
           break
         }
+
         const rawChunk = decoder.decode(value, { stream: true })
         const events = rawChunk.split("\n\n")
-        // let buffer = ""
+
         for (const event of events) {
           if (!event.trim()) continue
 
           if (event.startsWith("data:")) {
-            const cleaned = event.replace(/^data:\s*/, "").trim()
+            const cleaned = event.replace(/^data:/, "").trim()
+            try {
+              parsed = JSON.parse(cleaned)
+            } catch (error) {
+              append({
+                role: "assistant",
+                content: "An error occurred while processing your request.",
+              })
+              clearSingleTab()
+              console.error("Error during streaming:", error)
+              setIsStreaming(false)
+              setEntityProfileStage(null)
+              setListStage(null)
+              setStreamingMessage("")
+              return
+            }
 
             try {
-              // Only log cleaned data events for debugging
-              try {
-                let cleanedData = cleaned
-
-                // First, handle any potential line breaks or special characters
-                cleanedData = cleanedData.replace(/[\n\r]/g, "")
-
-                // Handle escaped unicode characters
-                if (cleanedData.includes("\\u")) {
-                  cleanedData = cleanedData.replace(/\\u([0-9a-fA-F]{4})/g, (match, p1) => {
-                    return String.fromCharCode(parseInt(p1, 16))
-                  })
-                }
-
-                // Handle other escaped characters
-                cleanedData = cleanedData.replace(/\\([^u])/g, "$1")
-
-                // Handle square brackets in company names by escaping them
-                cleanedData = cleanedData.replace(/"company_name":\s*"([^"]*)\[([^"]*)\[([^"]*)"/g, 
-                  '"company_name": "$1\\[$2\\[$3"')
-
-                // Handle special characters in investor descriptions and criteria
-                cleanedData = cleanedData.replace(/"investor_description":\s*"([^"]*)"/g, (match, p1) => {
-                  return `"investor_description": "${p1.replace(/"/g, '\\"').replace(/\u20ac/g, '€').replace(/\n/g, ' ')}"`
-                })
-                cleanedData = cleanedData.replace(/"investor_investment_criteria":\s*"([^"]*)"/g, (match, p1) => {
-                  return `"investor_investment_criteria": "${p1.replace(/"/g, '\\"').replace(/\u20ac/g, '€').replace(/\n/g, ' ')}"`
-                })
-
-                // Handle special characters in company descriptions
-                cleanedData = cleanedData.replace(/"company_description":\s*"([^"]*)"/g, (match, p1) => {
-                  return `"company_description": "${p1.replace(/"/g, '\\"').replace(/\u20ac/g, '€').replace(/\n/g, ' ')}"`
-                })
-
-                // Handle special characters in investor strategy and sector focus
-                cleanedData = cleanedData.replace(/"investor_strategy":\s*"([^"]*)"/g, (match, p1) => {
-                  return `"investor_strategy": "${p1.replace(/"/g, '\\"').replace(/\u20ac/g, '€').replace(/\n/g, ' ')}"`
-                })
-                cleanedData = cleanedData.replace(/"investor_sector_focus":\s*"([^"]*)"/g, (match, p1) => {
-                  return `"investor_sector_focus": "${p1.replace(/"/g, '\\"').replace(/\u20ac/g, '€').replace(/\n/g, ' ')}"`
-                })
-
-                // Handle empty arrays and null values
-                cleanedData = cleanedData.replace(/"investor_list":\s*\[\s*\]/g, '"investor_list": []')
-                cleanedData = cleanedData.replace(/"company_list":\s*\[\s*\]/g, '"company_list": []')
-                cleanedData = cleanedData.replace(/"selected_investments":\s*\[\s*\]/g, '"selected_investments": []')
-
-                // Handle null values in numeric fields
-                cleanedData = cleanedData.replace(/"investment_year":\s*null/g, '"investment_year": null')
-                cleanedData = cleanedData.replace(/"investor_founded_year":\s*null/g, '"investor_founded_year": null')
-
-                // Remove any trailing commas in arrays and objects
-                cleanedData = cleanedData.replace(/,(\s*[}\]])/g, '$1')
-
-                // Ensure the JSON string is properly terminated
-                if (!cleanedData.trim().endsWith("}")) {
-                  cleanedData = cleanedData.trim() + "}"
-                }
-
-                // Additional validation before parsing
-                if (!cleanedData.startsWith("{") || !cleanedData.endsWith("}")) {
-                  console.error("Invalid JSON structure:", cleanedData)
-                  continue
-                }
-
-                try {
-                  parsed = JSON.parse(cleanedData)
-                  accumulatedJSONChunks.push(parsed)
-                } catch (parseError) {
-                  console.error("JSON Parse Error:", parseError)
-                  console.error("Problematic JSON string:", cleanedData)
-                  // Try to fix common JSON issues
-                  try {
-                    // Remove any invalid control characters
-                    cleanedData = cleanedData.replace(/[\x00-\x1F\x7F-\x9F]/g, '')
-                    parsed = JSON.parse(cleanedData)
-                    accumulatedJSONChunks.push(parsed)
-                  } catch (retryError) {
-                    console.error("Failed to parse even after cleanup:", retryError)
-                    continue
-                  }
-                }
-              } catch (error) {
-                console.error("Error parsing JSON chunk:", error)
-                console.log("Problematic JSON string:", cleaned)
-                // Continue processing without this chunk
-                continue
-              }
-
-              const { data, event } = parsed
-
+              const { data, event: eventType } = parsed
+              console.log(parsed, "parsed")
               // Handle entity profile stages
-              if (event === "entity_profile") {
+              if (eventType === "entity_profile") {
                 setEntityProfileStage(data?.meta?.stage || null)
               }
 
               // Handle list stages (investor_list and company_list)
-              if (event === "investor_list" || event === "company_list") {
+              if (eventType === "investor_list" || eventType === "company_list") {
                 setListStage(data?.meta?.stage || null)
               }
 
               //-------------------Staging Responses----------------------
-              if (data?.meta?.stage !== "final" && event !== "text") {
+              if (data?.meta?.stage !== "final" && eventType !== "text") {
                 if (
-                  event === "entity_profile" ||
-                  event === "investor_list" ||
-                  event === "company_list"
+                  eventType === "entity_profile" ||
+                  eventType === "investor_list" ||
+                  eventType === "company_list"
                 ) {
                   // Don't append text for these events
                 }
               }
 
               // ---------------Parsing company list------------------------------
-              if (event === "company_list") {
+              if (eventType === "company_list") {
                 if (data?.meta?.stage !== "final") {
                   const dummyCompanies = Array.from({ length: 5 }, (_, index) => ({
                     company_id: Math.floor(Math.random() * 1000) + 1,
@@ -257,8 +184,9 @@ const Chat = () => {
                   setSingleTab("comp_" + new Date().getTime(), "companies", companiesArray, "final")
                 }
               }
+
               //----------------------Parsing investor list------------------------------
-              if (event === "investor_list") {
+              if (eventType === "investor_list") {
                 if (data?.meta?.stage !== "final") {
                   const dummyInvestors = Array.from({ length: 5 }, (_, index) => ({
                     investor_id: Math.floor(Math.random() * 1000) + 1,
@@ -281,15 +209,13 @@ const Chat = () => {
                   if (data?.text) {
                     append({ role: "assistant", content: data?.text })
                   }
-                  setSingleTab("inv_"+ new Date().getTime(), "investors", investorsArray, "final")
+                  setSingleTab("inv_" + new Date().getTime(), "investors", investorsArray, "final")
                 }
               }
 
-              if (event === "done") {
+              if (eventType === "done") {
                 setStage(false)
-                //------------- setting company profile in chat-----------------------------
                 if (comapanyProfile) {
-                  // console.log(comapanyProfile, "company")
                   append({
                     role: "data",
                     content: JSON.stringify({
@@ -300,9 +226,7 @@ const Chat = () => {
                   })
                   scrollToBottom()
                 }
-                //------------- setting investor profile in chat-----------------------------
                 if (investorProfile) {
-                  // console.log(investorProfile, "investor")
                   append({
                     role: "data",
                     content: JSON.stringify({
@@ -316,19 +240,30 @@ const Chat = () => {
               }
 
               // Handle text streaming during processing
-              if (event === "text" && data?.meta?.stage === "processing") {
+              if (eventType === "text" && data?.meta?.stage === "processing") {
+                setStreamingMessage(prev => prev + (data?.text || ""))
                 processingBuffer += data?.text
               }
+
+              //append streaming message
+              if (eventType === "text" && data?.meta?.stage === "final") {
+                if (!isStreaming) {
+                  append({ role: "assistant", content: processingBuffer })
+                }
+                setIsStreaming(false)
+                setEntityProfileStage(null)
+                setListStage(null)
+                setStreamingMessage("")
+              }
+
               // Handle entity profile data when complete
-              else if (event === "entity_profile" && data?.meta?.stage === "final") {
-                // Clear any existing processing buffer
+              else if (eventType === "entity_profile" && data?.meta?.stage === "final") {
                 if (processingBuffer) {
                   processingBuffer = ""
                 }
 
                 const profileData = parsed?.data
 
-                // Handle company profile data
                 if (profileData?.type === "company_profile") {
                   comapanyProfile = {
                     company_id: profileData.company_id || 0,
@@ -342,7 +277,6 @@ const Chat = () => {
                   }
                 }
 
-                // Handle investor profile data
                 if (profileData?.type === "investor_profile") {
                   investorProfile = {
                     investor_id: profileData.investor_id || 0,
@@ -356,23 +290,17 @@ const Chat = () => {
                   }
                 }
 
-                // Append any additional text content
                 if (data?.text) {
                   append({ role: "assistant", content: data?.text })
                 }
               }
               scrollToBottom()
-              // Helper function to format location string
-              function formatLocation(city?: string, country?: string) {
-                return city && country ? `${city}, ${country}` : "Location unknown"
-              }
-            } catch (err) {
-              console.error("Error parsing cleaned chunk:", err, cleaned)
+            } catch (parseError) {
+              console.error("Error parsing JSON:", parseError)
             }
           }
         }
       }
-      console.log("Full JSON chunks received:", accumulatedJSONChunks)
     } catch (error) {
       append({ role: "assistant", content: "An error occurred while processing your request." })
       setSingleTab(null, "companies", [], "final")
@@ -381,8 +309,16 @@ const Chat = () => {
       setIsStreaming(false)
       setEntityProfileStage(null)
       setListStage(null)
+      setStreamingMessage("")
     }
   }
+
+  // Helper function to format location string
+  function formatLocation(city?: string, country?: string) {
+    return city && country ? `${city}, ${country}` : "Location unknown"
+  }
+
+
 
   return (
     <div className={cn(`bg-white h-full transition-all ease-in-out`)}>
@@ -409,9 +345,9 @@ const Chat = () => {
               >
                 <div
                   className={cn("max-w-full text-sm leading-relaxed px-3 py-1 rounded-md", {
-                    "ml-auto text-gray-700 border px-4 py-1 rounded-2xl rounded-tr-md max-w-xs bg-gray-50 [font_weight:500]":
+                    "ml-auto bg-blue-50 border border-blue-700/20 font-medium text-blue-600 px-4 py-1 rounded-2xl rounded-tr-md max-w-xs  ":
                       isUser,
-                    "text-gray-800 mr-auto border-none rounded-md": isAssistant,
+                    "text-gray-800 mr-auto border-none rounded-md font-medium": isAssistant,
                   })}
                 >
                   {m.role === "data" && <ChatProfileCard data={JSON.parse(m.content)} />}
@@ -420,6 +356,14 @@ const Chat = () => {
               </div>
             )
           })}
+
+          {isStreaming && streamingMessage && (
+            <div className="flex justify-start">
+              <div className="max-w-full text-sm leading-relaxed px-3 py-1 text-gray-800 mr-auto border-none rounded-md font-medium">
+                <Markdown>{streamingMessage}</Markdown>
+              </div>
+            </div>
+          )}
 
           {isStreaming && (
             <div className="flex justify-start">

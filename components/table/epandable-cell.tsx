@@ -5,12 +5,13 @@ import { Eye } from "lucide-react"
 type Props = {
   children: React.ReactNode
   className?: string
+  triggerClassName?: string
   TriggerCell?: React.ReactNode
 }
-export const ExpandableCell = ({ children, className, TriggerCell }: Props) => {
+export const ExpandableCell = ({ children, className, TriggerCell, triggerClassName }: Props) => {
   return (
     <Popover>
-      <PopoverTrigger asChild className={cn("truncate")}>
+      <PopoverTrigger asChild className={cn("", triggerClassName)}>
         {TriggerCell ?? children}
       </PopoverTrigger>
       <PopoverContent
@@ -20,7 +21,8 @@ export const ExpandableCell = ({ children, className, TriggerCell }: Props) => {
         )}
         side="bottom"
         align="center"
-        sideOffset={-30}>
+        sideOffset={-30}
+      >
         {children}
       </PopoverContent>
     </Popover>

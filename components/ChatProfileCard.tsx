@@ -1,6 +1,6 @@
 "use client"
 
-import { MapPin, Info } from "lucide-react"
+import { MapPin, Info, ChevronRight } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -92,48 +92,32 @@ export function ChatProfileCard({ data }: { data: ProfileData }) {
       }
 
   const content = (
-    <Card className="overflow-hidden p-2 border-border gap-2 min-w-80 max-w-md transition-all shadow-none  hover:shadow-md cursor-pointer">
-      <CardHeader className="px-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="relative h-12 w-12 overflow-hidden rounded-md border border-zinc-200 dark:border-zinc-800 bg-white">
-              {isLoading ? (
-                <div className="animate-pulse w-full h-full bg-gray-200 dark:bg-gray-700" />
-              ) : (
-                <Image
-                  src={logo || "/placeholder.svg"}
-                  alt={`${name} logo`}
-                  fill
-                  className="object-contain p-1"
-                />
-              )}
-            </div>
-            <div>
-              {isLoading ? (
-                <>
-                  <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
-                  <div className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                </>
-              ) : (
-                <>
-                  <CardTitle className="text-lg font-semibold truncate">
-                    {name ?? "Not Available"}
-                  </CardTitle>
-                  <CardDescription hidden />
-                  <Badge
-                    variant="outline"
-                    className="flex items-center gap-1 px-2 py-1 text-xs font-normal border-blue-200 bg-blue-50 text-blue-800 truncate"
-                  >
-                    <MapPin className="h-3 w-3" />
-                    {location}
-                  </Badge>
-                </>
-              )}
-            </div>
-            <CardContent hidden />
+    <Card className="overflow-hidden p-4 border-border gap-2 min-w-80 rounded-lg max-w-md transition-all shadow-sm hover:shadow-lg cursor-pointer">
+      <div className="flex items-center gap-3 justify-between">
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="shrink-0">
+            <Image
+              alt="Logo"
+              src={logo ?? "htttps:placehold.co/50x50.png"}
+              width={50}
+              height={50}
+              className="rounded-md border "
+            />
+          </div>
+          <div className="shrink-0">
+            <h1 className="text-xl font-bold truncate mb-1">{name ?? "Not Available"}</h1>
+            <p className="flex items-center truncate text-xs text-accent-foreground/60 font-medium">
+              <MapPin className="h-3.5 w-3.5 mr-0.5 shrink-0" />
+              {location}
+            </p>
           </div>
         </div>
-      </CardHeader>
+
+        <div className="shrink-0">
+          <ChevronRight className="h-6 w-6 text-accent-foreground/80" />
+        </div>
+      </div>
+      <CardContent hidden />
     </Card>
   )
 

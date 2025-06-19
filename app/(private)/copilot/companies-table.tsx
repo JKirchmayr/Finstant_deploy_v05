@@ -21,6 +21,7 @@ import Image from "next/image"
 import ChatDataTable from "@/components/chat/ChatDataTable"
 import { AddNewColumn } from "@/components/chat/AddNewColumn"
 import CompanySheet from "@/components/CompanySheet"
+import { ExpandableCell } from "@/components/table/epandable-cell"
 
 export type Company = {
   company_id: number
@@ -79,6 +80,7 @@ export default function CompaniesData({
     {
       accessorKey: "company_name",
       header: loading ? "Generating" : "Company",
+      maxSize: 100,
       cell: ({ row }) => {
         const [open, setOpen] = useState(false)
         return (
@@ -117,12 +119,21 @@ export default function CompaniesData({
       accessorKey: "company_description",
       header: loading ? "Generating" : "Description",
       cell: ({ row }) => (
-        <GenerateSkeleton isPlaceholder={loading} text={row.original.company_description} />
+        <ExpandableCell
+          TriggerCell={
+            <p className="whitespace-pre-line line-clamp-2">{row.original.company_description}</p>
+          }
+        >
+          <GenerateSkeleton isPlaceholder={loading} text={row.original.company_description}>
+            <p>{row.original.company_description}</p>
+          </GenerateSkeleton>
+        </ExpandableCell>
       ),
     },
     {
       accessorKey: "company_country",
       header: loading ? "Generating" : "Country",
+      size: 80,
       cell: ({ row }) => (
         <GenerateSkeleton isPlaceholder={loading} text={row.original.company_country} />
       ),
@@ -131,6 +142,7 @@ export default function CompaniesData({
     {
       accessorKey: "similarity_score",
       header: loading ? "Generating" : "Similarity",
+      size: 70,
       cell: ({ row }) => (
         <GenerateSkeleton isPlaceholder={loading} text={row.original.similarity_score} />
       ),
@@ -139,7 +151,7 @@ export default function CompaniesData({
   ]
 
   return (
-    <div className="h-full flex flex-col bg-white w-full pt-1.5 ">
+    <div className="h-full flex flex-col bg-white w-full">
       <ChatDataTable
         data={companies ? companies : []}
         columns={columns}

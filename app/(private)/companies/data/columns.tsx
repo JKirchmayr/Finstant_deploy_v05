@@ -79,23 +79,36 @@ const allColumns: ColumnDef<any>[] = [
       const [isCompanySheetOpen, setIsCompanySheetOpen] = useState(false)
 
       return (
-        <CompanySheet
-          company={row.original}
-          open={isCompanySheetOpen}
-          onOpenChange={setIsCompanySheetOpen}
-        >
-          <div className="inline-flex items-center hover:font-semibold transition-all duration-200">
-            <Image
-              src={row.original.companies_linkedin_logo_url || "https://placehold.co/50x50.png"}
-              alt="logo"
-              width={20}
-              height={20}
-              className="mr-1.5 rounded"
-              unoptimized={true}
-            />
+        // <CompanySheet
+        //   company={row.original}
+        //   open={isCompanySheetOpen}
+        //   onOpenChange={setIsCompanySheetOpen}
+        // >
+        //   <div className="inline-flex items-center hover:font-semibold transition-all duration-200">
+        //     <Image
+        //       src={row.original.companies_linkedin_logo_url || "https://placehold.co/50x50.png"}
+        //       alt="logo"
+        //       width={20}
+        //       height={20}
+        //       className="mr-1.5 rounded"
+        //       unoptimized={true}
+        //     />
+        //     {row.getValue("company_name") || "-"}
+        //   </div>
+        // </CompanySheet>
+        <div className="inline-flex items-center hover:font-semibold transition-all duration-200">
+          <Image
+            src={row.original.companies_linkedin_logo_url || "https://placehold.co/50x50.png"}
+            alt="logo"
+            width={20}
+            height={20}
+            className="mr-1.5 rounded"
+            unoptimized={true}
+          />
+          <Link href={`/companies/${row.original.company_id}` || "#"}>
             {row.getValue("company_name") || "-"}
-          </div>
-        </CompanySheet>
+          </Link>
+        </div>
       )
     },
     enablePinning: true,
@@ -111,7 +124,7 @@ const allColumns: ColumnDef<any>[] = [
       return (
         <ExpandableCell
           className={`w-${width}px`}
-          TriggerCell={<p>{row.getValue("companies_LLM_description")}</p>}
+          TriggerCell={<p className="line-clamp-2 ">{row.getValue("companies_LLM_description")}</p>}
         >
           {row.getValue("companies_LLM_description")}
         </ExpandableCell>

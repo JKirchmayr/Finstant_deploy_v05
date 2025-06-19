@@ -21,11 +21,15 @@ import {
   ArrowRightToLineIcon,
   ChevronLeft,
   ChevronRight,
+  CopyIcon,
   EllipsisIcon,
   Loader,
   PinIcon,
   PinOffIcon,
+  PlusIcon,
   Search,
+  ShareIcon,
+  Trash,
   X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -53,7 +57,7 @@ import { AddNewColumn } from "./AddNewColumn"
 import { toast } from "sonner"
 import { useSingleTabStore } from "@/store/singleTabStore"
 import { ChevronDown, ChevronUp } from "lucide-react"
-import { Tooltip, TooltipContent,  TooltipTrigger } from "../ui/tooltip"
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
 
 interface IChatDataTableProps<T extends any> {
   data: T[]
@@ -196,8 +200,9 @@ const ChatDataTable = <T extends any>({
   const selectedRows = table.getSelectedRowModel().rows.map(row => row.original)
   const handleExport = (format: "csv" | "excel") => {
     const exportData = selectedRows.length ? selectedRows : data
-    const filename = `${selectedRows.length ? "selected" : "all"}-data.${format === "csv" ? "csv" : "xlsx"
-      }`
+    const filename = `${selectedRows.length ? "selected" : "all"}-data.${
+      format === "csv" ? "csv" : "xlsx"
+    }`
 
     format === "csv" ? exportToCSV(exportData, filename) : exportToExcel(exportData, filename)
   }
@@ -227,9 +232,26 @@ const ChatDataTable = <T extends any>({
 
   return (
     <div className="w-full flex h-full flex-col gap-3">
-
       {!noHeader && (
         <div className="">
+          <div className="p-2 space-y-1 flex justify-between items-center ">
+            <p className="text-base font-medium mb-0">{titleName}</p>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="secondary"
+                  size="xs"
+                  className="!px-[6px] hover:bg-gray-300"
+                  onClick={closeTabPanel}
+                >
+                  <X />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="left" align="center">
+                <p>Close This Panel</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
           <div className="p-2 space-y-1">
             <div className="flex justify-between items-center">
               <div className="flex gap-2 shrink-0">
@@ -247,7 +269,7 @@ const ChatDataTable = <T extends any>({
                   className=" hover:bg-gray-300"
                   onClick={handleDeleteSelected}
                 >
-                  Delete
+                  Delete <Trash className="" />
                 </Button>
                 <Button
                   variant="secondary"
@@ -256,55 +278,38 @@ const ChatDataTable = <T extends any>({
                   disabled={!selectedRows.length && !data.length}
                   onClick={handleCopySelected}
                 >
-                  Copy
+                  Copy <CopyIcon className="" />
                 </Button>
               </div>
-              <div>
-                <p className="text-sm font-medium">{titleName}</p>
-              </div>
+
               <div className="flex gap-2">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="secondary"
-                      size="xs"
-                      className="!px-[6px] hover:bg-gray-300"
-                      onClick={closeTabPanel}
-                    >
-                      <X />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="left" align="center">
-                    <p>Close This Panel</p>
-                  </TooltipContent>
-                  </Tooltip>
-                  {addColumn && (
-                    <AddNewColumn>
-                      <Button
-                        variant="secondary"
-                        size="xs"
-                        className="h-7 py-1 text-xs hover:bg-gray-300"
-                      >
-                        Add Column
-                      </Button>
-                    </AddNewColumn>
-                  )}
-                  <ExportOptions
-                    data={
-                      Object.keys(rowSelection).length > 0
-                        ? Object.keys(rowSelection).map(index => data[Number(index)])
-                        : data
-                    }
-                    onExport={(format: "csv" | "excel") => handleExport(format)}
-                  >
+                {addColumn && (
+                  <AddNewColumn>
                     <Button
                       variant="secondary"
                       size="xs"
                       className="h-7 py-1 text-xs hover:bg-gray-300"
                     >
-                      Export
+                      Add Column <PlusIcon className="" />
                     </Button>
-                  </ExportOptions>
+                  </AddNewColumn>
+                )}
+                <ExportOptions
+                  data={
+                    Object.keys(rowSelection).length > 0
+                      ? Object.keys(rowSelection).map(index => data[Number(index)])
+                      : data
+                  }
+                  onExport={(format: "csv" | "excel") => handleExport(format)}
+                >
+                  <Button
+                    variant="secondary"
+                    size="xs"
+                    className="h-7 py-1 text-xs hover:bg-gray-300"
+                  >
+                    Export <ShareIcon className="" />
+                  </Button>
+                </ExportOptions>
               </div>
             </div>
           </div>

@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import React from "react";
+import React from "react"
 import {
   Building2,
   HandCoins,
@@ -15,7 +15,7 @@ import {
   Store,
   WandSparkles,
   Workflow,
-} from "lucide-react";
+} from "lucide-react"
 
 import {
   Sidebar,
@@ -29,14 +29,14 @@ import {
   SidebarRail,
   SidebarTrigger,
   useSidebar,
-} from "@/components/ui/sidebar";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import UserMenu from "./UserMenu";
-import { Separator } from "../ui/separator";
-import Image from "next/image";
-import IMAGES from "@/constant/images";
+} from "@/components/ui/sidebar"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
+import UserMenu from "./UserMenu"
+import { Separator } from "../ui/separator"
+import Image from "next/image"
+import IMAGES from "@/constant/images"
 
 const data = {
   projects: [
@@ -57,19 +57,19 @@ const data = {
     },
   ],
   footer: [
-    {
-      name: "Settings",
-      url: "/settings",
-      icon: Settings,
-    },
+    // {
+    //   name: "Settings",
+    //   url: "/settings",
+    //   icon: Settings,
+    // },
   ],
-};
+}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const pathname = usePathname();
-  const { state } = useSidebar();
+  const pathname = usePathname()
+  const { state } = useSidebar()
 
-  const isCollapsed = state === "collapsed";
+  const isCollapsed = state === "collapsed"
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="py-3 border-b border-gray-200">
@@ -78,14 +78,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton
               tooltip="PM Radar"
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent gap-4"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent gap-2"
             >
               <div className="flex aspect-square size-8 text-2xl items-center justify-center">
                 <Image src={IMAGES.icon} alt="logo" width={32} height={32} />
               </div>
               <div className="grid flex-1 text-left text-xl leading-tight">
-                <span className="truncate font-semibold">PM Radar</span>
+                <span className="font-semibold">PM Radar</span>
               </div>
+              {!isCollapsed && <SidebarTrigger className="" />}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -95,7 +96,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {data.projects.map((item) => (
+              {data.projects.map(item => (
                 <SidebarMenuItem
                   key={item.name}
                   className={cn(
@@ -152,7 +153,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenuItem>
               )}
 
-              {data.footer.map((item) => (
+              {/* {data.footer.map(item => (
                 <SidebarMenuItem
                   key={item.name}
                   className={cn(
@@ -186,7 +187,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              ))}
+              ))} */}
 
               <SidebarMenuItem className="">
                 <UserMenu isCollapsed={isCollapsed} />
@@ -197,5 +198,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
-  );
+  )
 }

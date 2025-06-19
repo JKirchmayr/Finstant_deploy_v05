@@ -79,7 +79,7 @@ const MainPanel = () => {
               onClick={openTabPanel}
               variant="outline"
               size="xs"
-              className="absolute right-4 top-4 z-50 !px-[6px] border border-gray-300 text-blue-700 hover:bg-gray-300"
+              className="absolute right-2 top-2 z-50 !px-[6px] border border-gray-300 text-blue-700 hover:bg-gray-300"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
