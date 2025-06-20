@@ -5,12 +5,14 @@ import { OpenAI } from "openai"
 
 export async function GET(req: NextRequest) {
   type CompanyRow = Database["development"]["Tables"]["companies"]["Row"]
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY!,
-  })
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
+
   const url = req.nextUrl
-  const from = parseInt(url.searchParams.get("from") || "0")
-  const to = parseInt(url.searchParams.get("to") || "30")
+  const page = parseInt(url.searchParams.get("page") || "1")
+  const pageSize = parseInt(url.searchParams.get("pageSize") || "10")
+
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
 
   const hqCountries = url.searchParams.getAll("hqCountry")
   const industries = url.searchParams.getAll("industry")
@@ -19,7 +21,7 @@ export async function GET(req: NextRequest) {
   const revenueMax = url.searchParams.get("revenueMax")
   const revenueMin = url.searchParams.get("revenueMin")
   const description = url.searchParams.get("description") || ""
-  // Select only allowed fields (exclude vector fields)
+
   const allowedFields = Object.keys({} as CompanyRow)
     .filter(
       (key) =>
@@ -27,11 +29,12 @@ export async function GET(req: NextRequest) {
     )
     .join(",")
 
-  console.log(hqCountries, industries, ebitdaMax, ebitdaMin, revenueMax, revenueMin)
-
   try {
     const supabase = await createClient()
-    let query = supabase.schema("development").from("companies").select(allowedFields)
+    let query = supabase
+      .schema("development")
+      .from("companies")
+      .select(allowedFields, { count: "exact" }) // Include count for pagination
 
     // Apply filters
     if (hqCountries.length > 0) {
@@ -41,21 +44,24 @@ export async function GET(req: NextRequest) {
     if (industries.length > 0) {
       query = query.in("companies_linkedin_industries", industries)
     }
+
     if (ebitdaMax) {
-      query = query.lt("companies_EBITDA_estimate_mEUR", ebitdaMax)
+      query = query.lt("companies_EBITDA_estimate_mEUR", Number(ebitdaMax))
     }
 
     if (ebitdaMin) {
-      query = query.gt("companies_EBITDA_estimate_mEUR", ebitdaMin)
+      query = query.gt("companies_EBITDA_estimate_mEUR", Number(ebitdaMin))
     }
+
     if (revenueMax) {
-      query = query.lt("companies_revenue_estimate_mEUR", revenueMax)
+      query = query.lt("companies_revenue_estimate_mEUR", Number(revenueMax))
     }
 
     if (revenueMin) {
-      query = query.gt("companies_revenue_estimate_mEUR", revenueMin)
+      query = query.gt("companies_revenue_estimate_mEUR", Number(revenueMin))
     }
 
+    // Handle semantic search
     if (description.trim()) {
       const embeddingRes = await openai.embeddings.create({
         model: "text-embedding-3-small",
@@ -87,12 +93,10 @@ export async function GET(req: NextRequest) {
       })
     }
 
-    // Pagination
+    // Apply pagination only after filters
     query = query.range(from, to)
 
-    const { data: companies, error } = await query
-
-    // console.log(companies)
+    const { data: companies, error, count } = await query
 
     if (error) {
       console.error("❌ Supabase error:", error.message)
@@ -102,12 +106,17 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       data: companies,
+      total: count,
       message: "Fetched companies successfully",
+      pagination: {
+        page,
+        pageSize,
+        from,
+        to,
+      },
     })
   } catch (err) {
     console.error("❌ Companies API Error:", err)
     return NextResponse.json({ error: "Something went wrong" }, { status: 500 })
   }
 }
-
-export const dynamic = "force-dynamic"

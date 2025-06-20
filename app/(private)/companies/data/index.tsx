@@ -1,6 +1,6 @@
 "use client"
 import DataTable from "@/components/table/data-table"
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { getColumnsForData } from "./columns"
 import { useCompanies } from "@/hooks/useCompanies"
 import { useCompanyFilters } from "@/store/useCompanyFilters"
@@ -9,44 +9,47 @@ import PinnableDataTable from "@/components/table/pinnable-data-table"
 const Data = () => {
   const { appliedFilters, setLoading } = useCompanyFilters()
 
-  const [from, setFrom] = React.useState(1)
-  const [to, setTo] = React.useState(30)
-  const { data, isPending, isSuccess } = useCompanies({
+  const [from, setFrom] = useState(1)
+  const pageSize = 30
+
+  const { data, isPending, isSuccess, isStale } = useCompanies({
     ...(appliedFilters || {}),
-    from,
-    to,
+    page: Math.ceil(from / pageSize),
+    pageSize,
   })
 
-  const [moreData, setMoreData] = React.useState<any[]>([])
-  const [hasMoreData, setHasMoreData] = React.useState(false)
+  const [moreData, setMoreData] = useState<any[]>([])
+  const [hasMoreData, setHasMoreData] = useState(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
+    setFrom(1)
+  }, [appliedFilters])
+
+  useEffect(() => {
     if (data && from === 1) {
       setMoreData(data)
     } else if (data && from > 1) {
       setMoreData((prev) => [...prev, ...data])
-      // setLoading(false)
     }
-    if (data && data.length < to - from + 1) {
+
+    if (data && data.length < pageSize) {
       setHasMoreData(false)
-    } else if (data && data.length === to - from + 1) {
-      // setHasMoreData(true)
+    } else if (data && data.length === pageSize) {
+      setHasMoreData(true)
     }
-  }, [data, from, to])
+  }, [data, from])
 
   const loadMoreData = () => {
     if (!isPending && hasMoreData) {
-      setFrom((prev) => prev + (to - from + 1))
-      setTo((prev) => prev + (to - from + 1))
+      setFrom((prev) => prev + pageSize)
     }
   }
 
   useEffect(() => {
-    if (isSuccess || !isPending) {
+    if (isSuccess || !isPending || isStale) {
       setLoading(false)
     }
-  }, [isSuccess, isPending])
-  // console.log(moreData, "moreData")
+  }, [isSuccess, isPending, isStale])
 
   return (
     <div className="bg-gray-100 w-full h-full overflow-x-auto p-4">

@@ -99,8 +99,10 @@ const Filters = () => {
 
   const handleSearch = () => {
     if (isCompanies) {
-      // setLoading(true)
-      applyFilters(company)
+      // Check is isCompanyFilterApplied correctly apply otherwise ignore the filter
+      if (isCompanyFilterApplied) {
+        applyFilters(company)
+      }
     } else {
       applyInvestorFilters(investor)
     }
