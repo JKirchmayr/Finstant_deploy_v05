@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react"
 import { useCompanyFilters } from "@/store/useCompanyFilters"
 import { usePathname } from "next/navigation"
 import { Checkbox } from "./ui/checkbox"
-import { useInvestorFilters } from "@/store/useInvestorFilters"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion"
 import MultipleSelector, { Option } from "./ui/multiselect"
 import CategorizedCountryMultiSelect from "./CategorizedCountryMultiSelect"
@@ -37,22 +36,8 @@ const industryOptions = [
   },
 ]
 
-const investorOptions = [
-  { value: "Private Equity", label: "Private Equity" },
-  { value: "Fund Manager", label: "Fund Manager" },
-  { value: "Real Estate", label: "Real Estate" },
-  { value: "Corporate", label: "Corporate" },
-  { value: "Credit", label: "Credit" },
-]
-
 const Filters = () => {
-  const pathname = usePathname()
-  const isCompanies = pathname.includes("companies")
-  const isInvestors = pathname.includes("investors")
-  const { applyFilters, resetFilters, isLoading, setLoading } = useCompanyFilters()
-  const { applyFilters: applyInvestorFilters, resetFilters: resetInvestorFilters } =
-    useInvestorFilters()
-
+  const { applyFilters, resetFilters, isLoading: globalLoading, setLoading } = useCompanyFilters()
   const [company, setCompany] = useState({
     description: "",
     revenueMin: "",
@@ -62,15 +47,10 @@ const Filters = () => {
     industry: [] as string[],
     hqCountry: [] as string[],
   })
-  const [investor, setInvestor] = useState({
-    investorType: [] as string[],
-    revenueMin: "",
-    revenueMax: "",
-    ebitdaMin: "",
-    ebitdaMax: "",
-    industry: [] as string[],
-    investorLocation: [] as string[],
-  })
+
+  const [localLoading, setLocalLoading] = useState(false)
+
+  const [clearCountry, setClearCountry] = useState(false)
 
   const isCompanyFilterApplied =
     company.description ||
@@ -82,104 +62,45 @@ const Filters = () => {
     company.hqCountry.length > 0
 
   const handleMinMaxChange = (key: string, value: string) => {
-    if (isCompanies) {
-      setCompany((prev) => ({ ...prev, [key]: value }))
-    } else {
-      setInvestor((prev) => ({ ...prev, [key]: value }))
-    }
+    setCompany((prev) => ({ ...prev, [key]: value }))
   }
 
   const handleMultiChange = (key: string, values: string[]) => {
-    if (isCompanies) {
-      setCompany((prev) => ({ ...prev, [key]: values }))
-    } else {
-      setInvestor((prev) => ({ ...prev, [key]: values }))
-    }
+    setCompany((prev) => ({ ...prev, [key]: values }))
   }
 
   const handleSearch = () => {
-    if (isCompanies) {
-      // Check is isCompanyFilterApplied correctly apply otherwise ignore the filter
-      if (isCompanyFilterApplied) {
-        applyFilters(company)
-      }
-    } else {
-      applyInvestorFilters(investor)
+    if (isCompanyFilterApplied) {
+      setLocalLoading(true)
+      applyFilters({ ...company, _searchId: Date.now() })
     }
   }
 
   const handleClear = () => {
-    if (isCompanies) {
-      setCompany({
-        description: "",
-        revenueMin: "",
-        revenueMax: "",
-        ebitdaMin: "",
-        ebitdaMax: "",
-        industry: [],
-        hqCountry: [],
-      })
-
-      resetFilters()
-    } else {
-      setInvestor({
-        investorType: [],
-        revenueMin: "",
-        revenueMax: "",
-        ebitdaMin: "",
-        ebitdaMax: "",
-        industry: [],
-        investorLocation: [],
-      })
-      resetInvestorFilters()
-    }
+    setCompany({
+      description: "",
+      revenueMin: "",
+      revenueMax: "",
+      ebitdaMin: "",
+      ebitdaMax: "",
+      industry: [],
+      hqCountry: [],
+    })
+    resetFilters()
     setLoading(false)
+    setClearCountry(true)
   }
 
-  const handleInvestorChange = (selected: string[]) => {
-    setInvestor((prev) => ({
-      ...prev,
-      investorType: selected,
-    }))
-  }
   const handleSelectCountries = (countries: string[]) => {
-    console.log(countries)
-    if (isCompanies) {
-      setCompany((prev) => ({ ...prev, hqCountry: countries }))
-    }
-    setInvestor((prev) => ({
-      ...prev,
-      investorLocation: countries,
-    }))
+    setCompany((prev) => ({ ...prev, hqCountry: countries }))
   }
 
   const handleSelectIndustries = (industries: string[]) => {
-    if (isCompanies) {
-      setCompany((prev) => ({ ...prev, industry: industries }))
-    }
-    setInvestor((prev) => ({
-      ...prev,
-      investorType: industries,
-    }))
+    setCompany((prev) => ({ ...prev, industry: industries }))
   }
 
-  const isInvestorFilterApplied =
-    investor.investorType.length > 0 ||
-    investor.revenueMin ||
-    investor.revenueMax ||
-    investor.ebitdaMin ||
-    investor.ebitdaMax ||
-    investor.industry.length > 0 ||
-    investor.investorLocation.length > 0
-
-  const shouldShowClear = isCompanies
-    ? isCompanyFilterApplied
-    : isInvestors
-    ? isInvestorFilterApplied
-    : false
-
-  const revenueMin = isCompanies ? company.revenueMin : investor.revenueMin
-  const revenueMax = isCompanies ? company.revenueMax : investor.revenueMax
+  const revenueMin = company.revenueMin
+  const revenueMax = company.revenueMax
 
   useEffect(() => {
     setCompany({
@@ -191,59 +112,40 @@ const Filters = () => {
       industry: [],
       hqCountry: [],
     })
-    setInvestor({
-      investorType: [],
-      revenueMin: "",
-      revenueMax: "",
-      ebitdaMin: "",
-      ebitdaMax: "",
-      industry: [],
-      investorLocation: [],
-    })
-    resetInvestorFilters()
     resetFilters()
   }, [])
 
+  // Sync local loading with global loading
+  useEffect(() => {
+    if (!globalLoading) {
+      setLocalLoading(false)
+    }
+  }, [globalLoading])
+
   const accordionItemsConfig = [
-    ...(isCompanies
-      ? [
-          {
-            value: "description-investor",
-            title: (
-              <label className="flex items-center gap-1 text-[14px]">
-                Description <Sparkles size={14} className="text-blue-700" />
-              </label>
-            ),
-            content: () => (
-              <DiscriptionFilter
-                value={company.description}
-                onChange={(val) => {
-                  setCompany((prev) => ({ ...prev, description: val }))
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault()
-                    handleSearch()
-                  }
-                }}
-                isLoading={isLoading}
-              />
-            ),
-          },
-        ]
-      : [
-          {
-            value: "description-investor",
-            title: <label className="flex items-center gap-1 text-sm">Investor</label>,
-            content: () => (
-              <InvestorsFilter
-                options={investorOptions}
-                selectedInvestors={investor.investorType}
-                onChange={handleInvestorChange}
-              />
-            ),
-          },
-        ]),
+    {
+      value: "description-company",
+      title: (
+        <label className="flex items-center gap-1 text-[14px]">
+          Description <Sparkles size={14} className="text-blue-700" />
+        </label>
+      ),
+      content: () => (
+        <DiscriptionFilter
+          value={company.description}
+          onChange={(val) => {
+            setCompany((prev) => ({ ...prev, description: val }))
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault()
+              handleSearch()
+            }
+          }}
+          isLoading={localLoading}
+        />
+      ),
+    },
     {
       value: "revenue",
       title: "Revenue (mEUR)",
@@ -314,7 +216,8 @@ const Filters = () => {
             commandProps={{
               label: "Select Industry",
             }}
-            onChange={(v) => handleSelectIndustries(v.map((i) => i.value))}
+            value={industryOptions.filter(opt => company.industry.includes(opt.value))}
+            onChange={(opts) => handleSelectIndustries(opts.map((i) => i.value))}
             defaultOptions={industryOptions}
             placeholder="Select Industry"
             hidePlaceholderWhenSelected
@@ -329,6 +232,7 @@ const Filters = () => {
       title: "HQ Country",
       content: () => (
         <CategorizedCountryMultiSelect
+          value={company.hqCountry}
           onSelecCountries={(countries: Option[]) =>
             handleSelectCountries(countries.map((c) => c.label))
           }
@@ -361,15 +265,15 @@ const Filters = () => {
         <button
           className="px-6 py-2 bg-gray-900 text-white rounded-sm cursor-pointer flex items-center justify-center"
           onClick={handleSearch}
-          disabled={isLoading}
+          disabled={globalLoading || localLoading}
         >
-          {isLoading && !company.description ? (
+          {(globalLoading || localLoading) && !company.description ? (
             <Loader2 className="animate-spin w-5 h-5" />
           ) : (
             "Search"
           )}
         </button>
-        {shouldShowClear && (
+        {isCompanyFilterApplied && (
           <button
             className="px-6 py-2 text-gray-800 border border-gray-300 rounded-sm cursor-pointer"
             onClick={handleClear}
@@ -478,54 +382,4 @@ const MinMax = ({
   )
 }
 
-const LabelAndField = ({ title, children }: { title: string; children: React.ReactNode }) => {
-  return (
-    <div className="flex flex-col gap-2">
-      <label className="flex items-center gap-1 text-sm">{title}</label>
-      {children}
-    </div>
-  )
-}
-
-interface InvestorOption {
-  value: string
-  label: string
-}
-
-interface InvestorsProps {
-  options: InvestorOption[]
-  selectedInvestors: string[]
-  onChange: (selected: string[]) => void
-}
-
-const InvestorsFilter: React.FC<InvestorsProps> = ({ options, selectedInvestors, onChange }) => {
-  const handleCheckboxChange = (value: string) => {
-    const newInvestor = selectedInvestors.includes(value)
-      ? selectedInvestors.filter((item) => item !== value)
-      : [...selectedInvestors, value]
-    onChange(newInvestor)
-  }
-
-  return (
-    <div className="flex flex-col justify-between gap-2 ">
-      <div className="flex flex-col gap-1 ">
-        {options.map((option) => (
-          <div className="flex items-center space-x-2" key={option.value}>
-            <Checkbox
-              id={option.value}
-              checked={selectedInvestors.includes(option.value)}
-              onCheckedChange={(checked) => handleCheckboxChange(option.value)}
-            />
-            <label
-              htmlFor={option.value}
-              className="text-xs select-none cursor-pointer text-gray-600 capitalize leading-none"
-            >
-              {option.label}
-            </label>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
 export default Filters

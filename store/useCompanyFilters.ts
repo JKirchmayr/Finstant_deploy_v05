@@ -10,6 +10,7 @@ interface FilterPayload {
   hqCountry?: string[]
   from?: number
   to?: number
+  _searchId?: number
 }
 
 interface CompanyFilterState {
