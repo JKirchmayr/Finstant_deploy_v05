@@ -105,7 +105,7 @@ const allColumns: ColumnDef<any>[] = [
             className="mr-1.5 rounded"
             unoptimized={true}
           />
-          <Link href={`/companies/${row.original.company_id}` || "#"}>
+          <Link target="_blank" href={`/companies/${row.original.company_id}` || "#"}>
             {row.getValue("company_name") || "-"}
           </Link>
         </div>

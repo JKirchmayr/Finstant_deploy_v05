@@ -22,6 +22,7 @@ import ChatDataTable from "@/components/chat/ChatDataTable"
 import { AddNewColumn } from "@/components/chat/AddNewColumn"
 import CompanySheet from "@/components/CompanySheet"
 import { ExpandableCell } from "@/components/table/epandable-cell"
+import Link from "next/link"
 
 export type Company = {
   company_id: number
@@ -58,7 +59,7 @@ export default function CompaniesData({
             }
             onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
             aria-label="Select all"
-            // className="mx-auto"
+          // className="mx-auto"
           />
           <div className="text-center">#</div>
         </div>
@@ -69,7 +70,7 @@ export default function CompaniesData({
             checked={row.getIsSelected()}
             onCheckedChange={value => row.toggleSelected(!!value)}
             aria-label="Select row"
-            // className="mx-auto"
+          // className="mx-auto"
           />
           <div className="text-center">{row.index + 1}</div>
         </div>
@@ -84,33 +85,46 @@ export default function CompaniesData({
       cell: ({ row }) => {
         const [open, setOpen] = useState(false)
         return (
-          <CompanySheet
-            open={open}
-            onOpenChange={setOpen}
-            company={{
-              ...row.original,
-              companies_linkedin_logo_url: row.original.company_logo,
-              companies_LLM_country: row.original.company_country,
-            }}
-          >
-            <button
-              disabled={loading}
-              className="hover:underline items-center inline-flex cursor-pointer hover:font-medium transition-all duration-200 text-left w-full"
-              type="button"
-            >
-              {row.original.company_logo && (
-                <Image
-                  src={row.original.company_logo ?? "https://placehold.co/50x50.png"}
-                  alt={`${row.original.company_name} logo`}
-                  width={18}
-                  height={18}
-                  className="mr-1.5 rounded"
-                  unoptimized={true}
-                />
-              )}
-              <GenerateSkeleton isPlaceholder={loading} text={row.original.company_name} />
-            </button>
-          </CompanySheet>
+          <div className="inline-flex items-center hover:font-semibold transition-all duration-200">
+            <Image
+              src={row.original.company_logo || "https://placehold.co/50x50.png"}
+              alt="logo"
+              width={20}
+              height={20}
+              className="mr-1.5 rounded"
+              unoptimized={true}
+            />
+            <Link target="_blank" href={`/companies/${row.original.company_id}` || "#"}>
+              {row.getValue("company_name") || "-"}
+            </Link>
+          </div>
+          // <CompanySheet
+          //   open={open}
+          //   onOpenChange={setOpen}
+          //   company={{
+          //     ...row.original,
+          //     companies_linkedin_logo_url: row.original.company_logo,
+          //     companies_LLM_country: row.original.company_country,
+          //   }}
+          // >
+          //   <button
+          //     disabled={loading}
+          //     className="hover:underline items-center inline-flex cursor-pointer hover:font-medium transition-all duration-200 text-left w-full"
+          //     type="button"
+          //   >
+          //     {row.original.company_logo && (
+          //       <Image
+          //         src={row.original.company_logo ?? "https://placehold.co/50x50.png"}
+          //         alt={`${row.original.company_name} logo`}
+          //         width={18}
+          //         height={18}
+          //         className="mr-1.5 rounded"
+          //         unoptimized={true}
+          //       />
+          //     )}
+          //     <GenerateSkeleton isPlaceholder={loading} text={row.original.company_name} />
+          //   </button>
+          // </CompanySheet>
         )
       },
       enableSorting: true,
@@ -135,7 +149,7 @@ export default function CompaniesData({
       header: loading ? "Generating" : "Country",
       size: 80,
       cell: ({ row }) => (
-        <GenerateSkeleton isPlaceholder={loading} text={row.original.company_country} />
+        <GenerateSkeleton isPlaceholder={loading} text={row.original.company_country || '-'} />
       ),
       enableSorting: true,
     },

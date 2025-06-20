@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/useAuth"
 import CompanyProfile from "@/components/CompanyProfile"
 import { useSingleTabStore } from "@/store/singleTabStore"
 import { ChatProfileCard } from "@/components/ChatProfileCard"
+import { usePathname } from "next/navigation"
 
 type Company = {
   company_name: string
@@ -28,7 +29,7 @@ const Chat = () => {
   const userId = "aa227293-c91c-4b03-91db-0d2048ee73e7"
 
   const { messages, input, handleInputChange, append, setInput } = useChat()
-  const { setSingleTab, clearSingleTab } = useSingleTabStore()
+  const { setSingleTab, clearSingleTab, singleTab } = useSingleTabStore()
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [isStreaming, setIsStreaming] = useState(false)
   const [connectionError, setConnectionError] = useState(false)
@@ -44,6 +45,8 @@ const Chat = () => {
 
   const endRef = useRef<HTMLDivElement>(null)
 
+  const pathname = usePathname()
+
   const scrollToBottom = () => {
     // Add a small delay to ensure DOM updates are complete
     setTimeout(() => {
@@ -53,6 +56,12 @@ const Chat = () => {
       }
     }, 100)
   }
+
+  useEffect(() => {
+    if (!!singleTab.id) {
+      clearSingleTab()
+    }
+  }, [pathname])
 
   let processingBuffer = ""
   const [streamingMessage, setStreamingMessage] = useState<string>("")

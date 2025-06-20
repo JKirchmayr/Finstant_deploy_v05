@@ -73,21 +73,34 @@ const allColumns: ColumnDef<any>[] = [
     header: () => <div className="text-left min-w-[110px]">Investor Name</div>,
     cell: ({ row }) => {
       return (
-        <InvestorSheet investor={row.original}>
-          <div className="inline-flex items-center hover:font-semibold transition-all duration-200">
-            <Image
-              src={
-                row.original.investor_linkedin_logo.trimEnd() || "https://placehold.co/50x50.png"
-              }
-              alt="logo"
-              width={20}
-              height={20}
-              className="mr-1.5 rounded"
-              unoptimized={true}
-            />
+        <div className="inline-flex items-center hover:font-semibold transition-all duration-200">
+          <Image
+            src={row.original.investor_linkedin_logo.trimEnd() || "https://placehold.co/50x50.png"}
+            alt="logo"
+            width={20}
+            height={20}
+            className="mr-1.5 rounded"
+            unoptimized={true}
+          />
+          <Link target="_blank" href={`/investors/${row.original.investor_id}` || "#"}>
             {row.getValue("investor_name") || "-"}
-          </div>
-        </InvestorSheet>
+          </Link>
+        </div>
+        // <InvestorSheet investor={row.original}>
+        //   <div className="inline-flex items-center hover:font-semibold transition-all duration-200">
+        //     <Image
+        //       src={
+        //         row.original.investor_linkedin_logo.trimEnd() || "https://placehold.co/50x50.png"
+        //       }
+        //       alt="logo"
+        //       width={20}
+        //       height={20}
+        //       className="mr-1.5 rounded"
+        //       unoptimized={true}
+        //     />
+        //     {row.getValue("investor_name") || "-"}
+        //   </div>
+        // </InvestorSheet>
       )
     },
   },

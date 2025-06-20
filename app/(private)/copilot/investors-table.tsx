@@ -100,35 +100,48 @@ export default function InvestorsResponseData({
       minSize: 200,
       cell: ({ row }) => {
         return (
-          <InvestorSheet
-            investor={{
-              id: Number(row.original.investor_id),
-              name: row.original.investor_name,
-              investor_linkedin_logo: row.original.investor_logo,
-              description: row.original.investor_description,
-              investor_LLM_country: row.original.investor_country,
-              investor_linkedin_city: row.original.investor_city,
-              investor_linkedin_description: row.original.investor_description,
-              founded_year: row.original.investor_founded_year,
-              investment_criteria_description: row.original.investor_investment_criteria,
-            }}
-          >
-            <button
-              disabled={loading}
-              className="hover:underline items-center inline-flex cursor-pointer hover:font-medium transition-all duration-200 text-left w-full"
-              type="button"
-            >
-              <Image
-                src={row.original.investor_logo || "https://placehold.co/50x50.png"}
-                alt={`${row.original.investor_name} logo`}
-                width={18}
-                height={18}
-                className="mr-1.5 rounded"
-                unoptimized={true}
-              />
-              <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_name} />
-            </button>
-          </InvestorSheet>
+          // <InvestorSheet
+          //   investor={{
+          //     id: Number(row.original.investor_id),
+          //     name: row.original.investor_name,
+          //     investor_linkedin_logo: row.original.investor_logo,
+          //     description: row.original.investor_description,
+          //     investor_LLM_country: row.original.investor_country,
+          //     investor_linkedin_city: row.original.investor_city,
+          //     investor_linkedin_description: row.original.investor_description,
+          //     founded_year: row.original.investor_founded_year,
+          //     investment_criteria_description: row.original.investor_investment_criteria,
+          //   }}
+          // >
+          //   <button
+          //     disabled={loading}
+          //     className="hover:underline items-center inline-flex cursor-pointer hover:font-medium transition-all duration-200 text-left w-full"
+          //     type="button"
+          //   >
+          //     <Image
+          //       src={row.original.investor_logo || "https://placehold.co/50x50.png"}
+          //       alt={`${row.original.investor_name} logo`}
+          //       width={18}
+          //       height={18}
+          //       className="mr-1.5 rounded"
+          //       unoptimized={true}
+          //     />
+          //     <GenerateSkeleton isPlaceholder={loading} text={row.original.investor_name} />
+          //   </button>
+          // </InvestorSheet>
+          <div className="inline-flex items-center hover:font-semibold transition-all duration-200">
+            <Image
+              src={(row.original.investor_logo?.trimEnd?.() && row.original.investor_logo.trimEnd()) || "https://placehold.co/50x50.png"}
+              alt="logo"
+              width={20}
+              height={20}
+              className="mr-1.5 rounded"
+              unoptimized={true}
+            />
+            <Link target="_blank" href={`/investors/${row.original.investor_id}` || "#"}>
+              {row.getValue("investor_name") || "-"}
+            </Link>
+          </div>
         )
       },
       enableSorting: true,
@@ -195,9 +208,8 @@ export default function InvestorsResponseData({
             id: investment.company_id.toString(),
             src: investment.company_logo || "https://placehold.co/400x400.png",
             alt: `${investment.company_name} logo`,
-            name: `${investment.company_name}${
-              investment.investment_year ? ` (${investment.investment_year})` : ""
-            }`,
+            name: `${investment.company_name}${investment.investment_year ? ` (${investment.investment_year})` : ""
+              }`,
           })) || []
 
         return (
@@ -246,7 +258,7 @@ export default function InvestorsResponseData({
         isLoading={loading}
         togglePanel={togglePanel}
         closeTabPanel={closeTabPanel}
-        loadMoreData={() => {}}
+        loadMoreData={() => { }}
         hasMoreData={false}
         titleName="Investors List"
         defaultPinnedColumns={["select", "investor_name"]}
