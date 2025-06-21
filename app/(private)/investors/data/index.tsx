@@ -5,13 +5,14 @@ import { getColumnsForData } from "./columns"
 import { useInvestors } from "@/hooks/useInvestors"
 import { useInvestorFilters } from "@/store/useInvestorFilters"
 import PinnableDataTable from "@/components/table/pinnable-data-table"
+import { toast } from "sonner"
 const InvestorData = () => {
-  const { appliedFilters, setLoading } = useInvestorFilters()
+  const { appliedFilters, setLoading  } = useInvestorFilters()
 
   const [from, setFrom] = useState(1)
   const pageSize = 30
 
-  const { data, isPending, isSuccess, isStale } = useInvestors({
+  const { data, isPending, isSuccess, isStale , isError} = useInvestors({
     ...(appliedFilters || {}),
     page: Math.ceil(from / pageSize),
     pageSize,
@@ -52,6 +53,12 @@ const InvestorData = () => {
       setFrom((prev) => prev + pageSize)
     }
   }
+  useEffect(()=>{
+    if(isError){
+      setLoading(false)
+      toast.warning('Data not available with these filters')
+    }
+  },[isError])
 
   return (
     <div className="h-full bg-gray-100 w-full overflow-x-auto p-4">

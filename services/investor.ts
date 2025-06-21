@@ -11,5 +11,8 @@ export const getInvestor = async (filters: any = {}) => {
   const query = qs.stringify(filters, { skipEmptyString: true, skipNull: true })
   const url = query ? `/api/investors?${query}` : "/api/investors"
   const { data } = await axios.get(url)
-  return data.data
+  if(data.success){
+    return data.data
+  }
+  return null
 }
