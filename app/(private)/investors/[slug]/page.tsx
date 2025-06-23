@@ -4,8 +4,8 @@ import Link from "next/link"
 import { ExternalLink, Linkedin, Calendar, Users } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const id = params.slug
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const id = (await params).slug
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
   try {
     const res = await fetch(`${baseUrl}/api/profile/investor_profile/${id}`, { cache: "no-store" })
@@ -19,10 +19,16 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     }
     return {
       title: `${profile.investor_name || "Investor"} | PMRadar`,
-      description: profile.investor_linkedin_description || profile.investors_LLM_description || "Investor profile on PMRadar.",
+      description:
+        profile.investor_linkedin_description ||
+        profile.investors_LLM_description ||
+        "Investor profile on PMRadar.",
       openGraph: {
         title: `${profile.investor_name || "Investor"} | PMRadar`,
-        description: profile.investor_linkedin_description || profile.investors_LLM_description || "Investor profile on PMRadar.",
+        description:
+          profile.investor_linkedin_description ||
+          profile.investors_LLM_description ||
+          "Investor profile on PMRadar.",
         images: [profile.investor_linkedin_logo || "https://placehold.co/50x50.png"],
       },
     }
@@ -34,8 +40,12 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default async function InvestorProfilePage({ params }: { params: { slug: string } }) {
-  const id = params.slug
+export default async function InvestorProfilePage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const id = (await params).slug
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
 
   const res = await fetch(`${baseUrl}/api/profile/investor_profile/${id}`, { cache: "no-store" })
@@ -46,7 +56,9 @@ export default async function InvestorProfilePage({ params }: { params: { slug: 
     return (
       <div className="flex flex-col items-center justify-center h-full p-10">
         <h1 className="text-2xl font-bold mb-4">Investor Not Found</h1>
-        <p className="text-gray-600">We couldn't find an investor with the id: <span className="font-mono">{id}</span></p>
+        <p className="text-gray-600">
+          We couldn't find an investor with the id: <span className="font-mono">{id}</span>
+        </p>
       </div>
     )
   }
@@ -102,20 +114,13 @@ export default async function InvestorProfilePage({ params }: { params: { slug: 
             </div>
             <div className="flex flex-wrap gap-2">
               {profile.investor_type && (
-                <Badge
-                  variant="secondary"
-                  className="bg-blue-50 text-blue-700 border-blue-200"
-                >
+                <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
                   {profile.investor_type}
                   {profile.investor_asset_classes && ` • ${profile.investor_asset_classes}`}
                 </Badge>
               )}
-              {profile.strategy && (
-                <Badge variant="secondary">{profile.strategy}</Badge>
-              )}
-              {profile.industry && (
-                <Badge variant="secondary">{profile.industry}</Badge>
-              )}
+              {profile.strategy && <Badge variant="secondary">{profile.strategy}</Badge>}
+              {profile.industry && <Badge variant="secondary">{profile.industry}</Badge>}
             </div>
           </div>
         </div>
@@ -158,17 +163,13 @@ export default async function InvestorProfilePage({ params }: { params: { slug: 
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <span>Type</span>
                   </div>
-                  <p className="font-medium">
-                    {profile.investor_type || "-"}
-                  </p>
+                  <p className="font-medium">{profile.investor_type || "-"}</p>
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <span>Asset Classes</span>
                   </div>
-                  <p className="font-medium">
-                    {profile.investor_asset_classes || "-"}
-                  </p>
+                  <p className="font-medium">{profile.investor_asset_classes || "-"}</p>
                 </div>
               </div>
             </div>
@@ -177,7 +178,8 @@ export default async function InvestorProfilePage({ params }: { params: { slug: 
           <div className="space-y-3">
             <h2 className="text-lg font-semibold text-gray-900">Investment Criteria</h2>
             <p className="text-gray-700 leading-relaxed">
-              {profile.investor_investment_criteria_description || "No investment criteria provided."}
+              {profile.investor_investment_criteria_description ||
+                "No investment criteria provided."}
             </p>
           </div>
         </div>

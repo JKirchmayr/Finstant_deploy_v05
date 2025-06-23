@@ -2,7 +2,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { getUserProfile, login, signup, updateUserProfile } from "./action"
+import { getUserProfile, login } from "./action"
 import { useEffect, useState } from "react"
 import { useAuthStore } from "@/store/authStore"
 import { createClient } from "@/lib/supabase/client"
@@ -30,8 +30,8 @@ export const useLoginUser = () => {
 }
 
 export const useAuth = () => {
-  const user = useAuthStore((s) => s.user)
-  const setUser = useAuthStore((s) => s.setUser)
+  const user = useAuthStore(s => s.user)
+  const setUser = useAuthStore(s => s.setUser)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {

@@ -10,16 +10,6 @@ interface NonMemoizedMarkdownProps {
 }
 
 const NonMemoizedMarkdown = ({ children }: NonMemoizedMarkdownProps) => {
-  const handleDownload = (content: string, language: string) => {
-    const element = document.createElement("a")
-    const file = new Blob([content], { type: "text/plain" })
-    element.href = URL.createObjectURL(file)
-    element.download = `code.${language}`
-    document.body.appendChild(element)
-    element.click()
-    document.body.removeChild(element)
-  }
-
   const components = {
     code({ node, inline, className, children, ...props }: any) {
       ;<code
