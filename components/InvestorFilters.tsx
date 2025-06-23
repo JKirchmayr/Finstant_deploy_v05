@@ -1,5 +1,5 @@
 "use client"
-import { ListFilterPlus, Loader2 } from "lucide-react"
+import { ListFilterPlus, Loader2, Sparkles } from "lucide-react"
 import React, { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
 import { Checkbox } from "./ui/checkbox"
@@ -46,7 +46,7 @@ const InvestorFilters = () => {
   const {
     applyFilters: applyInvestorFilters,
     resetFilters: resetInvestorFilters,
-    isLoading,
+    isLoading: globalLoading,
     setLoading,
   } = useInvestorFilters()
 
@@ -61,12 +61,17 @@ const InvestorFilters = () => {
     investorLocation: [] as string[],
   })
 
+  const [localLoading, setLocalLoading] = useState(false)
+
   const handleMinMaxChange = (key: string, value: string) => {
-    setInvestor((prev) => ({ ...prev, [key]: value }))
+    setInvestor(prev => ({ ...prev, [key]: value }))
   }
 
   const handleSearch = () => {
-    applyInvestorFilters(investor)
+    if (isInvestorFilterApplied) {
+      setLocalLoading(true)
+      applyInvestorFilters({ ...investor, _searchId: Date.now() })
+    }
   }
 
   const handleClear = () => {
@@ -85,21 +90,21 @@ const InvestorFilters = () => {
   }
 
   const handleInvestorChange = (selected: string[]) => {
-    setInvestor((prev) => ({
+    setInvestor(prev => ({
       ...prev,
       investorType: selected,
     }))
   }
 
   const handleSelectCountries = (countries: string[]) => {
-    setInvestor((prev) => ({
+    setInvestor(prev => ({
       ...prev,
       investorLocation: countries,
     }))
   }
 
   const handleSelectIndustries = (industries: string[]) => {
-    setInvestor((prev) => ({
+    setInvestor(prev => ({
       ...prev,
       industry: industries,
     }))
@@ -112,7 +117,8 @@ const InvestorFilters = () => {
     investor.ebitdaMin ||
     investor.ebitdaMax ||
     investor.industry.length > 0 ||
-    investor.investorLocation.length > 0
+    investor.investorLocation.length > 0 ||
+    investor.description
 
   useEffect(() => {
     setInvestor({
@@ -127,6 +133,13 @@ const InvestorFilters = () => {
     })
     resetInvestorFilters()
   }, [])
+
+  // Sync local loading with global loading
+  useEffect(() => {
+    if (!globalLoading) {
+      setLocalLoading(false)
+    }
+  }, [globalLoading])
 
   const accordionItemsConfig = [
     {
@@ -160,7 +173,7 @@ const InvestorFilters = () => {
             step={1}
             value={[Number(investor.ebitdaMin) || 0, Number(investor.ebitdaMax) || 200]}
             onInput={(val: number[]) => {
-              setInvestor((prev) => ({
+              setInvestor(prev => ({
                 ...prev,
                 ebitdaMin: val[0].toString(),
                 ebitdaMax: val[1].toString(),
@@ -190,7 +203,7 @@ const InvestorFilters = () => {
             step={1}
             value={[Number(investor.revenueMin) || 0, Number(investor.revenueMax) || 200]}
             onInput={(val: number[]) => {
-              setInvestor((prev) => ({
+              setInvestor(prev => ({
                 ...prev,
                 revenueMin: val[0].toString(),
                 revenueMax: val[1].toString(),
@@ -218,7 +231,7 @@ const InvestorFilters = () => {
             </h1>
           </div> */}
           <div className="p-3 pt-1">
-            {accordionItemsConfig.map((item) => (
+            {accordionItemsConfig.map(item => (
               <div key={item.value} className="pb-2">
                 <div className="hover:no-underline hover:cursor-pointer pb-1 font-medium">
                   {item.title}
@@ -234,19 +247,19 @@ const InvestorFilters = () => {
           </div>
           <div className="pb-2 p-3 pt-1">
             <div className="hover:no-underline hover:cursor-pointer font-medium mb-2">
-              Target Description
+              Target Description <Sparkles size={14} className="text-blue-700" />
             </div>
             <div className="overflow-visible z-10">
               <DiscriptionFilter
                 value={investor.description}
-                onChange={(val) => setInvestor((prev) => ({ ...prev, description: val }))}
-                onKeyDown={(e) => {
+                onChange={val => setInvestor(prev => ({ ...prev, description: val }))}
+                onKeyDown={e => {
                   if (e.key === "Enter") {
                     e.preventDefault()
                     handleSearch()
                   }
                 }}
-                isLoading={isLoading}
+                isLoading={globalLoading}
               />
             </div>
           </div>
@@ -256,8 +269,9 @@ const InvestorFilters = () => {
             </div>
             <div className="overflow-visible z-10">
               <CategorizedCountryMultiSelect
+                value={investor.investorLocation}
                 onSelecCountries={(countries: Option[]) =>
-                  handleSelectCountries(countries.map((c) => c.label))
+                  handleSelectCountries(countries.map(c => c.label))
                 }
               />
             </div>
@@ -273,7 +287,8 @@ const InvestorFilters = () => {
                   commandProps={{
                     label: "Select Industry",
                   }}
-                  onChange={(v) => handleSelectIndustries(v.map((i) => i.value))}
+                  value={industryOptions.filter(opt => investor.industry.includes(opt.value))}
+                  onChange={v => handleSelectIndustries(v.map(i => i.value))}
                   defaultOptions={industryOptions}
                   placeholder="Select Industry"
                   hidePlaceholderWhenSelected
@@ -288,12 +303,12 @@ const InvestorFilters = () => {
 
       <div className="relative z-50 border-t border-gray-300 px-3 py-2 min-h-[50px] grid grid-cols-2 gap-3">
         <button
-          className="px-6 py-2 bg-gray-900 text-white rounded-sm cursor-pointer"
+          className="px-6 py-2 bg-gray-900 text-white rounded-sm cursor-pointer flex items-center justify-center"
           onClick={handleSearch}
-          disabled={isLoading}
+          disabled={globalLoading || localLoading}
           type="button"
         >
-          {isLoading && !investor.description ? (
+          {(globalLoading || localLoading) && !investor.description ? (
             <Loader2 className="animate-spin w-5 h-5" />
           ) : (
             "Search"
@@ -341,7 +356,7 @@ const DiscriptionFilter = ({
         placeholder="Describe the company you are looking for..."
         className="w-full h-full max-h-24 bg-white border border-gray-300 rounded-sm p-2 text-gray-700"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={e => onChange(e.target.value)}
         rows={4}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
@@ -422,7 +437,7 @@ interface InvestorsProps {
 const InvestorsFilter: React.FC<InvestorsProps> = ({ options, selectedInvestors, onChange }) => {
   const handleCheckboxChange = (value: string) => {
     const newInvestor = selectedInvestors.includes(value)
-      ? selectedInvestors.filter((item) => item !== value)
+      ? selectedInvestors.filter(item => item !== value)
       : [...selectedInvestors, value]
     onChange(newInvestor)
   }
@@ -430,12 +445,12 @@ const InvestorsFilter: React.FC<InvestorsProps> = ({ options, selectedInvestors,
   return (
     <div className="flex flex-col justify-between gap-2 ">
       <div className="flex flex-col gap-1 ">
-        {options.map((option) => (
+        {options.map(option => (
           <div className="flex items-center space-x-2" key={option.value}>
             <Checkbox
               id={option.value}
               checked={selectedInvestors.includes(option.value)}
-              onCheckedChange={(checked) => handleCheckboxChange(option.value)}
+              onCheckedChange={checked => handleCheckboxChange(option.value)}
             />
             <label
               htmlFor={option.value}

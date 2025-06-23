@@ -26,72 +26,73 @@ export async function login({ email, password }: { email: string; password: stri
   return data.session
 }
 
-export async function signup({ email, password }: SignupCredType) {
-  const supabase = await createClient()
+// export async function signup({ email, password }: SignupCredType) {
+//   const supabase = await createClient()
 
-  const { error, data } = await supabase.auth.signUp({ email, password })
+//   const { error, data } = await supabase.auth.signUp({ email, password })
 
-  if (data?.user) {
-    const { error: userError } = await supabase.from("users").insert([
-      {
-        auth_user_id: data.user.id,
-        email: data.user.email,
-      },
-    ])
+//   if (data?.user) {
+//     const { error: userError } = await supabase.from("users").insert([
+//       {
+//         auth_user_id: data.user.id,
+//         email: data.user.email,
+//       },
+//     ])
 
-    if (userError) {
-      console.log("User table insert error:", userError)
-      throw new Error(userError.message)
-    }
-  }
+//     if (userError) {
+//       console.log("User table insert error:", userError)
+//       throw new Error(userError.message)
+//     }
+//   }
 
-  if (error) {
-    throw new Error(error.message)
-  }
+//   if (error) {
+//     throw new Error(error.message)
+//   }
 
-  return data
-}
+//   return data
+// }
 
 export async function getUserProfile() {
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getUser()
 
-  if (error || !data.user) {
-    redirect("/login")
-  }
+  return null
+  // if (error || !data.user) {
+  //   redirect("/login")
+  // }
 
-  // Fetch user profile from DB
-  const { data: userProfile, error: userError } = await supabase
-    .from("users")
-    .select("*")
-    .eq("auth_user_id", data.user.id)
-    .single()
+  // // Fetch user profile from DB
+  // const { data: userProfile, error: userError } = await supabase
+  //   .from("users")
+  //   .select("*")
+  //   .eq("auth_user_id", data.user.id)
+  //   .single()
 
-  if (userError) {
-    throw new Error("Failed to fetch profile")
-  }
+  // if (userError) {
+  //   throw new Error("Failed to fetch profile")
+  // }
 
-  return userProfile
+  // return userProfile
 }
 
-export async function updateUserProfile(profileData: { fname: string; lname: string }) {
-  const supabase = await createClient()
-  const { data: session } = await supabase.auth.getSession()
+// export async function updateUserProfile(profileData: { fname: string; lname: string }) {
+//   const supabase = await createClient()
+//   const { data: session } = await supabase.auth.getSession()
 
-  if (!session?.session) {
-    redirect("/login")
-  }
+//   if (!session?.session) {
+//     redirect("/login")
+//   }
 
-  const { data: updatedUser, error } = await supabase
-    .from("users")
-    .update(profileData)
-    .eq("auth_user_id", session.session.user.id)
-    .select("*")
-    .single()
+//   const { data: updatedUser, error } = await supabase
+//     .from("users")
+//     .update(profileData)
+//     .eq("auth_user_id", session.session.user.id)
+//     .select("*")
+//     .single()
 
-  if (error) {
-    throw new Error("Failed to update profile")
-  }
+//   if (error) {
+//     throw new Error("Failed to update profile")
+//   }
 
-  return updatedUser
-}
+//   return updatedUser
+// }

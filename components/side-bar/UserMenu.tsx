@@ -13,42 +13,33 @@ import {
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
+import { useAuthStore } from "@/store/authStore";
 
 export default function UserMenu({ isCollapsed }: { isCollapsed: boolean }) {
   const [loading, setLoading] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const router = useRouter();
-  // const handleLogout = async () => {
-  //     setLoading(true);
-  //     await supabase.auth.signOut();
-  //     router.replace('/login');
-  //     setLoading(false);
-  // };
+  const {setUser} = useAuthStore()
+  const supabase = createClient()
 
-  // if (isUserLoading) {
-  //     return (
-  //         <div className="flex items-center gap-2 animate-pulse">
-  //             <div className="w-10 h-10 bg-gray-300 rounded-full" />
-  //             <div className="w-24 h-4 bg-gray-300 rounded" />
-  //         </div>
-  //     );
-  // }
+  async function handleLogout() {
+    try {
+      const {error} = await supabase.auth.signOut()
+      
+      if(error){
+        toast.error('Error while logging out, Please try again')
+        return
+      }
+      toast.success('Logout "successful" 👍')
+      router.replace('/login')
 
-  // const fname = userData?.fname;
+    } catch (error) {
+      toast.error("Failed to log out. Please try again.")
+      console.error("Logout Error:", error)
+    }
+  }
 
-  // if (!fname) {
-  //     return (
-  //         <SidebarMenuButton
-  //             disabled={loading}
-  //             tooltip="Logout"
-  //             onClick={handleLogout}
-  //             className="hover:bg-red-500 hover:text-white"
-  //         >
-  //             <LogOut className="!size-5" />
-  //             <span>{loading ? 'Logging out...' : 'Logout'}</span>
-  //         </SidebarMenuButton>
-  //     );
-  // }
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -94,7 +85,7 @@ export default function UserMenu({ isCollapsed }: { isCollapsed: boolean }) {
       <DropdownMenuContent align="end" className="w-40">
         <DropdownMenuItem
           disabled={loading}
-          //   onClick={handleLogout}
+          onClick={handleLogout}
           className="text-red-500 hover:bg-red-500 hover:text-white cursor-pointer"
         >
           <LogOut className="w-4 h-4 mr-2" />

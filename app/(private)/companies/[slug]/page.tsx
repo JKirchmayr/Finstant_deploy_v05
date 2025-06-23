@@ -4,8 +4,8 @@ import Link from "next/link"
 import { MapPin, Globe, Calendar, Users, DollarSign, Linkedin } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const id = params.slug
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const id = (await params).slug
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
   try {
     const res = await fetch(`${baseUrl}/api/profile/company_profile/${id}`, { cache: "no-store" })
@@ -19,10 +19,16 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     }
     return {
       title: `${profile.company_name || "Company"} | PMRadar`,
-      description: profile.companies_linkedin_about || profile.companies_LLM_description || "Company profile on PMRadar.",
+      description:
+        profile.companies_linkedin_about ||
+        profile.companies_LLM_description ||
+        "Company profile on PMRadar.",
       openGraph: {
         title: `${profile.company_name || "Company"} | PMRadar`,
-        description: profile.companies_linkedin_about || profile.companies_LLM_description || "Company profile on PMRadar.",
+        description:
+          profile.companies_linkedin_about ||
+          profile.companies_LLM_description ||
+          "Company profile on PMRadar.",
         images: [profile.companies_linkedin_logo_url || "https://placehold.co/50x50.png"],
       },
     }
@@ -34,8 +40,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default async function CompanyProfile({ params }: { params: { slug: string } }) {
-  const id = params.slug
+export default async function CompanyProfile({ params }: { params: Promise<{ slug: string }> }) {
+  const id = (await params).slug
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
 
   const res = await fetch(`${baseUrl}/api/profile/company_profile/${id}`, { cache: "no-store" })
@@ -46,7 +52,9 @@ export default async function CompanyProfile({ params }: { params: { slug: strin
     return (
       <div className="flex flex-col items-center justify-center h-full p-10">
         <h1 className="text-2xl font-bold mb-4">Company Not Found</h1>
-        <p className="text-gray-600">We couldn't find a company with the id: <span className="font-mono">{id}</span></p>
+        <p className="text-gray-600">
+          We couldn't find a company with the id: <span className="font-mono">{id}</span>
+        </p>
       </div>
     )
   }
@@ -102,10 +110,7 @@ export default async function CompanyProfile({ params }: { params: { slug: strin
             </div>
             <div className="flex flex-wrap gap-2">
               {profile.companies_linkedin_industries && (
-                <Badge
-                  variant="secondary"
-                  className="bg-blue-50 text-blue-700 border-blue-200"
-                >
+                <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
                   {profile.companies_linkedin_industries}
                 </Badge>
               )}
@@ -161,7 +166,9 @@ export default async function CompanyProfile({ params }: { params: { slug: strin
                     <span>Revenue</span>
                   </div>
                   <p className="font-medium">
-                    {profile.companies_revenue_estimate_mEUR ? `€${profile.companies_revenue_estimate_mEUR}M` : "Not Available"}
+                    {profile.companies_revenue_estimate_mEUR
+                      ? `€${profile.companies_revenue_estimate_mEUR}M`
+                      : "Not Available"}
                   </p>
                 </div>
                 <div className="space-y-1">
@@ -170,7 +177,9 @@ export default async function CompanyProfile({ params }: { params: { slug: strin
                     <span>EBITDA</span>
                   </div>
                   <p className="font-medium">
-                    {profile.companies_EBITDA_estimate_mEUR ? `€${profile.companies_EBITDA_estimate_mEUR}M` : "-"}
+                    {profile.companies_EBITDA_estimate_mEUR
+                      ? `€${profile.companies_EBITDA_estimate_mEUR}M`
+                      : "-"}
                   </p>
                 </div>
               </div>

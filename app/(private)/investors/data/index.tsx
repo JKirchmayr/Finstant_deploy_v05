@@ -1,53 +1,64 @@
 "use client"
 import DataTable from "@/components/table/data-table"
-import React, { useEffect } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import { getColumnsForData } from "./columns"
 import { useInvestors } from "@/hooks/useInvestors"
 import { useInvestorFilters } from "@/store/useInvestorFilters"
 import PinnableDataTable from "@/components/table/pinnable-data-table"
+import { toast } from "sonner"
 const InvestorData = () => {
-  const { appliedFilters, setLoading } = useInvestorFilters()
-  console.log(appliedFilters, "appliedFilters")
+  const { appliedFilters, setLoading  } = useInvestorFilters()
 
-  const [from, setFrom] = React.useState(1)
-  const [to, setTo] = React.useState(30)
+  const [from, setFrom] = useState(1)
+  const pageSize = 30
 
-  const { data, isPending, isSuccess, isError } = useInvestors({
+  const { data, isPending, isSuccess, isStale , isError} = useInvestors({
     ...(appliedFilters || {}),
-    from,
-    to,
+    page: Math.ceil(from / pageSize),
+    pageSize,
   })
 
-  const [moreData, setMoreData] = React.useState<any[]>([])
-  const [hasMoreData, setHasMoreData] = React.useState(false)
+  const [moreData, setMoreData] = useState<any[]>([])
+  const [hasMoreData, setHasMoreData] = useState(false)
 
-  React.useEffect(() => {
+  // Track last applied filters to detect new search
+  const lastFiltersRef = useRef<any>(null)
+
+  useEffect(() => {
+    // If filters changed, it's a new search
+    if (JSON.stringify(appliedFilters) !== JSON.stringify(lastFiltersRef.current)) {
+      setFrom(1)
+      setLoading(true)
+      lastFiltersRef.current = appliedFilters
+    }
+  }, [appliedFilters, setLoading])
+
+  useEffect(() => {
     if (data && from === 1) {
       setMoreData(data)
+      setLoading(false) // Only stop loading for first page (new search)
     } else if (data && from > 1) {
       setMoreData((prev) => [...prev, ...data])
     }
-    if (data && data.length < to - from + 1) {
+
+    if (data && data.length < pageSize) {
       setHasMoreData(false)
-    } else if (data && data.length === to - from + 1) {
+    } else if (data && data.length === pageSize) {
       setHasMoreData(true)
     }
-  }, [data, from, to])
+  }, [data, from, setLoading, pageSize])
 
   const loadMoreData = () => {
     if (!isPending && hasMoreData) {
-      setFrom((prev) => prev + (to - from + 1))
-      setTo((prev) => prev + (to - from + 1))
+      setFrom((prev) => prev + pageSize)
     }
   }
-
-  useEffect(() => {
-    if (isSuccess || !isPending || isError) {
+  useEffect(()=>{
+    if(isError){
       setLoading(false)
+      toast.warning('Data not available with these filters')
     }
-  }, [isSuccess, isPending, isError])
-
-  // console.log(moreData)
+  },[isError])
 
   return (
     <div className="h-full bg-gray-100 w-full overflow-x-auto p-4">
@@ -65,3 +76,4 @@ const InvestorData = () => {
 }
 
 export default InvestorData
+

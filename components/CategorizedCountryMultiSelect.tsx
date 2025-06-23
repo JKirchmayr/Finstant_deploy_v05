@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React from "react"
 import MultipleSelector, { Option } from "./ui/multiselect"
 
 const categorizedOptions: Option[] = [
@@ -31,26 +31,22 @@ const categorizedOptions: Option[] = [
 ]
 
 export function CategorizedCountryMultiSelect({
+  value = [],
   onSelecCountries,
 }: {
+  value?: string[]
   onSelecCountries: (countries: Option[]) => void
 }) {
-  const [selectedCountries, setSelectedCountries] = React.useState<Option[]>([])
+  // Derive selected options from value prop
+  const selectedCountries = value.length > 0
+    ? categorizedOptions.filter(opt => value.includes(opt.label))
+    : []
 
-  const handleChange = (options: Option[]) => {
-    setSelectedCountries(options)
-  }
-
-  useEffect(() => {
-    if (selectedCountries.length > 0) {
-      onSelecCountries(selectedCountries)
-    }
-  }, [selectedCountries])
   return (
     <MultipleSelector
       noAbsolute
       value={selectedCountries}
-      onChange={handleChange}
+      onChange={onSelecCountries}
       options={categorizedOptions}
       defaultOptions={categorizedOptions}
       placeholder="Select countries..."

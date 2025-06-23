@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useEffect } from "react"
 import { Command as CommandPrimitive, useCommandState } from "cmdk"
-import { XIcon } from "lucide-react"
+import { ChevronDown, XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command"
@@ -508,7 +508,11 @@ const MultipleSelector = ({
               inputProps?.className
             )}
           />
-          <button
+          {!(selected.length !== 0 && !disabled) ? (
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+              <ChevronDown size={18} />
+            </span>
+          ) : <button
             type="button"
             onClick={() => {
               setSelected(selected.filter((s) => s.fixed))
@@ -520,12 +524,12 @@ const MultipleSelector = ({
                 disabled ||
                 selected.length < 1 ||
                 selected.filter((s) => s.fixed).length === selected.length) &&
-                "hidden"
+              "hidden"
             )}
             aria-label="Clear all"
           >
             <XIcon size={16} aria-hidden="true" />
-          </button>
+          </button>}
         </div>
       </div>
       <div className="relative">
@@ -588,7 +592,7 @@ const MultipleSelector = ({
                               className={cn(
                                 "cursor-pointer",
                                 option.disable &&
-                                  "pointer-events-none cursor-not-allowed opacity-50"
+                                "pointer-events-none cursor-not-allowed opacity-50"
                               )}
                             >
                               {option?.flag && (

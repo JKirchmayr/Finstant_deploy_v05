@@ -9,6 +9,9 @@ interface InvestorFilterPayload {
   industry?: string[]
   investorLocation?: string[]
   description?: string
+  from?: number
+  to?: number
+  _searchId?: number
 }
 
 interface InvestorFilterState {
@@ -22,17 +25,13 @@ interface InvestorFilterState {
 export const useInvestorFilters = create<InvestorFilterState>(set => ({
   appliedFilters: null,
   isLoading: false,
-  applyFilters: async filters => {
+  applyFilters: filters => {
+    set({ appliedFilters: { ...filters } })
     set({ isLoading: true })
-    try {
-      set({ appliedFilters: { ...filters } }) // ✅ store filter values
-    } finally {
-      set({ isLoading: false })
-    }
   },
 
   resetFilters: () => {
-    set({ appliedFilters: null }) // ❌ reset to empty
+    set({ appliedFilters: null })
   },
 
   setLoading: (loading: boolean) => {

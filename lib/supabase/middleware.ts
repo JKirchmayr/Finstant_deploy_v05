@@ -19,7 +19,7 @@ export async function updateSession(request: NextRequest) {
 
   // Redirect authenticated users away from login/register
   if (isAuthenticated && isAuthRoute) {
-    return NextResponse.redirect(new URL("/companies", request.url))
+    return NextResponse.redirect(new URL("/copilot", request.url))
   }
 
   // Redirect unauthenticated users trying to access protected routes (excluding "/")
