@@ -246,7 +246,7 @@ const InvestorFilters = () => {
             </h1>
           </div>
           <div className="pb-2 p-3 pt-1">
-            <div className="hover:no-underline hover:cursor-pointer font-medium mb-2">
+            <div className="hover:no-underline hover:cursor-pointer font-medium mb-2 flex gap-2">
               Target Description <Sparkles size={14} className="text-blue-700" />
             </div>
             <div className="overflow-visible z-10">
