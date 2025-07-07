@@ -17,7 +17,7 @@ type Company = {
   similarity_score: number
 }
 
-const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL! || ""
+const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
 
 const Chat = () => {
   const { user, loading } = useAuth()
@@ -99,7 +99,7 @@ const Chat = () => {
       let accumulatedJSONChunks = []
       let investors = [] as any[]
       let companies = [] as any[]
-      let comapanyProfile
+      let companyProfile
       let investorProfile
       let parsed
 
@@ -227,12 +227,12 @@ const Chat = () => {
               }
 
               if (eventType === "done") {
-                if (comapanyProfile) {
+                if (companyProfile) {
                   append({
                     role: "data",
                     content: JSON.stringify({
                       type: "company_profile",
-                      comapanyProfile,
+                      companyProfile,
                       isLoading: false,
                     }),
                   })
@@ -277,7 +277,7 @@ const Chat = () => {
                 const profileData = parsed?.data
 
                 if (profileData?.type === "company_profile") {
-                  comapanyProfile = {
+                  companyProfile = {
                     company_id: profileData.company_id || 0,
                     company_name: profileData.company_name || "Unknown Company",
                     company_description: profileData.company_description || "-",
