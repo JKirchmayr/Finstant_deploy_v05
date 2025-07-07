@@ -108,7 +108,7 @@ export function ChatProfileCard({ data }: { data: ProfileData }) {
             <h1 className="text-xl font-bold truncate mb-1">{name ?? "Not Available"}</h1>
             <p className="flex items-center truncate text-xs text-accent-foreground/60 font-medium">
               <MapPin className="h-3.5 w-3.5 mr-0.5 shrink-0" />
-              {location} df
+              {location}
             </p>
           </div>
         </div>
