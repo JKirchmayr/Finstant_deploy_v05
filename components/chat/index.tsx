@@ -10,6 +10,8 @@ import { useSingleTabStore } from "@/store/singleTabStore"
 import { ChatProfileCard } from "@/components/ChatProfileCard"
 import { usePathname } from "next/navigation"
 import { PromptField } from "@/components/chat/PromptField"
+import { BottomSuggestions, Suggestions } from "./Suggestions"
+import { ActiveProjects } from "./ActiveProjects"
 
 type Company = {
   company_name: string
@@ -332,15 +334,16 @@ const Chat = () => {
 
   return (
     <div className={cn(`bg-white h-full transition-all ease-in-out`)}>
-      <div
+      <Suggestions />
+      {/* <div
         className={cn(
           `max-w-3xl mx-auto h-full grid grid-rows-[20px_1fr] relative overflow-hidden transition-transform ease-in-out duration-300`,
           {
             "grid-rows-[1fr_100px]": messages.length,
           }
         )}
-      >
-        <div className={cn("overflow-y-auto px-4 pt-4 m space-y-2 noscroll")}>
+      > */}
+      {/* <div className={cn("overflow-y-auto px-4 pt-4 m space-y-2 noscroll")}>
           {messages.map((m, i) => {
             const isUser = m.role === "user"
             const isAssistant = m.role === "assistant"
@@ -404,23 +407,29 @@ const Chat = () => {
           )}
 
           <div className={cn("h-5 opacity-0", { "h-20": messages.length > 1 })} ref={endRef} />
-        </div>
-        <div
-          className={cn("flex justify-center items-center")}
-          style={{
-            // height: messages.length > 0 ? 100 : 0,
-            transition: "all 0.3s",
-          }}
-        >
-          <PromptField
-            handleSend={handleSend}
-            input={input}
-            handleInputChange={handleInputChange}
-            isLoading={isStreaming}
-            messages={messages}
-          />
-        </div>
+        </div> */}
+      <div
+        className={cn("flex justify-center items-center max-w-3xl mx-auto")}
+        style={{
+          // height: messages.length > 0 ? 100 : 0,
+          transition: "all 0.3s",
+        }}
+      >
+        <PromptField
+          handleSend={handleSend}
+          input={input}
+          handleInputChange={handleInputChange}
+          isLoading={isStreaming}
+          messages={messages}
+        />
       </div>
+      <div className="max-w-3xl mx-auto py-4 px-2">
+        <BottomSuggestions setInput={setInput} />
+      </div>
+      <div className="max-w-3xl mx-auto pt-4 px-2 pb-4">
+        <ActiveProjects />
+      </div>
+      {/* </div> */}
     </div>
   )
 }

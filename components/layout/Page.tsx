@@ -1,6 +1,5 @@
 "use client"
 import React from "react"
-import Header from "../shared/Header"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import Filters from "../Filters"

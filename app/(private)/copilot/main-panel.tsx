@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { useTabPanelStore } from "@/store/tabStore"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
-import Chat from "./chat"
+import Chat from "../../../components/chat"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft } from "lucide-react"
 

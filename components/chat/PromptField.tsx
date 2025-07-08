@@ -1,42 +1,14 @@
 import { cn } from "@/lib/utils"
-import { ArrowUp, Loader2 } from "lucide-react"
-import Image from "next/image"
+import { ArrowUp, AtSign, ChevronDown, Loader2, Paperclip } from "lucide-react"
 import React from "react"
 import { useRef, useState, useEffect } from "react"
 import TextareaAutosize from "react-textarea-autosize"
-
-type SuggestionCategories = {
-  [key: string]: string[]
-}
-
-const suggestions: SuggestionCategories = {
-  companies: [
-    "Show me AI companies in Germany",
-    "List biotech startups in the US",
-    "Companies working on climate change",
-    "Indian healthtech companies",
-    "Fintech companies with recent funding",
-    "German deep tech startups",
-  ],
-
-  investors: [
-    "Investors focused on AI startups",
-    "VCs investing in Southeast Asia",
-    "List climate tech investors in Europe",
-    "Healthtech investors in the US",
-    "Show fintech-focused investors",
-    "Investors backing diverse founders",
-  ],
-
-  deals: [
-    "Show recent Series A deals",
-    "Find latest healthtech acquisitions",
-    "List climate tech funding rounds",
-    "Show fintech investments in 2024",
-    "Find AI startup deals in Europe",
-    "List recent deep tech investments",
-  ],
-}
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu"
 
 export const PromptField = ({
   handleSend,
@@ -52,8 +24,9 @@ export const PromptField = ({
   messages: any
 }) => {
   const textareaRef = useRef<any>(null)
-  const [showSuggestions, setShowSuggestions] = useState(true)
-  const [type, setType] = useState<string>("companies")
+
+  const [isWeb, setIsWeb] = useState<boolean>(true)
+  const [isNorthData, setIsNorthData] = useState<boolean>(true)
 
   useEffect(() => {
     const textarea = textareaRef.current
@@ -69,60 +42,25 @@ export const PromptField = ({
   const internalHandleSend = (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim()) return
-
-    setShowSuggestions(false) // Hide suggestions after real submit
     handleSend(e)
   }
   return (
     <div
-      className={cn("h-[300px] w-full px-2 ", {
+      className={cn("h-full w-full px-2 ", {
         "h-[200px]": messages.length > 0,
       })}
       style={{ transition: "all 0.3s" }}
     >
-      {!messages.length && (
-        <div className="flex justify-center items-center mb-3 flex-col gap-y-3">
-          <h1 className="font-heading text-pretty text-center text-sm font-medium tracking-tighter text-gray-900 sm:text-xl">
-            Ask me about :
-          </h1>
-          <div className="flex space-x-6">
-            {[
-              { label: "Companies", img: "/images/office-co.png" },
-              { label: "Investors", img: "/images/investor-co.png" },
-              { label: "Deals", img: "/images/handshake-co.png" },
-            ].map((item, index) => (
-              <span
-                key={index}
-                onClick={() => setType(item.label.toLowerCase())}
-                className={cn(
-                  "px-4 py-2 rounded-full text-sm font-medium cursor-pointer flex flex-col items-center"
-                )}
-              >
-                <Image
-                  src={item.img}
-                  alt={`${item.label} Icon`}
-                  width={80}
-                  height={80}
-                  className="inline-block mr-1"
-                />
-                <span
-                  className={cn("text-gray-400 mt-4 transition p-1 px-1.5 rounded-xl", {
-                    " text-foreground bg-foreground/5  ": type === item.label.toLowerCase(),
-                  })}
-                >
-                  {item.label}
-                </span>{" "}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
       <form
         onSubmit={internalHandleSend}
-        className="focus-within:border-gray-300 bg-white border-gray-300 relative rounded-xl border shadow-[0_2px_2px_rgba(0,0,0,0.08),0_8px_8px_-8px_rgba(0,0,0,0.08),0_0_8px_rgba(128,128,128,0.2)] transition-shadow"
+        className="focus-within:border-gray-300 bg-background border-gray-300 relative rounded-xl border transition-shadow"
       >
-        <div className="@container/textarea bg-white relative z-10 grid min-h-[100px] rounded-xl overflow-hidden">
+        <div className="pt-1.5 px-2">
+          <button className="bg-accent text-muted-foreground hover:text-foreground cursor-pointer p-[4px]  rounded text-xs leading-3 text-center">
+            @ context
+          </button>
+        </div>
+        <div className="@container/textarea bg-background relative z-10 grid min-h-[100px] rounded-xl overflow-hidden">
           <TextareaAutosize
             ref={textareaRef}
             value={input}
@@ -145,10 +83,38 @@ export const PromptField = ({
               // { "max-h-[150px]": messages.length > 0 }
             )}
           />
-          <div className="flex items-center gap-2 pb-3 px-3">
+          <div className="flex justify-between gap-2 pb-2 px-2">
+            <div className="p-1 flex gap-4">
+              <button className="bg-accent inline-flex gap-1 justify-center items-center text-muted-foreground hover:text-foreground cursor-pointer px-1.5 p-0.5 rounded text-xs leading-3 text-center">
+                <Paperclip className="size-2.5" /> Attach
+              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="bg-accent inline-flex gap-1 justify-center items-center text-muted-foreground hover:text-foreground cursor-pointer px-1.5 p-0.5 rounded text-xs leading-3 text-center">
+                    Sources <ChevronDown className="size-3" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuCheckboxItem
+                    className="h-7 cursor-pointer"
+                    checked={isWeb}
+                    // onCheckedChange={setIsWeb}
+                  >
+                    Web
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    className="h-7 cursor-pointer"
+                    checked={isNorthData}
+                    // onCheckedChange={setIsNorthData}
+                  >
+                    North Data
+                  </DropdownMenuCheckboxItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             <div className="ml-auto flex items-center gap-1">
               <button
-                className=" inline-flex shrink-0 cursor-pointer select-none items-center justify-center gap-1.5 whitespace-nowrap text-nowrap border-none font-medium outline-none transition-all disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400  [&>svg]:pointer-events-none [&>svg]:size-4 [&_svg]:shrink-0  text-background bg-foreground hover:bg-gray-700 px-3 text-sm has-[>kbd]:gap-2 has-[>svg]:px-2 has-[>kbd]:pr-[6px] ml-1 size-7 rounded-md"
+                className="inline-flex shrink-0 cursor-pointer select-none items-center text-xs font-normal justify-center gap-1.5 whitespace-nowrap text-nowrap border-none outline-none transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600 [&>svg]:pointer-events-none [&>svg]:size-4 [&_svg]:shrink-0  text-background bg-foreground hover:bg-gray-700 px-3 py-1 rounded"
                 type="submit"
                 disabled={isLoading || !input.trim().length}
                 onClick={internalHandleSend}
@@ -156,27 +122,13 @@ export const PromptField = ({
                 {isLoading ? (
                   <Loader2 className="animate-spin w-5 h-5 text-black [animation-duration:0.3s]" />
                 ) : (
-                  <ArrowUp size={20} />
+                  "Ask Finstant"
                 )}
               </button>
             </div>
           </div>
         </div>
       </form>
-
-      {!messages.length && showSuggestions && (
-        <div className="mt-3 flex flex-wrap gap-2 mx-4">
-          {suggestions[type as keyof typeof suggestions].map((suggestion: string) => (
-            <button
-              key={suggestion}
-              onClick={() => handleInputChange({ target: { value: suggestion } })}
-              className="text-[13px] text-foreground/80 hover:text-foreground bg-white hover:bg-gray-100 px-3 py-1.5 rounded-md border border-gray-200 hover:border-gray-300 transition cursor-pointer"
-            >
-              {suggestion}
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   )
 }
