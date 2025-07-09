@@ -149,6 +149,7 @@ const Chat = () => {
             const cleaned = event.replace(/^data:/, "").trim()
             try {
               parsed = JSON.parse(cleaned)
+              console.log(parsed, "parsed")
             } catch (error) {
               append({
                 role: "assistant",
@@ -334,16 +335,20 @@ const Chat = () => {
 
   return (
     <div className={cn(`bg-white h-full transition-all ease-in-out`)}>
-      <Suggestions />
-      {/* <div
+      {messages.length <= 0 && (
+        <div className="max-w-3xl mx-auto px-2">
+          <Suggestions />
+        </div>
+      )}
+      <div
         className={cn(
-          `max-w-3xl mx-auto h-full grid grid-rows-[20px_1fr] relative overflow-hidden transition-transform ease-in-out duration-300`,
+          `max-w-3xl mx-auto grid grid-rows-[20px_1fr] relative overflow-hidden transition-transform ease-in-out duration-300`,
           {
-            "grid-rows-[1fr_100px]": messages.length,
+            "grid-rows-[1fr_200px]": messages.length,
           }
         )}
-      > */}
-      {/* <div className={cn("overflow-y-auto px-4 pt-4 m space-y-2 noscroll")}>
+      >
+        <div className={cn("overflow-y-auto px-4 pt-4 m space-y-2 noscroll")}>
           {messages.map((m, i) => {
             const isUser = m.role === "user"
             const isAssistant = m.role === "assistant"
@@ -406,30 +411,36 @@ const Chat = () => {
             </div>
           )}
 
-          <div className={cn("h-5 opacity-0", { "h-20": messages.length > 1 })} ref={endRef} />
-        </div> */}
-      <div
-        className={cn("flex justify-center items-center max-w-3xl mx-auto")}
-        style={{
-          // height: messages.length > 0 ? 100 : 0,
-          transition: "all 0.3s",
-        }}
-      >
-        <PromptField
-          handleSend={handleSend}
-          input={input}
-          handleInputChange={handleInputChange}
-          isLoading={isStreaming}
-          messages={messages}
-        />
+          {messages.length > 1 && (
+            <div className={cn("h-1 opacity-0", { "h-20": messages.length > 1 })} ref={endRef} />
+          )}
+        </div>
+        <div
+          className={cn("flex justify-center h-fit items-center w-full max-w-3xl mx-auto")}
+          style={{
+            // height: messages.length > 0 ? 100 : 0,
+            transition: "all 0.3s",
+          }}
+        >
+          <PromptField
+            handleSend={handleSend}
+            input={input}
+            handleInputChange={handleInputChange}
+            isLoading={isStreaming}
+            messages={messages}
+          />
+        </div>
+        {messages.length <= 0 && (
+          <div className="max-w-3xl mx-auto py-4 px-2">
+            <BottomSuggestions setInput={setInput} />
+          </div>
+        )}
+        {messages.length <= 0 && (
+          <div className="max-w-3xl mx-auto pt-4 px-2 pb-4">
+            <ActiveProjects />
+          </div>
+        )}
       </div>
-      <div className="max-w-3xl mx-auto py-4 px-2">
-        <BottomSuggestions setInput={setInput} />
-      </div>
-      <div className="max-w-3xl mx-auto pt-4 px-2 pb-4">
-        <ActiveProjects />
-      </div>
-      {/* </div> */}
     </div>
   )
 }

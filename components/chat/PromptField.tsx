@@ -46,7 +46,7 @@ export const PromptField = ({
   }
   return (
     <div
-      className={cn("h-full w-full px-2 ", {
+      className={cn("h-[150px] w-full px-2 ", {
         "h-[200px]": messages.length > 0,
       })}
       style={{ transition: "all 0.3s" }}

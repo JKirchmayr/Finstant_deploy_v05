@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useLoginUser } from "@/hooks/useAuth"
+import Image from "next/image"
+import { Button } from "../ui/button"
 
 // **Validation Schema**
 const loginSchema = z.object({
@@ -36,14 +38,24 @@ const LoginForm = () => {
       <div className="flex-1 flex flex-col justify-center items-center px-8 py-12 bg-white">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="w-full max-w-sm bg-gray-100 bg-opacity-90 rounded-2xl p-8 animate-fade-in"
+          className="w-full max-w-sm bg-gray-50 bg-opacity-90 rounded-2xl p-8 animate-fade-in"
         >
-          <h2 className="text-2xl font-semibold text-gray-800 mb-8 text-center tracking-wide">
-            Login
-          </h2>
+          <div className="flex justify-center items-center">
+            <Image
+              src="/images/logo_small.jpg"
+              alt="Instant Corporate Finance Workflows"
+              width={40}
+              height={40}
+              className="mb-4"
+            />
+          </div>
+          <h1 className="text-center text-xl" style={{ fontFamily: "Times New Roman" }}>
+            Instant Corporate Finance Workflows
+          </h1>
+          <p className="text-lg font-semibold text-muted-foreground my-6 text-center">Login</p>
           {/* Email Field */}
           <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1 pl-1">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
               Email
             </label>
             <input
@@ -58,7 +70,7 @@ const LoginForm = () => {
           </div>
           {/* Password Field */}
           <div className="mb-6">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1 pl-1">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
               Password
             </label>
             <div className="relative">
@@ -74,7 +86,7 @@ const LoginForm = () => {
                 type="button"
                 tabIndex={-1}
                 onClick={() => setShowPassword(v => !v)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 focus:outline-none"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
@@ -84,10 +96,10 @@ const LoginForm = () => {
               <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
             )}
           </div>
-          <button
+          <Button
             type="submit"
             disabled={isPending || isSubmitting}
-            className="w-full py-2 rounded-md font-semibold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 transition-colors duration-150 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full py-2 rounded-md font-semibold text-white hover:bg-accent-foreground/70 cursor-pointer active:bg-gray-700 transition-colors duration-150 focus:outline-none disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isPending || isSubmitting ? (
               <span className="flex items-center justify-center">
@@ -112,7 +124,7 @@ const LoginForm = () => {
             ) : (
               "Login"
             )}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

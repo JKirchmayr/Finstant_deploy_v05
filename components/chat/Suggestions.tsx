@@ -62,7 +62,7 @@ export const Suggestions = () => {
   ]
 
   return (
-    <div className="flex flex-col items-center justify-center bg-white my-8">
+    <div className="flex flex-col w-full items-center justify-center bg-white my-8">
       <div className="">
         <Image src="/images/logo_small.jpg" alt="logo" width={40} height={40} className="" />
       </div>
@@ -72,7 +72,7 @@ export const Suggestions = () => {
       >
         Instant Corporate Finance Workflows
       </h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-3xl mx-auto ">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         {suggestions.map((suggestion, index) => (
           <div key={index} onClick={() => setSelectedSuggestion(index)} className="w-full">
             <SuggestionCard
