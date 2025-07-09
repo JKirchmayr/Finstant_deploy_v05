@@ -20,3 +20,12 @@ export const handleCopyAsTSV = (data: any[]) => {
     toast.error("Error copying Data")
   }
 }
+
+
+export function tryParseJSON(str: string) {
+  try {
+    return JSON.parse(str);
+  } catch (e) {
+    return null;
+  }
+}

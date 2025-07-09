@@ -1,22 +1,29 @@
 import { create } from "zustand"
 
 export type ChatMessage = {
-  role: "user" | "assistant"
-  content?: string
+  role: "user" | "assistant" | "system" | 'company-profile' |'data'
+  content: string
+  createdAt: Date
 }
 
 type ChatStore = {
   messages: ChatMessage[]
-  isTyping: boolean
-  addMessage: (msg: ChatMessage) => void
-  setIsTyping: (status: boolean) => void
+  input: string
+  setInput: (input: string) => void
+  append: ({ role, content }: { role: ChatMessage["role"]; content: string, data?:any }) => void
   clearMessages: () => void
 }
 
 export const useChatStore = create<ChatStore>((set) => ({
   messages: [],
-  isTyping: false,
-  addMessage: (msg) => set((state) => ({ messages: [...state.messages, msg] })),
-  setIsTyping: (status) => set({ isTyping: status }),
-  clearMessages: () => set({ messages: [], isTyping: false }),
+  input: "",
+  setInput: (input) => set({ input }),
+  append: ({ role, content, data }) =>
+    set((state) => ({
+      messages: [
+        ...state.messages,
+        { role, content, createdAt: new Date(), data },
+      ],
+    })),
+  clearMessages: () => set({ messages: [] }),
 }))
