@@ -1,15 +1,15 @@
-"use client";
-import React, { useState } from "react";
-import { Card } from "@/components/ui/card";
-import Image from "next/image";
-import { cn } from "@/lib/utils";
-import { Button } from "../ui/button";
+"use client"
+import React, { useState } from "react"
+import { Card } from "@/components/ui/card"
+import Image from "next/image"
+import { cn } from "@/lib/utils"
+import { Button } from "../ui/button"
 
 interface SuggestionCardProps {
-  img: string;
-  title: string;
-  selected: boolean;
-  className?: string;
+  img: string
+  title: string
+  selected: boolean
+  className?: string
 }
 
 export const SuggestionCard: React.FC<SuggestionCardProps> = ({
@@ -30,12 +30,10 @@ export const SuggestionCard: React.FC<SuggestionCardProps> = ({
     </div>
     <p className="text-sm">{title}</p>
   </Card>
-);
+)
 
 export const Suggestions = () => {
-  const [selectedSuggestion, setSelectedSuggestion] = useState<number | null>(
-    null
-  );
+  const [selectedSuggestion, setSelectedSuggestion] = useState<number | null>(null)
   const suggestions = [
     {
       img: "/images/suggest/building.png",
@@ -61,7 +59,7 @@ export const Suggestions = () => {
       img: "/images/suggest/scale.png",
       title: "Benchmarking Analysis",
     },
-  ];
+  ]
 
   return (
     <div className="flex flex-col w-full items-center justify-center bg-white my-8">
@@ -80,7 +78,7 @@ export const Suggestions = () => {
       >
         Instant Corporate Finance Workflows
       </h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
         {suggestions.map((suggestion, index) => (
           <div
             key={index}
@@ -97,28 +95,23 @@ export const Suggestions = () => {
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
 interface BottomSuggestionsProps {
-  setInput: (input: string) => void;
-  className?: string;
+  setInput: (input: string) => void
+  className?: string
 }
-export const BottomSuggestions = ({
-  setInput,
-  className,
-}: BottomSuggestionsProps) => {
+export const BottomSuggestions = ({ setInput, className }: BottomSuggestionsProps) => {
   const shortSuggestions = [
     "Company Profile of Siemens",
     "Give me an intro to SAP",
     "Volkswagen AG",
     "Profile of Bosch",
     "Give me an Overview of Daimler",
-  ];
+  ]
   return (
-    <div
-      className={cn("w-full flex flex-wrap gap-4 justify-center", className)}
-    >
+    <div className={cn("w-full flex flex-wrap gap-4 justify-center", className)}>
       {shortSuggestions.map((suggestion, index) => (
         <Button
           key={index}
@@ -130,5 +123,5 @@ export const BottomSuggestions = ({
         </Button>
       ))}
     </div>
-  );
-};
+  )
+}
