@@ -1,6 +1,6 @@
 "use client";
 import { useState, useMemo } from "react";
-import { ArrowUp, Copy, Download, ExternalLink } from "lucide-react";
+import { FileUp, Copy, Download, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "./ui/button";
@@ -82,18 +82,21 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
             <Copy className="w-4 h-4" /> Copy
           </Button>
           <Button size="xs" variant="secondary">
-            <ArrowUp className="w-4 h-4" /> Export PPT
+            <FileUp className="w-4 h-4" /> Export PPT
           </Button>
         </div>
       </div>
       <div className="flex gap-4 items-center mb-4">
-        <Image
-          src={header.company_logo || "/logo.png"}
-          alt="Logo"
-          width={50}
-          height={50}
-          className="rounded bg-gray-100"
-        />
+        <div className="w-26 h-16 border rounded-lg bg-gray-50 flex items-center justify-center">
+          <Image
+            src={header.company_logo || "/logo.png"}
+            alt={`${safe(header.company_name)} logo`}
+            width={90}
+            height={40}
+            className="rounded object-contain max-h-full max-w-full"
+            style={{ objectFit: "contain" }}
+          />
+        </div>
         <div>
           <div className="font-bold">{safe(header.company_name)}</div>
           <div className="text-sm text-gray-600">
@@ -128,26 +131,12 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
             />
           )}
         </div>
-        <div className="text-sm">
-          <div>
-            <b>Entity Legal name:</b> {safe(keyFacts.company_legal_name)}
-          </div>
-          <div>
-            <b>Founded:</b> {safe(keyFacts.company_founded)}
-          </div>
-          <div>
-            <b>Headquarters:</b> {safe(keyFacts.company_headquarter_city)},{" "}
-            {safe(keyFacts.company_headquarter_country)}
-          </div>
-          <div>
-            <b>Employees:</b> {safe(keyFacts.company_employees)}
-          </div>
-          <div>
-            <b>Revenue:</b> {safe(keyFacts.company_revenue)}{" "}
-            {safe(keyFacts.company_revenue_currency, "")}{" "}
-            {keyFacts.company_revenue_year &&
-              `(${keyFacts.company_revenue_year})`}
-          </div>
+        <div className="text-sm space-y-1">
+          <p><span className="font-medium">Entity Legal Name:</span> {safe(keyFacts.company_legal_name)}</p>
+          <p><span className="font-medium">Founded:</span> {safe(keyFacts.company_founded)}</p>
+          <p><span className="font-medium">Headquarters:</span> {safe(keyFacts.company_headquarter_city)}, {safe(keyFacts.company_headquarter_country)}</p>
+          <p><span className="font-medium">Employees:</span> {safe(keyFacts.company_employees)}</p>
+          <p><span className="font-medium">Revenue:</span> {safe(keyFacts.company_revenue)} {safe(keyFacts.company_revenue_currency, "")} {keyFacts.company_revenue_year && `(${keyFacts.company_revenue_year})`}</p>
         </div>
       </div>
       <div className="mb-4">
@@ -200,37 +189,36 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
             </h2>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full text-xs border mt-2">
+            <table className="w-full border-collapse text-sm">
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="px-2 py-1 border">Year</th>
-                  <th className="px-2 py-1 border">Revenue ({currency})</th>
-                  <th className="px-2 py-1 border">Growth (%)</th>
-                  <th className="px-2 py-1 border">Net Income ({currency})</th>
-                  <th className="px-2 py-1 border">Margin (%)</th>
+                <tr className="bg-gray-50">
+                  <th className="border border-gray-200 p-2 text-left">(in mEUR)</th>
+                  <th className="border border-gray-200 p-2 text-left">Revenue ({currency})</th>
+                  <th className="border border-gray-200 p-2 text-left">Growth (%)</th>
+                  <th className="border border-gray-200 p-2 text-left">Net Income ({currency})</th>
+                  <th className="border border-gray-200 p-2 text-left">Margin (%)</th>
                 </tr>
               </thead>
               <tbody>
                 {financialRows.map((row: any) => (
-                  <tr key={row.year} className="text-center">
-                    <td className="px-2 py-1 border">{row.year}</td>
-                    <td className="px-2 py-1 border">
+                  <tr key={row.year}>
+                    <td className="border border-gray-200 p-2">{row.year}</td>
+                    <td className="border border-gray-200 p-2">
                       {row.revenue?.toLocaleString() ?? "N/A"}
                     </td>
-                    <td className="px-2 py-1 border">
+                    <td className="border border-gray-200 p-2">
                       {row.revenue_growth_yoy !== null &&
-                      row.revenue_growth_yoy !== undefined
-                        ? `${row.revenue_growth_yoy > 0 ? "+" : ""}${
-                            row.revenue_growth_yoy
-                          }%`
+                        row.revenue_growth_yoy !== undefined
+                        ? `${row.revenue_growth_yoy > 0 ? "+" : ""}${row.revenue_growth_yoy
+                        }%`
                         : "N/A"}
                     </td>
-                    <td className="px-2 py-1 border">
+                    <td className="border border-gray-200 p-2">
                       {row.net_income?.toLocaleString() ?? "N/A"}
                     </td>
-                    <td className="px-2 py-1 border">
+                    <td className="border border-gray-200 p-2">
                       {row.net_income_margin !== null &&
-                      row.net_income_margin !== undefined
+                        row.net_income_margin !== undefined
                         ? `${row.net_income_margin}%`
                         : "N/A"}
                     </td>
