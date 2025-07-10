@@ -5,6 +5,8 @@ import { Markdown } from "../markdown";
 import TypingDots from "../TypingDots";
 import { Loader2 } from "lucide-react";
 import CompanyProfileCard from "../CompanyProfileCard";
+import { PROFILESTAGES } from "@/lib/chat-helpers";
+import StageProgress from "../StageProgress";
 
 type Message = {
   role: "user" | "assistant" | "system" | "company-profile" | "data";
@@ -17,8 +19,7 @@ type MessagesProps = {
   messages: Message[];
   isStreaming: boolean;
   streamingMessage: string | null;
-  entityProfileStage: string | null;
-  listStage: string | null;
+  activeStageIndex: number | null;
   endRef: React.RefObject<HTMLDivElement>;
 };
 
@@ -26,8 +27,7 @@ export const Messages = ({
   messages,
   isStreaming,
   streamingMessage,
-  entityProfileStage,
-  listStage,
+  activeStageIndex,
   endRef,
 }: MessagesProps) => {
   return (
@@ -77,26 +77,12 @@ export const Messages = ({
       {isStreaming && (
         <div className="flex justify-start">
           <div className="rounded-2xl text-sm text-gray-600 max-w-[75%]">
-            {entityProfileStage ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="animate-spin w-4 h-4 [animation-duration:0.2s]" />
-                <span>
-                  {entityProfileStage === "init" &&
-                    "Processing your request..."}
-                  {entityProfileStage === "processing" &&
-                    "Retrieving profile..."}
-                  {entityProfileStage === "final" && "Found profile!"}
-                </span>
-              </div>
-            ) : listStage ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="animate-spin w-4 h-4 [animation-duration:0.2s]" />
-                <span>
-                  {listStage === "init" && "Processing your request..."}
-                  {listStage === "processing" && "Generating list..."}
-                  {listStage === "final" && "List generated!"}
-                </span>
-              </div>
+            {activeStageIndex !== null && activeStageIndex !== undefined ? (
+              <StageProgress
+                steps={PROFILESTAGES.map((s) => s.label)}
+                currentStep={activeStageIndex + 1}
+                isAnimating={isStreaming}
+              />
             ) : (
               <div className="px-2">
                 <TypingDots />

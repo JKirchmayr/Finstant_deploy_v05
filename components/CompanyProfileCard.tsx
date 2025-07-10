@@ -74,7 +74,7 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
   return (
     <div className="relative max-w-3xl mx-auto my-2 bg-white border rounded-sm p-4">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">
+        <h1 className="text-lg font-bold">
           Company Profile – {safe(header.company_name)}
         </h1>
         <div className="flex gap-4">
@@ -87,16 +87,14 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
         </div>
       </div>
       <div className="flex gap-4 items-center mb-4">
-        <div className="w-26 h-16 border rounded-lg bg-gray-50 flex items-center justify-center">
-          <Image
-            src={header.company_logo || "/logo.png"}
-            alt={`${safe(header.company_name)} logo`}
-            width={90}
-            height={40}
-            className="rounded object-contain max-h-full max-w-full"
-            style={{ objectFit: "contain" }}
-          />
-        </div>
+        <Image
+          src={header.company_logo || "/logo.png"}
+          alt={`${safe(header.company_name)} logo`}
+          width={60}
+          height={60}
+          className="rounded object-contain max-h-full max-w-full"
+          style={{ objectFit: "contain" }}
+        />
         <div>
           <div className="font-bold">{safe(header.company_name)}</div>
           <div className="text-sm text-gray-600">
@@ -132,11 +130,54 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
           )}
         </div>
         <div className="text-sm space-y-1">
-          <p><span className="font-medium">Entity Legal Name:</span> {safe(keyFacts.company_legal_name)}</p>
-          <p><span className="font-medium">Founded:</span> {safe(keyFacts.company_founded)}</p>
-          <p><span className="font-medium">Headquarters:</span> {safe(keyFacts.company_headquarter_city)}, {safe(keyFacts.company_headquarter_country)}</p>
-          <p><span className="font-medium">Employees:</span> {safe(keyFacts.company_employees)}</p>
-          <p><span className="font-medium">Revenue:</span> {safe(keyFacts.company_revenue)} {safe(keyFacts.company_revenue_currency, "")} {keyFacts.company_revenue_year && `(${keyFacts.company_revenue_year})`}</p>
+          {keyFacts.company_legal_name && (
+            <p>
+              <span className="font-medium">Entity Legal Name:</span>{" "}
+              {safe(keyFacts.company_legal_name)}
+            </p>
+          )}
+          {keyFacts.company_founded && (
+            <p>
+              <span className="font-medium">Founded:</span>{" "}
+              {safe(keyFacts.company_founded)}
+            </p>
+          )}
+          {(keyFacts.company_headquarter_city ||
+            keyFacts.company_headquarter_country) && (
+            <p>
+              <span className="font-medium">Headquarters:</span>{" "}
+              {safe(keyFacts.company_headquarter_city)}
+              {keyFacts.company_headquarter_city &&
+              keyFacts.company_headquarter_country
+                ? ", "
+                : ""}
+              {safe(keyFacts.company_headquarter_country)}
+            </p>
+          )}
+          {keyFacts.company_employees && (
+            <p>
+              <span className="font-medium">Employees:</span>{" "}
+              {safe(keyFacts.company_employees)}
+            </p>
+          )}
+          {(keyFacts.company_revenue ||
+            keyFacts.company_revenue_currency ||
+            keyFacts.company_revenue_year) && (
+            <p>
+              <span className="font-medium">Revenue:</span>{" "}
+              {safe(keyFacts.company_revenue)}
+              {keyFacts.company_revenue && keyFacts.company_revenue_currency
+                ? " "
+                : ""}
+              {safe(keyFacts.company_revenue_currency, "")}
+              {keyFacts.company_revenue_year &&
+                (keyFacts.company_revenue ||
+                  keyFacts.company_revenue_currency) &&
+                " "}
+              {keyFacts.company_revenue_year &&
+                `(${keyFacts.company_revenue_year})`}
+            </p>
+          )}
         </div>
       </div>
       <div className="mb-4">
@@ -192,33 +233,46 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
             <table className="w-full border-collapse text-sm">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="border border-gray-200 p-2 text-left">(in mEUR)</th>
-                  <th className="border border-gray-200 p-2 text-left">Revenue ({currency})</th>
-                  <th className="border border-gray-200 p-2 text-left">Growth (%)</th>
-                  <th className="border border-gray-200 p-2 text-left">Net Income ({currency})</th>
-                  <th className="border border-gray-200 p-2 text-left">Margin (%)</th>
+                  <th className="border border-gray-200 p-1 text-left">
+                    (in mEUR)
+                  </th>
+                  <th className="border border-gray-200 p-1 text-left">
+                    Revenue ({currency})
+                  </th>
+                  <th className="border border-gray-200 p-1 text-left">
+                    Growth (%)
+                  </th>
+                  <th className="border border-gray-200 p-1 text-left">
+                    Net Income ({currency})
+                  </th>
+                  <th className="border border-gray-200 p-1 text-left">
+                    Margin (%)
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {financialRows.map((row: any) => (
                   <tr key={row.year}>
-                    <td className="border border-gray-200 p-2">{row.year}</td>
-                    <td className="border border-gray-200 p-2">
+                    <td className="border border-gray-200 p-1 px-2">
+                      {row.year}
+                    </td>
+                    <td className="border border-gray-200 p-1 px-2">
                       {row.revenue?.toLocaleString() ?? "N/A"}
                     </td>
-                    <td className="border border-gray-200 p-2">
+                    <td className="border border-gray-200 p-1 px-2">
                       {row.revenue_growth_yoy !== null &&
-                        row.revenue_growth_yoy !== undefined
-                        ? `${row.revenue_growth_yoy > 0 ? "+" : ""}${row.revenue_growth_yoy
-                        }%`
+                      row.revenue_growth_yoy !== undefined
+                        ? `${row.revenue_growth_yoy > 0 ? "+" : ""}${
+                            row.revenue_growth_yoy
+                          }%`
                         : "N/A"}
                     </td>
-                    <td className="border border-gray-200 p-2">
+                    <td className="border border-gray-200 p-1 px-2">
                       {row.net_income?.toLocaleString() ?? "N/A"}
                     </td>
-                    <td className="border border-gray-200 p-2">
+                    <td className="border border-gray-200 p-1 px-2">
                       {row.net_income_margin !== null &&
-                        row.net_income_margin !== undefined
+                      row.net_income_margin !== undefined
                         ? `${row.net_income_margin}%`
                         : "N/A"}
                     </td>

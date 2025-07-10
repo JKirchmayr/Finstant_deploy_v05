@@ -7,6 +7,7 @@ import { BottomSuggestions, Suggestions } from "./Suggestions";
 import { ActiveProjects } from "./ActiveProjects";
 import { Messages } from "./Messages";
 import { useChatStore } from "@/store/chatStore";
+import { PROFILESTAGES } from "@/lib/chat-helpers";
 
 type Company = {
   company_name: string;
@@ -25,13 +26,8 @@ const Chat = () => {
   const { messages, input, append, setInput } = useChatStore();
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [entityProfileStage, setEntityProfileStage] = useState<
-    "init" | "processing" | "final" | null
-  >(null);
-  const [listStage, setListStage] = useState<
-    "init" | "processing" | "final" | null
-  >(null);
   const [streamingMessage, setStreamingMessage] = useState<string>("");
+  const [activeStageIndex, setActiveStageIndex] = useState<number | null>(null);
 
   const endRef = useRef<HTMLDivElement>(null);
 
@@ -90,8 +86,7 @@ const Chat = () => {
             append({ role: "assistant", content: processingBuffer });
           }
           setIsStreaming(false);
-          setEntityProfileStage(null);
-          setListStage(null);
+          setActiveStageIndex(null);
           if (parsed?.data?.session_id) {
             setSessionId(parsed.data.session_id);
           }
@@ -104,7 +99,7 @@ const Chat = () => {
         for (const event of events) {
           if (!event.trim() || !event.startsWith("data:")) continue;
 
-          console.log(event.trim());
+          // console.log(event.trim());
 
           const cleaned = event.replace(/^data:/, "").trim();
           parsed = tryParseJSON(cleaned);
@@ -116,8 +111,21 @@ const Chat = () => {
           const { data, event: eventType } = parsed;
 
           // Handle entity profile stages
-          if (eventType === "entity_profile") {
-            setEntityProfileStage(data?.meta?.stage || null);
+          if (
+            eventType === "company_profile" &&
+            data?.meta?.stage === "processing"
+          ) {
+            const message = data.text || "";
+
+            const matchedIndex = PROFILESTAGES.findIndex((stage) =>
+              stage.match.test(message)
+            );
+            if (
+              matchedIndex !== -1 &&
+              matchedIndex > (activeStageIndex ?? -1)
+            ) {
+              setActiveStageIndex(matchedIndex); // <-- Set the active stage index
+            }
           }
 
           // Handle text streaming during processing
@@ -151,9 +159,6 @@ const Chat = () => {
                 companyProfileSections[parsedSection.section] =
                   parsedSection.data;
               }
-            } else {
-              // If plain message (status updates), append directly
-              append({ role: "assistant", content: rawText });
             }
 
             // If this is the final message, append the full profile
@@ -166,8 +171,7 @@ const Chat = () => {
 
               // reset buffer
               companyProfileSections = {};
-              setEntityProfileStage(null);
-              setListStage(null);
+              setActiveStageIndex(null);
             }
           }
           scrollToBottom();
@@ -181,13 +185,12 @@ const Chat = () => {
 
       console.error("Error during streaming:", error);
       setIsStreaming(false);
-      setEntityProfileStage(null);
-      setListStage(null);
+      setActiveStageIndex(null);
       setStreamingMessage("");
     }
   };
 
-  // console.log(messages);
+  console.log(activeStageIndex);
 
   return (
     <div className={cn("h-screen flex flex-col bg-white")}>
@@ -203,8 +206,7 @@ const Chat = () => {
               messages={messages}
               isStreaming={isStreaming}
               streamingMessage={streamingMessage}
-              entityProfileStage={entityProfileStage}
-              listStage={listStage}
+              activeStageIndex={activeStageIndex}
               endRef={endRef}
             />
           </div>
