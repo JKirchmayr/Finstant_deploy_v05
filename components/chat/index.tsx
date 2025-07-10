@@ -1,77 +1,65 @@
-"use client"
-import TypingDots from "@/components/TypingDots"
-import { cn, tryParseJSON } from "@/lib/utils"
-import { ArrowUp, CircleSmall, Loader2, Loader2Icon } from "lucide-react"
-import React, { useEffect, useRef, useState } from "react"
-import { Markdown } from "@/components/markdown"
-import { useAuth } from "@/hooks/useAuth"
-import { useSingleTabStore } from "@/store/singleTabStore"
-import { usePathname } from "next/navigation"
-import { PromptField } from "@/components/chat/PromptField"
-import { BottomSuggestions, Suggestions } from "./Suggestions"
-import { ActiveProjects } from "./ActiveProjects"
-import { Messages } from "./Messages"
-import { useChatStore } from "@/store/chatStore"
+"use client";
+import { cn, tryParseJSON } from "@/lib/utils";
+import React, { useEffect, useRef, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { PromptField } from "@/components/chat/PromptField";
+import { BottomSuggestions, Suggestions } from "./Suggestions";
+import { ActiveProjects } from "./ActiveProjects";
+import { Messages } from "./Messages";
+import { useChatStore } from "@/store/chatStore";
 
 type Company = {
-  company_name: string
-  company_description: string
-  similarity_score: number
-}
+  company_name: string;
+  company_description: string;
+  similarity_score: number;
+};
 
-const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
+const backendURL =
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
 const Chat = () => {
-  const { user, loading } = useAuth()
+  const { user, loading } = useAuth();
 
-  const userId = "aa227293-c91c-4b03-91db-0d2048ee73e7"
+  const userId = "aa227293-c91c-4b03-91db-0d2048ee73e7";
 
-  const { messages, input, append, setInput } = useChatStore()
-  const [sessionId, setSessionId] = useState<string | null>(null)
-  const [isStreaming, setIsStreaming] = useState(false)
+  const { messages, input, append, setInput } = useChatStore();
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [entityProfileStage, setEntityProfileStage] = useState<
     "init" | "processing" | "final" | null
-  >(null)
-  const [listStage, setListStage] = useState<"init" | "processing" | "final" | null>(null)
-  const hasAddedPlaceholders = useRef(false)
-  const lastPromptRef = useRef<string | null>(null)
-  const hasSentPromptRef = useRef<boolean>(false)
+  >(null);
+  const [listStage, setListStage] = useState<
+    "init" | "processing" | "final" | null
+  >(null);
+  const [streamingMessage, setStreamingMessage] = useState<string>("");
 
-  const endRef = useRef<HTMLDivElement>(null)
-
-  const pathname = usePathname()
+  const endRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     // Add a small delay to ensure DOM updates are complete
     setTimeout(() => {
-      const end = endRef.current
+      const end = endRef.current;
       if (end) {
-        end.scrollIntoView({ behavior: "smooth", block: "end" })
+        end.scrollIntoView({ behavior: "smooth", block: "end" });
       }
-    }, 100)
-  }
+    }, 100);
+  };
 
-  const [streamingMessage, setStreamingMessage] = useState<string>("")
-
-  let processingBuffer = ""
+  let processingBuffer = "";
 
   const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (!input.trim()) return
+    if (!input.trim()) return;
 
-    const promptToSend = input.trim()
-    lastPromptRef.current = promptToSend
-    hasSentPromptRef.current = false
-    hasAddedPlaceholders.current = false
-    setEntityProfileStage(null)
-    setListStage(null)
-    setStreamingMessage("")
+    const promptToSend = input.trim();
+    setStreamingMessage("");
 
-    append({ role: "user", content: promptToSend })
-    setInput("")
-    scrollToBottom()
-    setIsStreaming(true)
+    append({ role: "user", content: promptToSend });
+    setInput("");
+    scrollToBottom();
+    setIsStreaming(true);
+    let companyProfileSections: Record<string, any> = {};
 
     try {
       const response = await fetch(`${backendURL}/chat`, {
@@ -82,109 +70,124 @@ const Chat = () => {
           user_id: userId,
           session_id: sessionId,
         }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Network response was not ok.")
+        throw new Error("Network response was not ok.");
       }
 
-      const reader = response.body?.getReader()
-      if (!reader) throw new Error("No reader available.")
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error("No reader available.");
 
-      const decoder = new TextDecoder()
-      let parsed: any
+      const decoder = new TextDecoder();
+      let parsed: any;
 
       while (true) {
-        const { done, value } = await reader.read()
+        const { done, value } = await reader.read();
 
         if (done) {
           if (processingBuffer.trim()) {
-            append({ role: "assistant", content: processingBuffer })
+            append({ role: "assistant", content: processingBuffer });
           }
-          setIsStreaming(false)
-          setEntityProfileStage(null)
-          setListStage(null)
+          setIsStreaming(false);
+          setEntityProfileStage(null);
+          setListStage(null);
           if (parsed?.data?.session_id) {
-            setSessionId(parsed.data.session_id)
+            setSessionId(parsed.data.session_id);
           }
-          break
+          break;
         }
 
-        const rawChunk = decoder.decode(value, { stream: true })
-        const events = rawChunk.split("\n\n")
+        const rawChunk = decoder.decode(value, { stream: true });
+        const events = rawChunk.split("\n\n");
 
         for (const event of events) {
-          if (!event.trim() || !event.startsWith("data:")) continue
+          if (!event.trim() || !event.startsWith("data:")) continue;
 
-          console.log(event.trim())
+          console.log(event.trim());
 
-          const cleaned = event.replace(/^data:/, "").trim()
-          parsed = tryParseJSON(cleaned)
+          const cleaned = event.replace(/^data:/, "").trim();
+          parsed = tryParseJSON(cleaned);
           if (!parsed) {
-            console.warn("Skipping invalid JSON chunk:", cleaned)
-            continue
+            console.warn("Skipping invalid JSON chunk:", cleaned);
+            continue;
           }
 
-          const { data, event: eventType } = parsed
+          const { data, event: eventType } = parsed;
 
           // Handle entity profile stages
           if (eventType === "entity_profile") {
-            setEntityProfileStage(data?.meta?.stage || null)
+            setEntityProfileStage(data?.meta?.stage || null);
           }
 
           // Handle text streaming during processing
           if (eventType === "text") {
             if (data?.meta?.stage === "processing") {
-              setStreamingMessage(prev => prev + (data?.text || ""))
-              processingBuffer += data?.text
+              setStreamingMessage((prev) => prev + (data?.text || ""));
+              processingBuffer += data?.text;
             }
-
-            // if (data?.meta?.stage === "final") {
-            // if (processingBuffer.trim()) {
-            //   append({ role: "assistant", content: processingBuffer });
-            // }
-            // }
           }
 
           // Handle company profile messages
           if (eventType === "company_profile") {
-            if (data?.meta?.stage !== "final") {
-              processingBuffer = ""
-              if (data?.text) {
-                append({ role: "assistant", content: data.text })
+            const stage = data?.meta?.stage;
+            const rawText = data?.text?.trim();
+
+            let parsedSection;
+            try {
+              parsedSection = tryParseJSON(rawText);
+            } catch {
+              parsedSection = null;
+            }
+
+            // If valid structured section, handle company_news_item specially
+            if (parsedSection && parsedSection.section && parsedSection.data) {
+              if (parsedSection.section === "company_news_item") {
+                if (!companyProfileSections["company_news"]) {
+                  companyProfileSections["company_news"] = [];
+                }
+                companyProfileSections["company_news"].push(parsedSection.data);
+              } else {
+                companyProfileSections[parsedSection.section] =
+                  parsedSection.data;
               }
             } else {
-              try {
-                const jsonString = data.text.trim()
-                const profileData = JSON.parse(jsonString)
-                append({
-                  role: "company-profile",
-                  content: "",
-                  data: profileData,
-                })
-              } catch (e) {
-                append({ role: "assistant", content: data.text })
-                return
-              }
+              // If plain message (status updates), append directly
+              append({ role: "assistant", content: rawText });
+            }
+
+            // If this is the final message, append the full profile
+            if (stage === "final") {
+              append({
+                role: "company-profile",
+                content: "",
+                data: companyProfileSections,
+              });
+
+              // reset buffer
+              companyProfileSections = {};
+              setEntityProfileStage(null);
+              setListStage(null);
             }
           }
-
-          scrollToBottom()
+          scrollToBottom();
         }
       }
     } catch (error) {
       append({
         role: "assistant",
         content: "An error occurred while processing your request.",
-      })
+      });
 
-      console.error("Error during streaming:", error)
-      setIsStreaming(false)
-      setEntityProfileStage(null)
-      setListStage(null)
-      setStreamingMessage("")
+      console.error("Error during streaming:", error);
+      setIsStreaming(false);
+      setEntityProfileStage(null);
+      setListStage(null);
+      setStreamingMessage("");
     }
-  }
+  };
+
+  // console.log(messages);
 
   return (
     <div className={cn("h-screen flex flex-col bg-white")}>
@@ -211,7 +214,9 @@ const Chat = () => {
         <PromptField
           handleSend={handleSend}
           input={input}
-          handleInputChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+          handleInputChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setInput(e.target.value)
+          }
           isLoading={isStreaming}
           messages={messages}
         />
@@ -227,7 +232,7 @@ const Chat = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default React.memo(Chat)
+export default React.memo(Chat);
