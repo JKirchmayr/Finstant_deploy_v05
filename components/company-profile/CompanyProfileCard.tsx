@@ -1,33 +1,34 @@
-"use client";
-import { useState, useMemo } from "react";
-import { FileUp, Copy, Download, ExternalLink } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "./ui/button";
-import { SourcesSheet } from "./SourcesSheet";
+"use client"
+import { useState, useMemo } from "react"
+import { FileUp, Copy, Download, ExternalLink } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { Button } from "../ui/button"
+import { SourcesSheet } from "../SourcesSheet"
+import { FinancialTable } from "./FinancialTable"
 
 interface CompanyProfileCardProps {
-  data: any;
+  data: any
 }
 
 export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
-  const safe = (v: any, fallback = "N/A") => v ?? fallback;
+  const safe = (v: any, fallback = "N/A") => v ?? fallback
 
-  const header = data.header || {};
-  const keyFacts = data.key_facts || {};
-  const businessOverview = data.business_description || {};
-  const productServices = data.product_services || {};
-  const financial = data.financial_information || {};
+  const header = data.header || {}
+  const keyFacts = data.key_facts || {}
+  const businessOverview = data.business_description || {}
+  const productServices = data.product_services || {}
+  const financial = data.financial_information || {}
   const financialRows = Array.isArray(financial.financial_information)
     ? financial.financial_information
-    : [];
-  const currency = financial.currency || (financialRows[0]?.currency ?? "");
-  const newsArr = Array.isArray(data.company_news) ? data.company_news : [];
-  // console.log(newsArr);
+    : []
+  const currency = financial.currency || (financialRows[0]?.currency ?? "")
+  const newsArr = Array.isArray(data.company_news) ? data.company_news : []
+  console.log(data)
 
   // Helper to get source count, fallback to 0 if not array
   const getSourceCount = (sources: string[] | null | undefined) =>
-    Array.isArray(sources) ? sources.length : 0;
+    Array.isArray(sources) ? sources.length : 0
 
   // Create array of source objects by section
   const sourcesBySection = useMemo(() => {
@@ -51,32 +52,23 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
         name: "News & Developments",
         sources: newsArr.flatMap((item: any) => item.news_sources || []),
         count: newsArr.reduce(
-          (total: number, item: any) =>
-            total + getSourceCount(item.news_sources),
+          (total: number, item: any) => total + getSourceCount(item.news_sources),
           0
         ),
       },
-    };
+    }
 
-    return sections;
-  }, [
-    keyFacts.sources,
-    businessOverview.sources,
-    productServices.sources,
-    newsArr,
-  ]);
+    return sections
+  }, [keyFacts.sources, businessOverview.sources, productServices.sources, newsArr])
 
-  const hasFinancial =
-    financial && Array.isArray(financialRows) && financialRows.length > 0;
+  const hasFinancial = financial && Array.isArray(financialRows) && financialRows.length > 0
 
-  const hasNews = Array.isArray(newsArr) && newsArr.length > 0;
+  const hasNews = Array.isArray(newsArr) && newsArr.length > 0
 
   return (
     <div className="relative max-w-3xl mx-auto my-2 bg-white border rounded-sm p-4">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-lg font-bold">
-          Company Profile – {safe(header.company_name)}
-        </h1>
+        <h1 className="text-lg font-bold">Company Profile – {safe(header.company_name)}</h1>
         <div className="flex gap-4">
           <Button size="xs" variant="secondary">
             <Copy className="w-4 h-4" /> Copy
@@ -87,14 +79,16 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
         </div>
       </div>
       <div className="flex gap-4 items-center mb-4">
-        <Image
-          src={header.company_logo || "/logo.png"}
-          alt={`${safe(header.company_name)} logo`}
-          width={60}
-          height={60}
-          className="rounded object-contain max-h-full max-w-full"
-          style={{ objectFit: "contain" }}
-        />
+        {header.company_logo && (
+          <Image
+            src={header.company_logo || "/logo.png"}
+            alt={`logo`}
+            width={60}
+            height={60}
+            className="rounded object-contain max-h-full max-w-full border"
+            style={{ objectFit: "contain" }}
+          />
+        )}
         <div>
           <div className="font-bold">{safe(header.company_name)}</div>
           <div className="text-sm text-gray-600">
@@ -138,17 +132,14 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
           )}
           {keyFacts.company_founded && (
             <p>
-              <span className="font-medium">Founded:</span>{" "}
-              {safe(keyFacts.company_founded)}
+              <span className="font-medium">Founded:</span> {safe(keyFacts.company_founded)}
             </p>
           )}
-          {(keyFacts.company_headquarter_city ||
-            keyFacts.company_headquarter_country) && (
+          {(keyFacts.company_headquarter_city || keyFacts.company_headquarter_country) && (
             <p>
               <span className="font-medium">Headquarters:</span>{" "}
               {safe(keyFacts.company_headquarter_city)}
-              {keyFacts.company_headquarter_city &&
-              keyFacts.company_headquarter_country
+              {keyFacts.company_headquarter_city && keyFacts.company_headquarter_country
                 ? ", "
                 : ""}
               {safe(keyFacts.company_headquarter_country)}
@@ -156,26 +147,20 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
           )}
           {keyFacts.company_employees && (
             <p>
-              <span className="font-medium">Employees:</span>{" "}
-              {safe(keyFacts.company_employees)}
+              <span className="font-medium">Employees:</span> {safe(keyFacts.company_employees)}
             </p>
           )}
           {(keyFacts.company_revenue ||
             keyFacts.company_revenue_currency ||
             keyFacts.company_revenue_year) && (
             <p>
-              <span className="font-medium">Revenue:</span>{" "}
-              {safe(keyFacts.company_revenue)}
-              {keyFacts.company_revenue && keyFacts.company_revenue_currency
-                ? " "
-                : ""}
+              <span className="font-medium">Revenue:</span> {safe(keyFacts.company_revenue)}
+              {keyFacts.company_revenue && keyFacts.company_revenue_currency ? " " : ""}
               {safe(keyFacts.company_revenue_currency, "")}
               {keyFacts.company_revenue_year &&
-                (keyFacts.company_revenue ||
-                  keyFacts.company_revenue_currency) &&
+                (keyFacts.company_revenue || keyFacts.company_revenue_currency) &&
                 " "}
-              {keyFacts.company_revenue_year &&
-                `(${keyFacts.company_revenue_year})`}
+              {keyFacts.company_revenue_year && `(${keyFacts.company_revenue_year})`}
             </p>
           )}
         </div>
@@ -196,15 +181,11 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
             />
           )}
         </div>
-        <div className="text-sm">
-          {safe(businessOverview.business_description)}
-        </div>
+        <div className="text-sm">{safe(businessOverview.business_description)}</div>
       </div>
       <div className="mb-4">
         <div className="flex items-center gap-2">
-          <h2 className="font-semibold underline text-lg">
-            Product & Services
-          </h2>
+          <h2 className="font-semibold underline text-lg">Product & Services</h2>
           {getSourceCount(productServices.sources) > 0 && (
             <SourcesSheet
               trigger={
@@ -218,77 +199,17 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
             />
           )}
         </div>
-        <div className="text-sm prose">
-          {safe(productServices.product_services)}
-        </div>
+        <div className="text-sm prose">{safe(productServices.product_services)}</div>
       </div>
       {hasFinancial && (
         <div className="mb-4">
-          <div className="flex items-center gap-2">
-            <h2 className="font-semibold underline text-lg">
-              Financial information
-            </h2>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="border border-gray-200 p-1 text-left">
-                    (in mEUR)
-                  </th>
-                  <th className="border border-gray-200 p-1 text-left">
-                    Revenue ({currency})
-                  </th>
-                  <th className="border border-gray-200 p-1 text-left">
-                    Growth (%)
-                  </th>
-                  <th className="border border-gray-200 p-1 text-left">
-                    Net Income ({currency})
-                  </th>
-                  <th className="border border-gray-200 p-1 text-left">
-                    Margin (%)
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {financialRows.map((row: any) => (
-                  <tr key={row.year}>
-                    <td className="border border-gray-200 p-1 px-2">
-                      {row.year}
-                    </td>
-                    <td className="border border-gray-200 p-1 px-2">
-                      {row.revenue?.toLocaleString() ?? "N/A"}
-                    </td>
-                    <td className="border border-gray-200 p-1 px-2">
-                      {row.revenue_growth_yoy !== null &&
-                      row.revenue_growth_yoy !== undefined
-                        ? `${row.revenue_growth_yoy > 0 ? "+" : ""}${
-                            row.revenue_growth_yoy
-                          }%`
-                        : "N/A"}
-                    </td>
-                    <td className="border border-gray-200 p-1 px-2">
-                      {row.net_income?.toLocaleString() ?? "N/A"}
-                    </td>
-                    <td className="border border-gray-200 p-1 px-2">
-                      {row.net_income_margin !== null &&
-                      row.net_income_margin !== undefined
-                        ? `${row.net_income_margin}%`
-                        : "N/A"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <FinancialTable data={financialRows} />
         </div>
       )}
       {hasNews && (
         <div className="mb-4">
           <div className="flex items-center gap-2">
-            <h2 className="font-semibold underline text-lg">
-              Relevant News & Developments
-            </h2>
+            <h2 className="font-semibold underline text-lg">Relevant News & Developments</h2>
           </div>
 
           <div className="text-sm space-y-4">
@@ -316,5 +237,5 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
         </div>
       )}
     </div>
-  );
+  )
 }

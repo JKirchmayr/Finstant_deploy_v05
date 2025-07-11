@@ -24,6 +24,49 @@ const NonMemoizedMarkdown = ({ children }: NonMemoizedMarkdownProps) => {
         {children}
       </code>
     },
+    table({ node, children, ...props }: any) {
+      return (
+        <div className="overflow-x-auto my-4">
+          <table
+            className="min-w-full border-collapse border border-gray-300 dark:border-gray-700"
+            {...props}
+          >
+            {children}
+          </table>
+        </div>
+      )
+    },
+    thead({ node, children, ...props }: any) {
+      return (
+        <thead className="bg-gray-100 dark:bg-gray-800" {...props}>
+          {children}
+        </thead>
+      )
+    },
+    tbody({ node, children, ...props }: any) {
+      return <tbody {...props}>{children}</tbody>
+    },
+    tr({ node, children, ...props }: any) {
+      return (
+        <tr className="border-b border-gray-300 dark:border-gray-700" {...props}>
+          {children}
+        </tr>
+      )
+    },
+    th({ node, children, ...props }: any) {
+      return (
+        <th className="px-2 py-1.5 text-left text-sm font-semibold border" {...props}>
+          {children}
+        </th>
+      )
+    },
+    td({ node, children, ...props }: any) {
+      return (
+        <td className="px-2 py-1.5 text-sm border" {...props}>
+          {children}
+        </td>
+      )
+    },
     ol({ node, children, ...props }: any) {
       return (
         <ol className="list-decimal list-outside ml-4 text-sm" {...props}>
@@ -108,7 +151,7 @@ const NonMemoizedMarkdown = ({ children }: NonMemoizedMarkdownProps) => {
     },
     p({ node, children, ...props }: any) {
       return (
-        <p className=" text-sm leading-6 " {...props}>
+        <p className="text-sm leading-6" {...props}>
           {children}
         </p>
       )
