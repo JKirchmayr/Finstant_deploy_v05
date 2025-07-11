@@ -79,25 +79,26 @@ export const Messages = ({
       {isStreaming && (
         <div className="flex justify-start">
           <div className="rounded-2xl text-sm text-gray-600 max-w-[75%]">
-            <AnimatePresence>
-              {activeStageIndex !== null && activeStageIndex !== undefined ? (
-                <StageProgress
-                  steps={PROFILESTAGES.map(s => s.label)}
-                  currentStep={activeStageIndex + 1}
-                  isAnimating={isStreaming}
-                />
-              ) : (
-                <div className="px-2">
-                  <TypingDots />
-                </div>
-              )}
-            </AnimatePresence>
+            {activeStageIndex !== null && activeStageIndex !== undefined ? (
+              <StageProgress
+                steps={PROFILESTAGES.map((s) => s.label)}
+                currentStep={activeStageIndex + 1}
+                isAnimating={isStreaming}
+              />
+            ) : (
+              <div className="px-2">
+                <TypingDots />
+              </div>
+            )}
           </div>
         </div>
       )}
 
       {messages.length > 1 && (
-        <div className={cn("h-1 opacity-0", { "h-20": messages.length > 1 })} ref={endRef} />
+        <div
+          className={cn("h-1 opacity-0", { "h-5": messages.length > 1 })}
+          ref={endRef}
+        />
       )}
     </div>
   )

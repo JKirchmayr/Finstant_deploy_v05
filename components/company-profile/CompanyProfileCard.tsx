@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Button } from "../ui/button"
 import { SourcesSheet } from "../SourcesSheet"
 import { FinancialTable } from "./FinancialTable"
+import { Markdown } from "../markdown"
 
 interface CompanyProfileCardProps {
   data: any
@@ -110,18 +111,15 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
       <div className="mb-4">
         <div className="flex items-center gap-2">
           <h2 className="font-semibold underline text-lg">Key Facts</h2>
-          {getSourceCount(keyFacts.sources) > 0 && (
-            <SourcesSheet
-              trigger={
-                <Button className="h-6" variant="secondary" size="xs">
-                  {getSourceCount(keyFacts.sources)}
-                </Button>
-              }
-              title="All Reference Sources"
-              description={`Complete list of reference sources used for this company profile`}
-              sourcesBySection={sourcesBySection}
-            />
-          )}
+
+          <SourcesSheet
+            trigger={
+              <Button className="h-6" variant="secondary" size="xs">
+                1
+              </Button>
+            }
+            sourcesBySection={sourcesBySection}
+          />
         </div>
         <div className="text-sm space-y-1">
           {keyFacts.company_legal_name && (
@@ -154,7 +152,12 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
             keyFacts.company_revenue_currency ||
             keyFacts.company_revenue_year) && (
             <p>
-              <span className="font-medium">Revenue:</span> {safe(keyFacts.company_revenue)}
+              <span className="font-medium">Revenue:</span>{" "}
+              {new Intl.NumberFormat("en-US", {
+                style: "decimal", // or 'currency'
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              }).format(safe(keyFacts.company_revenue))}
               {keyFacts.company_revenue && keyFacts.company_revenue_currency ? " " : ""}
               {safe(keyFacts.company_revenue_currency, "")}
               {keyFacts.company_revenue_year &&
@@ -168,48 +171,51 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
       <div className="mb-4">
         <div className="flex items-center gap-2">
           <h2 className="font-semibold underline text-lg">Business Overview</h2>
-          {getSourceCount(businessOverview.sources) > 0 && (
-            <SourcesSheet
-              trigger={
-                <Button className="h-6" variant="secondary" size="xs">
-                  {getSourceCount(businessOverview.sources)}
-                </Button>
-              }
-              title="All Reference Sources"
-              description={`Complete list of reference sources used for this company profile`}
-              sourcesBySection={sourcesBySection}
-            />
-          )}
+          <SourcesSheet
+            trigger={
+              <Button className="h-6" variant="secondary" size="xs">
+                2
+              </Button>
+            }
+            sourcesBySection={sourcesBySection}
+          />
         </div>
-        <div className="text-sm">{safe(businessOverview.business_description)}</div>
+        <div className="text-sm prose">{safe(businessOverview.business_description)}</div>
       </div>
       <div className="mb-4">
         <div className="flex items-center gap-2">
           <h2 className="font-semibold underline text-lg">Product & Services</h2>
-          {getSourceCount(productServices.sources) > 0 && (
-            <SourcesSheet
-              trigger={
-                <Button className="h-6" variant="secondary" size="xs">
-                  {getSourceCount(productServices.sources)}
-                </Button>
-              }
-              title="All Reference Sources"
-              description={`Complete list of reference sources used for this company profile`}
-              sourcesBySection={sourcesBySection}
-            />
-          )}
+          <SourcesSheet
+            trigger={
+              <Button className="h-6" variant="secondary" size="xs">
+                3
+              </Button>
+            }
+            sourcesBySection={sourcesBySection}
+          />
         </div>
-        <div className="text-sm prose">{safe(productServices.product_services)}</div>
+        <div className="text-sm ">
+          <Markdown>{productServices.product_services}</Markdown>
+        </div>
       </div>
-      {hasFinancial && (
-        <div className="mb-4">
-          <FinancialTable data={financialRows} />
-        </div>
-      )}
+      <FinancialTable
+        data={financialRows}
+        hasFinancial={hasFinancial}
+        sourcesBySection={sourcesBySection}
+      />
+
       {hasNews && (
         <div className="mb-4">
           <div className="flex items-center gap-2">
             <h2 className="font-semibold underline text-lg">Relevant News & Developments</h2>
+            <SourcesSheet
+              trigger={
+                <Button className="h-6" variant="secondary" size="xs">
+                  5
+                </Button>
+              }
+              sourcesBySection={sourcesBySection}
+            />
           </div>
 
           <div className="text-sm space-y-4">
@@ -217,18 +223,6 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
               <div key={idx} className="mb-2">
                 <div className="flex items-center gap-2">
                   <b>{item.news_title}</b>
-                  {getSourceCount(item.news_sources) > 0 && (
-                    <SourcesSheet
-                      trigger={
-                        <Button className="h-6" variant="secondary" size="xs">
-                          {getSourceCount(item.news_sources)}
-                        </Button>
-                      }
-                      title="All Reference Sources"
-                      description={`Complete list of reference sources used for this company profile`}
-                      sourcesBySection={sourcesBySection}
-                    />
-                  )}
                 </div>
                 <div>{item.news_summary}</div>
               </div>
