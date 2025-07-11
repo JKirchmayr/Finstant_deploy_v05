@@ -16,7 +16,8 @@ const Spinner = () => (
     height="24"
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
-    className="animate-spin text-muted-foreground"
+    style={{ animation: "spin 0.5s linear infinite" }} // 0.5s = fast spin
+    className="text-muted-foreground"
   >
     <g transform="translate(12,12)">
       {Array.from({ length: 12 }).map((_, i) => (
@@ -37,7 +38,11 @@ const Spinner = () => (
   </svg>
 )
 
-export default function StageProgress({ steps, currentStep, isAnimating }: StageProgressProps) {
+export default function StageProgress({
+  steps,
+  currentStep,
+  isAnimating,
+}: StageProgressProps) {
   return (
     <motion.div
       initial={{ opacity: 1, y: 0 }}
@@ -99,7 +104,7 @@ export default function StageProgress({ steps, currentStep, isAnimating }: Stage
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ duration: 0.1 }}
                       >
                         <Spinner />
                       </motion.div>

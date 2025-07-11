@@ -20,10 +20,9 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
   const businessOverview = data.business_description || {}
   const productServices = data.product_services || {}
   const financial = data.financial_metadata || {}
-  const financialRows = Array.isArray(financial.financial_years) ? financial.financial_years : []
+  const financialRows = Array.isArray(data.financial_years) ? data.financial_years : []
   const currency = financial.currency || (financialRows[0]?.currency ?? "")
   const newsArr = Array.isArray(data.company_news) ? data.company_news : []
-
   // Helper to get source count, fallback to 0 if not array
   const getSourceCount = (sources: string[] | null | undefined) =>
     Array.isArray(sources) ? sources.length : 0
@@ -59,14 +58,17 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
     return sections
   }, [keyFacts.sources, businessOverview.sources, productServices.sources, newsArr])
 
-  const hasFinancial = financial && Array.isArray(financialRows) && financialRows.length > 0
+  const hasFinancial =
+    financial && Array.isArray(financialRows) && financialRows.length > 0
 
   const hasNews = Array.isArray(newsArr) && newsArr.length > 0
 
   return (
     <div className="relative max-w-3xl mx-auto my-2 bg-white border rounded-sm p-4">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-lg font-bold">Company Profile – {safe(header.company_name)}</h1>
+        <h1 className="text-lg font-bold">
+          Company Profile – {safe(header.company_name)}
+        </h1>
         <div className="flex gap-4">
           <Button size="xs" variant="secondary">
             <Copy className="w-4 h-4" /> Copy
@@ -127,10 +129,12 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
           )}
           {keyFacts.company_founded && (
             <p>
-              <span className="font-medium">Founded:</span> {safe(keyFacts.company_founded)}
+              <span className="font-medium">Founded:</span>{" "}
+              {safe(keyFacts.company_founded)}
             </p>
           )}
-          {(keyFacts.company_headquarter_city || keyFacts.company_headquarter_country) && (
+          {(keyFacts.company_headquarter_city ||
+            keyFacts.company_headquarter_country) && (
             <p>
               <span className="font-medium">Headquarters:</span>{" "}
               {safe(keyFacts.company_headquarter_city)}
@@ -142,7 +146,8 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
           )}
           {keyFacts.company_employees && (
             <p>
-              <span className="font-medium">Employees:</span> {safe(keyFacts.company_employees)}
+              <span className="font-medium">Employees:</span>{" "}
+              {safe(keyFacts.company_employees)}
             </p>
           )}
           {(keyFacts.company_revenue ||
@@ -199,16 +204,19 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
         data={financialRows}
         hasFinancial={hasFinancial}
         sourcesBySection={sourcesBySection}
+        financial={financial}
       />
 
       {hasNews && (
         <div className="mb-4">
           <div className="flex items-center gap-2">
-            <h2 className="font-semibold underline text-lg">Relevant News & Developments</h2>
+            <h2 className="font-semibold underline text-lg">
+              Relevant News & Developments
+            </h2>
             <SourcesSheet
               trigger={
                 <Button className="h-6" variant="secondary" size="xs">
-                  5
+                  4
                 </Button>
               }
               sourcesBySection={sourcesBySection}

@@ -41,7 +41,6 @@ const Chat = () => {
   }
 
   let processingBuffer = ""
-  let companyProfileSections: Record<string, any> = {}
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -55,6 +54,7 @@ const Chat = () => {
     setInput("")
     scrollToBottom()
     setIsStreaming(true)
+    let companyProfileSections: Record<string, any> = {}
 
     try {
       const response = await fetch(`${backendURL}/chat`, {
@@ -86,14 +86,9 @@ const Chat = () => {
           }
           setIsStreaming(false)
           setActiveStageIndex(null)
-          if (parsed?.data?.session_id && !sessionId) {
+          if (parsed?.data?.session_id) {
             setSessionId(parsed.data.session_id)
           }
-          append({
-            role: "company-profile",
-            content: "",
-            data: companyProfileSections,
-          })
           break
         }
 
@@ -118,7 +113,9 @@ const Chat = () => {
           if (eventType === "company_profile" && data?.meta?.stage === "processing") {
             const message = data.text || ""
 
-            const matchedIndex = PROFILESTAGES.findIndex(stage => stage.match.test(message))
+            const matchedIndex = PROFILESTAGES.findIndex((stage) =>
+              stage.match.test(message)
+            )
             if (matchedIndex !== -1 && matchedIndex > (activeStageIndex ?? -1)) {
               setActiveStageIndex(matchedIndex) // <-- Set the active stage index
             }
@@ -127,7 +124,7 @@ const Chat = () => {
           // Handle text streaming during processing
           if (eventType === "text") {
             if (data?.meta?.stage === "processing") {
-              setStreamingMessage(prev => prev + (data?.text || ""))
+              setStreamingMessage((prev) => prev + (data?.text || ""))
               processingBuffer += data?.text
             }
           }
@@ -195,8 +192,6 @@ const Chat = () => {
     }
   }
 
-  console.log(companyProfileSections)
-
   return (
     <div className={cn("h-screen flex flex-col bg-white")}>
       {messages.length <= 0 && (
@@ -221,7 +216,9 @@ const Chat = () => {
         <PromptField
           handleSend={handleSend}
           input={input}
-          handleInputChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+          handleInputChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setInput(e.target.value)
+          }
           isLoading={isStreaming}
           messages={messages}
         />
@@ -240,4 +237,4 @@ const Chat = () => {
   )
 }
 
-export default React.memo(Chat)
+export default Chat
