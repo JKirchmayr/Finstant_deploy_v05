@@ -1,6 +1,5 @@
 "use client"
 
-
 import React, { CSSProperties, useCallback, useRef, useState } from "react"
 import * as XLSX from "xlsx"
 import {
@@ -88,9 +87,15 @@ export const FinancialTable = ({
   data,
   hasFinancial,
   sourcesBySection,
+  financial,
 }: {
   data: FinancialDataItem[]
   hasFinancial?: boolean
+  financial?: {
+    consolidated: boolean
+    currency: string
+    legal_entity: string
+  }
   sourcesBySection: {
     keyFacts: {
       name: string
@@ -215,8 +220,9 @@ export const FinancialTable = ({
   const selectedRows = table.getSelectedRowModel().rows.map(row => row.original)
   const handleExport = (format: "csv" | "excel") => {
     const exportData = selectedRows.length ? selectedRows : data
-    const filename = `${selectedRows.length ? "selected" : "all"}-data.${format === "csv" ? "csv" : "xlsx"
-      }`
+    const filename = `${selectedRows.length ? "selected" : "all"}-data.${
+      format === "csv" ? "csv" : "xlsx"
+    }`
 
     format === "csv" ? exportToCSV(exportData, filename) : exportToExcel(exportData, filename)
   }
@@ -242,8 +248,12 @@ export const FinancialTable = ({
         </div>
         <div className="flex items-center">
           <div className="flex flex-col items-end mr-4">
-            <div className="text-sm font-medium">Legal Entity: <span className="text-gray-700">Siemens AG</span></div>
-            <div className="text-sm font-medium">Consolidated: <span className="text-gray-700">Yes/No</span></div>
+            <div className="text-sm font-medium">
+              Legal Entity: <span className="text-gray-700">Siemens AG</span>
+            </div>
+            <div className="text-sm font-medium">
+              Consolidated: <span className="text-gray-700">Yes/No</span>
+            </div>
           </div>
 
           {hasFinancial && (

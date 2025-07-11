@@ -41,6 +41,7 @@ const Chat = () => {
   }
 
   let processingBuffer = ""
+  let companyProfileSections: Record<string, any> = {}
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -54,7 +55,6 @@ const Chat = () => {
     setInput("")
     scrollToBottom()
     setIsStreaming(true)
-    let companyProfileSections: Record<string, any> = {}
 
     try {
       const response = await fetch(`${backendURL}/chat`, {
@@ -86,9 +86,14 @@ const Chat = () => {
           }
           setIsStreaming(false)
           setActiveStageIndex(null)
-          if (parsed?.data?.session_id) {
+          if (parsed?.data?.session_id && !sessionId) {
             setSessionId(parsed.data.session_id)
           }
+          append({
+            role: "company-profile",
+            content: "",
+            data: companyProfileSections,
+          })
           break
         }
 
@@ -146,6 +151,16 @@ const Chat = () => {
                   companyProfileSections["company_news"] = []
                 }
                 companyProfileSections["company_news"].push(parsedSection.data)
+              } else if (parsedSection.section.startsWith("financial_information_")) {
+                // Handle financial information sections
+                if (parsedSection.section === "financial_information_metadata") {
+                  companyProfileSections["financial_metadata"] = parsedSection.data
+                } else if (parsedSection.section === "financial_information_year") {
+                  if (!companyProfileSections["financial_years"]) {
+                    companyProfileSections["financial_years"] = []
+                  }
+                  companyProfileSections["financial_years"].push(parsedSection.data)
+                }
               } else {
                 companyProfileSections[parsedSection.section] = parsedSection.data
               }
@@ -180,7 +195,7 @@ const Chat = () => {
     }
   }
 
-  // console.log(activeStageIndex);
+  console.log(companyProfileSections)
 
   return (
     <div className={cn("h-screen flex flex-col bg-white")}>

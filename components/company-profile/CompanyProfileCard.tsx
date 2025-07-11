@@ -19,13 +19,10 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
   const keyFacts = data.key_facts || {}
   const businessOverview = data.business_description || {}
   const productServices = data.product_services || {}
-  const financial = data.financial_information || {}
-  const financialRows = Array.isArray(financial.financial_information)
-    ? financial.financial_information
-    : []
+  const financial = data.financial_metadata || {}
+  const financialRows = Array.isArray(financial.financial_years) ? financial.financial_years : []
   const currency = financial.currency || (financialRows[0]?.currency ?? "")
   const newsArr = Array.isArray(data.company_news) ? data.company_news : []
-  console.log(data)
 
   // Helper to get source count, fallback to 0 if not array
   const getSourceCount = (sources: string[] | null | undefined) =>
