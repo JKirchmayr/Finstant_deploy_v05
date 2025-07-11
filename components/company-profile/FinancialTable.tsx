@@ -220,9 +220,8 @@ export const FinancialTable = ({
   const selectedRows = table.getSelectedRowModel().rows.map(row => row.original)
   const handleExport = (format: "csv" | "excel") => {
     const exportData = selectedRows.length ? selectedRows : data
-    const filename = `${selectedRows.length ? "selected" : "all"}-data.${
-      format === "csv" ? "csv" : "xlsx"
-    }`
+    const filename = `${selectedRows.length ? "selected" : "all"}-data.${format === "csv" ? "csv" : "xlsx"
+      }`
 
     format === "csv" ? exportToCSV(exportData, filename) : exportToExcel(exportData, filename)
   }
@@ -234,52 +233,60 @@ export const FinancialTable = ({
 
   return (
     <div className="w-full flex h-full flex-col gap-2 pb-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between w-full">
         <div>
-          <h2 className="font-semibold underline text-lg">Financial information</h2>
-          <SourcesSheet
-            trigger={
-              <Button className="h-6" variant="secondary" size="xs">
-                4
-              </Button>
-            }
-            sourcesBySection={sourcesBySection}
-          />
-        </div>
-        <div className="flex items-center">
-          <div className="flex flex-col items-end mr-4">
-            <div className="text-sm font-medium">
-              Legal Entity: <span className="text-gray-700">Siemens AG</span>
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="font-semibold underline text-base">Financial Information</h2>
+            <SourcesSheet
+              trigger={
+                <Button className="h-5 px-2 text-xs" variant="secondary" size="xs">
+                  4
+                </Button>
+              }
+              sourcesBySection={sourcesBySection}
+            />
+          </div>
+          <div className="text-sm font-semibold">
+            <div className="text-gray-800">
+              Legal Entity: <span className="font-normal">{financial?.legal_entity || "N/A"}</span>
             </div>
-            <div className="text-sm font-medium">
-              Consolidated: <span className="text-gray-700">Yes/No</span>
+            <div className="text-gray-800">
+              Consolidated:{" "}
+              <span className="font-normal">
+                {typeof financial?.consolidated === "boolean"
+                  ? financial.consolidated
+                    ? "Yes"
+                    : "No"
+                  : "N/A"}
+              </span>
             </div>
           </div>
-
-          {hasFinancial && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="secondary"
-                size="xs"
-                className="hover:bg-gray-300"
-                disabled={!selectedRows.length && !data.length}
-                onClick={handleCopySelected}
-              >
-                Copy <CopyIcon className="size-3.5" />
-              </Button>
-
-              <Button
-                variant="secondary"
-                size="xs"
-                onClick={() => handleExport("excel")}
-                className="h-7 py-1 text-xs hover:bg-gray-300"
-              >
-                Export <ShareIcon className="size-3.5" />
-              </Button>
-            </div>
-          )}
         </div>
+
+        {(
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size="xs"
+              className="hover:bg-gray-300"
+              disabled={!selectedRows.length && !data.length}
+              onClick={handleCopySelected}
+            >
+              Copy <CopyIcon className="size-3.5" />
+            </Button>
+
+            <Button
+              variant="secondary"
+              size="xs"
+              onClick={() => handleExport("excel")}
+              className="h-7 py-1 text-xs hover:bg-gray-300"
+            >
+              Export <ShareIcon className="size-3.5" />
+            </Button>
+          </div>
+        )}
       </div>
+
       {data?.length > 0 ? (
         <div className="flex flex-col w-full bg-white border overflow-auto overflow-x-auto">
           <Table
