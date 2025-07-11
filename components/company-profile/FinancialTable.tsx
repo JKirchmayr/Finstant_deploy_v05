@@ -1,5 +1,5 @@
 "use client"
-"use client"
+
 
 import React, { CSSProperties, useCallback, useRef, useState } from "react"
 import * as XLSX from "xlsx"
@@ -215,9 +215,8 @@ export const FinancialTable = ({
   const selectedRows = table.getSelectedRowModel().rows.map(row => row.original)
   const handleExport = (format: "csv" | "excel") => {
     const exportData = selectedRows.length ? selectedRows : data
-    const filename = `${selectedRows.length ? "selected" : "all"}-data.${
-      format === "csv" ? "csv" : "xlsx"
-    }`
+    const filename = `${selectedRows.length ? "selected" : "all"}-data.${format === "csv" ? "csv" : "xlsx"
+      }`
 
     format === "csv" ? exportToCSV(exportData, filename) : exportToExcel(exportData, filename)
   }
@@ -241,28 +240,35 @@ export const FinancialTable = ({
             sourcesBySection={sourcesBySection}
           />
         </div>
-        {hasFinancial && (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              size="xs"
-              className=" hover:bg-gray-300"
-              disabled={!selectedRows.length && !data.length}
-              onClick={handleCopySelected}
-            >
-              Copy <CopyIcon className="size-3.5" />
-            </Button>
-
-            <Button
-              variant="secondary"
-              size="xs"
-              onClick={() => handleExport("excel")}
-              className="h-7 py-1 text-xs hover:bg-gray-300"
-            >
-              Export <ShareIcon className="size-3.5" />
-            </Button>
+        <div className="flex items-center">
+          <div className="flex flex-col items-end mr-4">
+            <div className="text-sm font-medium">Legal Entity: <span className="text-gray-700">Siemens AG</span></div>
+            <div className="text-sm font-medium">Consolidated: <span className="text-gray-700">Yes/No</span></div>
           </div>
-        )}
+
+          {hasFinancial && (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                size="xs"
+                className="hover:bg-gray-300"
+                disabled={!selectedRows.length && !data.length}
+                onClick={handleCopySelected}
+              >
+                Copy <CopyIcon className="size-3.5" />
+              </Button>
+
+              <Button
+                variant="secondary"
+                size="xs"
+                onClick={() => handleExport("excel")}
+                className="h-7 py-1 text-xs hover:bg-gray-300"
+              >
+                Export <ShareIcon className="size-3.5" />
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
       {data?.length > 0 ? (
         <div className="flex flex-col w-full bg-white border overflow-auto overflow-x-auto">
@@ -332,7 +338,10 @@ export const FinancialTable = ({
                       return (
                         <TableCell
                           key={cell.id}
-                          className="py-2 [&[data-pinned][data-last-col]]:border-border data-pinned:bg-background/90 truncate data-pinned:backdrop-blur-xs [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right][data-last-col=right]]:border-l border-r border-gray-300"
+                          className={cn(
+                            "py-2 [&[data-pinned][data-last-col]]:border-border data-pinned:bg-background/90 truncate data-pinned:backdrop-blur-xs [&[data-pinned=left][data-last-col=left]]:border-r [&[data-pinned=right][data-last-col=right]]:border-l border-r border-gray-300",
+                            cell.column.id !== "label" && "text-right pr-3"
+                          )}
                           style={{ ...getPinningStyles(column) }}
                           data-pinned={isPinned || undefined}
                           data-last-col={

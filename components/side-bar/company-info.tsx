@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { ChevronsUpDown, Plus } from "lucide-react"
-
+import Image from "next/image"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +19,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-export function CompanyInfo({}) {
+export function CompanyInfo({ }) {
   const { isMobile, toggleSidebar, open } = useSidebar()
 
   return (
@@ -42,7 +42,8 @@ export function CompanyInfo({}) {
           )} */}
           {open && (
             <div className="w-full flex items-center ">
-              <img src="/images/full-logo.png" className="w-full -ml-2.5" />
+              {/* <img src="/images/full-logo.png" className="w-full -ml-2.5" /> */}
+              <Image src={'/images/full-logo.png'} alt='finstant' width={130} height={120} />
             </div>
           )}
 
