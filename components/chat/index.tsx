@@ -1,6 +1,6 @@
 "use client"
 import { cn, tryParseJSON } from "@/lib/utils"
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState, useCallback } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { PromptField } from "@/components/chat/PromptField"
 import { BottomSuggestions, Suggestions } from "./Suggestions"
@@ -29,16 +29,22 @@ const Chat = () => {
   const [activeStageIndex, setActiveStageIndex] = useState<number | null>(null)
 
   const endRef = useRef<HTMLDivElement>(null)
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  const scrollToBottom = () => {
-    // Add a small delay to ensure DOM updates are complete
-    setTimeout(() => {
+  const scrollToBottom = useCallback(() => {
+    // Throttle scroll calls to prevent excessive DOM updates
+    if (scrollTimeoutRef.current) {
+      return
+    }
+
+    scrollTimeoutRef.current = setTimeout(() => {
       const end = endRef.current
       if (end) {
         end.scrollIntoView({ behavior: "smooth", block: "end" })
       }
+      scrollTimeoutRef.current = null
     }, 100)
-  }
+  }, [])
 
   let processingBuffer = ""
 
@@ -57,30 +63,56 @@ const Chat = () => {
     let companyProfileSections: Record<string, any> = {}
 
     try {
+      console.log("🚀 Starting request to:", `${backendURL}/chat`)
+      console.log("📤 Request payload:", {
+        user_prompt: promptToSend,
+        user_id: userId,
+        session_id: sessionId,
+      })
+
+      // Add timeout to the fetch request
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => {
+        console.log("⏰ Request timeout after 30 seconds")
+        controller.abort()
+      }, 30000) // 30 second timeout
+
       const response = await fetch(`${backendURL}/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "text/event-stream",
+          "Cache-Control": "no-cache",
+        },
         body: JSON.stringify({
           user_prompt: promptToSend,
           user_id: userId,
           session_id: sessionId,
         }),
+        signal: controller.signal,
       })
 
+      clearTimeout(timeoutId)
+      console.log("📥 Response received:", response.status, response.statusText)
+
       if (!response.ok) {
-        throw new Error("Network response was not ok.")
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
 
       const reader = response.body?.getReader()
       if (!reader) throw new Error("No reader available.")
 
+      console.log("📖 Starting to read stream...")
       const decoder = new TextDecoder()
       let parsed: any
+      let chunkCount = 0
 
       while (true) {
         const { done, value } = await reader.read()
+        chunkCount++
 
         if (done) {
+          console.log("✅ Stream completed after", chunkCount, "chunks")
           if (processingBuffer.trim()) {
             append({ role: "assistant", content: processingBuffer })
           }
@@ -98,12 +130,12 @@ const Chat = () => {
         for (const event of events) {
           if (!event.trim() || !event.startsWith("data:")) continue
 
-          console.log(event.trim())
+          console.log("📦 Processing event:", event.trim().substring(0, 100) + "...")
 
           const cleaned = event.replace(/^data:/, "").trim()
           parsed = tryParseJSON(cleaned)
           if (!parsed) {
-            console.warn("Skipping invalid JSON chunk:", cleaned)
+            console.warn("⚠️ Skipping invalid JSON chunk:", cleaned)
             continue
           }
 
@@ -113,84 +145,136 @@ const Chat = () => {
           if (eventType === "company_profile" && data?.meta?.stage === "processing") {
             const message = data.text || ""
 
-            const matchedIndex = PROFILESTAGES.findIndex((stage) =>
-              stage.match.test(message)
-            )
+            const matchedIndex = PROFILESTAGES.findIndex(stage => stage.match.test(message))
             if (matchedIndex !== -1 && matchedIndex > (activeStageIndex ?? -1)) {
-              setActiveStageIndex(matchedIndex) // <-- Set the active stage index
+              setActiveStageIndex(matchedIndex)
             }
           }
 
           // Handle text streaming during processing
           if (eventType === "text") {
             if (data?.meta?.stage === "processing") {
-              setStreamingMessage((prev) => prev + (data?.text || ""))
-              processingBuffer += data?.text
+              const newText = data?.text || ""
+              setStreamingMessage(prev => prev + newText)
+              processingBuffer += newText
+              // Throttle scroll during text streaming
+              if (processingBuffer.length % 50 === 0) {
+                scrollToBottom()
+              }
             }
           }
 
           // Handle company profile messages
           if (eventType === "company_profile") {
             const stage = data?.meta?.stage
-            const rawText = data?.text?.trim()
+            const section = data?.section
+            const sectionData = data?.data
+            const text = data?.text || ""
 
-            let parsedSection
-            try {
-              parsedSection = tryParseJSON(rawText)
-            } catch {
-              parsedSection = null
-            }
+            console.log("🏢 Company profile event:", {
+              stage,
+              section,
+              hasData: !!sectionData,
+              text: text.substring(0, 50),
+            })
 
-            // If valid structured section, handle company_news_item specially
-            if (parsedSection && parsedSection.section && parsedSection.data) {
-              if (parsedSection.section === "company_news_item") {
+            // Handle structured section data directly from the new format
+            if (section && sectionData) {
+              if (section === "company_news_item") {
                 if (!companyProfileSections["company_news"]) {
                   companyProfileSections["company_news"] = []
                 }
-                companyProfileSections["company_news"].push(parsedSection.data)
-              } else if (parsedSection.section.startsWith("financial_information_")) {
-                // Handle financial information sections
-                if (parsedSection.section === "financial_information_metadata") {
-                  companyProfileSections["financial_metadata"] = parsedSection.data
-                } else if (parsedSection.section === "financial_information_year") {
-                  if (!companyProfileSections["financial_years"]) {
-                    companyProfileSections["financial_years"] = []
-                  }
-                  companyProfileSections["financial_years"].push(parsedSection.data)
+                companyProfileSections["company_news"].push(sectionData)
+              } else if (section === "financial_information_year") {
+                if (!companyProfileSections["financial_information"]) {
+                  companyProfileSections["financial_information"] = []
                 }
+                companyProfileSections["financial_information"].push(sectionData)
               } else {
-                companyProfileSections[parsedSection.section] = parsedSection.data
+                companyProfileSections[section] = sectionData
               }
             }
 
-            // If this is the final message, append the full profile
-            if (stage === "final") {
+            // Handle the final complete profile
+            if (stage === "final" && section === "complete_profile") {
+              console.log("🎯 Final company profile received")
               append({
                 role: "company-profile",
                 content: "",
                 data: companyProfileSections,
               })
 
-              // reset buffer
+              // reset buffer and stop streaming
               companyProfileSections = {}
               setActiveStageIndex(null)
+              setIsStreaming(false)
+              setStreamingMessage("")
+              scrollToBottom()
+            }
+
+            // Fallback: if we have accumulated profile data and get a final stage, consider it complete
+            if (stage === "final" && Object.keys(companyProfileSections).length > 0) {
+              console.log("🎯 Final company profile received (fallback)")
+              append({
+                role: "company-profile",
+                content: "",
+                data: companyProfileSections,
+              })
+
+              // reset buffer and stop streaming
+              companyProfileSections = {}
+              setActiveStageIndex(null)
+              setIsStreaming(false)
+              setStreamingMessage("")
+              scrollToBottom()
             }
           }
-          scrollToBottom()
         }
       }
     } catch (error) {
-      append({
-        role: "assistant",
-        content: "An error occurred while processing your request.",
-      })
+      console.error("❌ Error during streaming:", error)
 
-      console.error("Error during streaming:", error)
+      if (error instanceof Error) {
+        if (error.name === "AbortError") {
+          append({
+            role: "assistant",
+            content: "Request timed out. Please try again.",
+          })
+        } else {
+          append({
+            role: "assistant",
+            content: `Error: ${error.message}`,
+          })
+        }
+      } else {
+        append({
+          role: "assistant",
+          content: "An error occurred while processing your request.",
+        })
+      }
+
       setIsStreaming(false)
       setActiveStageIndex(null)
       setStreamingMessage("")
+
+      // Cleanup scroll timeout on error
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+        scrollTimeoutRef.current = null
+      }
     }
   }
+
+  // Cleanup scroll timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  // console.log(activeStageIndex);
 
   return (
     <div className={cn("h-screen flex flex-col bg-white")}>
@@ -216,9 +300,7 @@ const Chat = () => {
         <PromptField
           handleSend={handleSend}
           input={input}
-          handleInputChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setInput(e.target.value)
-          }
+          handleInputChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
           isLoading={isStreaming}
           messages={messages}
         />

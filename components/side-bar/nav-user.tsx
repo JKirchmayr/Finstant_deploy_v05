@@ -124,7 +124,7 @@ export function NavUser({}) {
             onClick={toggleSidebar}
             className="data-[state=open]:hidden data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer flex justify-center items-center"
           >
-            <img src="/images/sidebar-switch.png" className="size-4" />
+            <img src="/images/sidebar-switch.png" className="size-4 rotate-180" />
           </SidebarMenuButton>
         </SidebarMenuItem>
       )}
