@@ -61,7 +61,7 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
   const hasFinancial = financial && Array.isArray(financialRows) && financialRows.length > 0
 
   const hasNews = Array.isArray(newsArr) && newsArr.length > 0
-  console.log(data, "commpany profile")
+  // console.log(data, "commpany profile")
   return (
     <div className="relative max-w-3xl mx-auto my-2 bg-white border rounded-sm p-4">
       <div className="flex justify-between items-center mb-4">

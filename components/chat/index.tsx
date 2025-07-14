@@ -63,13 +63,6 @@ const Chat = () => {
     let companyProfileSections: Record<string, any> = {}
 
     try {
-      console.log("🚀 Starting request to:", `${backendURL}/chat`)
-      console.log("📤 Request payload:", {
-        user_prompt: promptToSend,
-        user_id: userId,
-        session_id: sessionId,
-      })
-
       // Add timeout to the fetch request
       const controller = new AbortController()
       const timeoutId = setTimeout(() => {
@@ -112,7 +105,7 @@ const Chat = () => {
         chunkCount++
 
         if (done) {
-          console.log("✅ Stream completed after", chunkCount, "chunks")
+          // console.log("✅ Stream completed after", chunkCount, "chunks")
           if (processingBuffer.trim()) {
             append({ role: "assistant", content: processingBuffer })
           }
@@ -121,6 +114,18 @@ const Chat = () => {
           if (parsed?.data?.session_id) {
             setSessionId(parsed.data.session_id)
           }
+          //-------- appending profile here because sometimes im not getting meta stage final in response-------------
+          if (companyProfileSections && Object.keys(companyProfileSections).length > 0) {
+            append({
+              role: "company-profile",
+              content: "",
+              data: companyProfileSections,
+            })
+          }
+
+          companyProfileSections = {}
+          setStreamingMessage("")
+          scrollToBottom()
           break
         }
 
@@ -129,8 +134,6 @@ const Chat = () => {
 
         for (const event of events) {
           if (!event.trim() || !event.startsWith("data:")) continue
-
-          console.log("📦 Processing event:", event.trim().substring(0, 100) + "...")
 
           const cleaned = event.replace(/^data:/, "").trim()
           parsed = tryParseJSON(cleaned)
@@ -171,13 +174,6 @@ const Chat = () => {
             const sectionData = data?.data
             const text = data?.text || ""
 
-            console.log("🏢 Company profile event:", {
-              stage,
-              section,
-              hasData: !!sectionData,
-              text: text.substring(0, 50),
-            })
-
             // Handle structured section data directly from the new format
             if (section && sectionData) {
               if (section === "company_news_item") {
@@ -198,36 +194,35 @@ const Chat = () => {
             // Handle the final complete profile
             if (stage === "final" && section === "complete_profile") {
               console.log("🎯 Final company profile received")
-              append({
-                role: "company-profile",
-                content: "",
-                data: companyProfileSections,
-              })
+              // append({
+              //   role: "company-profile",
+              //   content: "",
+              //   data: companyProfileSections,
+              // })
 
               // reset buffer and stop streaming
-              companyProfileSections = {}
-              setActiveStageIndex(null)
-              setIsStreaming(false)
-              setStreamingMessage("")
-              scrollToBottom()
+              // companyProfileSections = {}
+              // setActiveStageIndex(null)
+              // setIsStreaming(false)
+              // setStreamingMessage("")
+              // scrollToBottom()
             }
 
             // Fallback: if we have accumulated profile data and get a final stage, consider it complete
-            if (stage === "final" && Object.keys(companyProfileSections).length > 0) {
-              console.log("🎯 Final company profile received (fallback)")
-              append({
-                role: "company-profile",
-                content: "",
-                data: companyProfileSections,
-              })
-
-              // reset buffer and stop streaming
-              companyProfileSections = {}
-              setActiveStageIndex(null)
-              setIsStreaming(false)
-              setStreamingMessage("")
-              scrollToBottom()
-            }
+            // if (stage === "final") {
+            // console.log("🎯 Final company profile received (fallback)")
+            // append({
+            //   role: "company-profile",
+            //   content: "",
+            //   data: companyProfileSections,
+            // })
+            // reset buffer and stop streaming
+            // companyProfileSections = {}
+            // setActiveStageIndex(null)
+            // setIsStreaming(false)
+            // setStreamingMessage("")
+            // scrollToBottom()
+            // }
           }
         }
       }

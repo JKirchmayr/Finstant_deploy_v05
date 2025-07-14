@@ -37,7 +37,7 @@ export const FinancialTable = ({
     { label: "Margin (%)", key: "net_income_margin" },
   ]
 
-  console.log(financial)
+  // console.log(financial)
 
   const exportToExcel = (data: any[], filename = "export.xlsx") => {
     if (!data.length) return
@@ -110,16 +110,13 @@ export const FinancialTable = ({
           <table className="border-collapse text-xs table-fixed w-max min-w-full">
             <thead>
               <tr>
-                <th
-                  className="sticky left-0 top-0 z-10 border px-3 py-2 text-left font-medium bg-secondary w-24"
-                  style={{ willChange: "transform" }}
-                >
+                <th className="sticky left-0 top-0 z-20 border px-3 py-2 text-left font-medium bg-secondary w-24">
                   (in mEUR)
                 </th>
                 {data.map(d => (
                   <th
                     key={d.year}
-                    className="border px-3 py-2 text-right italic font-semibold bg-secondary/80 w-24"
+                    className="border px-3 py-2 text-right italic font-semibold bg-secondary w-24"
                   >
                     {d.year}
                   </th>
@@ -129,10 +126,7 @@ export const FinancialTable = ({
             <tbody>
               {rows.map(row => (
                 <tr key={row.key}>
-                  <td
-                    className="sticky left-0 z-10 border px-3 py-2 text-left font-medium text-xs bg-secondary w-24"
-                    style={{ willChange: "transform" }}
-                  >
+                  <td className="sticky left-0 z-20 border px-3 py-2 text-left font-medium text-xs bg-secondary w-24">
                     {row.label}
                   </td>
                   {data.map(d => (
@@ -140,7 +134,7 @@ export const FinancialTable = ({
                       key={d.year}
                       className="border px-3 py-2 text-right italic whitespace-nowrap w-24"
                     >
-                      {d[row.key as keyof typeof d] ?? "-"}
+                      {d[row.key as keyof typeof d]?.toFixed(2) ?? "-"}
                     </td>
                   ))}
                 </tr>
