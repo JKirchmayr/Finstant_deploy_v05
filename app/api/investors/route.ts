@@ -1,4 +1,4 @@
-/* import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { Database } from "@/types/supabase"
 import { OpenAI } from "openai"
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
     // }
 
     if (industry.length > 0) {
-      query = query.contains("investor_linkedin_industry", industry)
+      query = query.overlaps("investor_linkedin_industry", industry)
     }
 
     if (investorLocation.length > 0) {
@@ -102,7 +102,7 @@ export async function GET(req: NextRequest) {
       // Now we need to get the investor_id from the investments table
       const investorIds = investments
         .map(investment => investment.investor_id)
-        .filter((id): id is number => id !== null) as number[]
+        .filter((id): id is string => id !== null) as string[]
 
       const { data: investors, error: investorError } = await supabase
         .schema("development")
@@ -138,4 +138,4 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export const dynamic = "force-dynamic" */
+export const dynamic = "force-dynamic"

@@ -18,7 +18,7 @@ export async function GET(
       .schema("development")
       .from(profileType)
       .select("*")
-      .eq(IdType, Number(id))
+      .eq(IdType, id)
 
     if (error) {
       console.error("❌ Supabase error:", error.message)
