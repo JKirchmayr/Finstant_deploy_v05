@@ -1,4 +1,4 @@
-/* import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { Database } from "@/types/supabase"
 import { OpenAI } from "openai"
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (industries.length > 0) {
-      query = query.in("companies_linkedin_industries", industries)
+      query = query.overlaps("companies_linkedin_industries", industries)
     }
 
     if (ebitdaMax) {
@@ -120,4 +120,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Something went wrong" }, { status: 500 })
   }
 }
- */
