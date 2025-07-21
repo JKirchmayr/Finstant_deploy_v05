@@ -19,8 +19,8 @@ const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000
 
 const Chat = () => {
   const { user, loading } = useAuth()
-
-  const userId = "aa227293-c91c-4b03-91db-0d2048ee73e7"
+  //  const userId = "aa227293-c91c-4b03-91db-0d2048ee73e7"
+  const userId = user?.user_id ?? ""
 
   const { messages, input, append, setInput } = useChatStore()
   const [sessionId, setSessionId] = useState<string | null>(null)

@@ -41,7 +41,12 @@ export const useAuth = () => {
         setLoading(true)
         const { data, error } = await supabase.auth.getUser()
         if (data?.user) {
-          setUser(data.user)
+          const { data: user, error: err } = await supabase
+            .from("users")
+            .select()
+            .eq("email", data.user.email ?? "")
+
+          setUser({ user_id: user?.[0].id, ...data.user })
         } else {
           setUser(null)
         }
