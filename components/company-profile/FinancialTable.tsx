@@ -126,15 +126,43 @@ export const FinancialTable = ({
             <tbody>
               {rows.map(row => (
                 <tr key={row.key}>
-                  <td className="sticky left-0 z-20 border px-3 py-2 text-left font-medium text-xs bg-secondary w-24">
+                  <td className={`sticky left-0 z-20 border px-3 py-2 text-left font-medium bg-secondary w-24 ${
+                    row.key === "revenue_growth_yoy" || row.key === "net_income_margin" 
+                      ? "text-xs italic" 
+                      : "text-xs"
+                  }`}>
                     {row.label}
                   </td>
                   {data.map(d => (
                     <td
                       key={d.year}
-                      className="border px-3 py-2 text-right italic whitespace-nowrap w-24"
+                      className={`border px-3 py-2 text-right whitespace-nowrap w-24 ${
+                        row.key === "revenue_growth_yoy" || row.key === "net_income_margin" 
+                          ? "italic text-xs" 
+                          : row.key === "revenue" || row.key === "net_income" 
+                            ? "text-xs" 
+                            : "italic text-xs"
+                      }`}
                     >
-                      {d[row.key as keyof typeof d]?.toFixed(2) ?? "-"}
+                      {d[row.key as keyof typeof d] !== null && d[row.key as keyof typeof d] !== undefined
+                        ? (() => {
+                            const value = d[row.key as keyof typeof d] as number;
+                            if (row.key === "revenue_growth_yoy" || row.key === "net_income_margin") {
+                              // Format as percentage with + sign for positive growth
+                              const sign = row.key === "revenue_growth_yoy" && value > 0 ? "+" : "";
+                              return `${sign}${new Intl.NumberFormat("en-US", {
+                                minimumFractionDigits: 1,
+                                maximumFractionDigits: 1,
+                              }).format(value)}%`;
+                            } else {
+                              // Format as regular number
+                              return new Intl.NumberFormat("en-US", {
+                                minimumFractionDigits: 1,
+                                maximumFractionDigits: 1,
+                              }).format(value);
+                            }
+                          })()
+                        : "-"}
                     </td>
                   ))}
                 </tr>

@@ -149,17 +149,14 @@ export default function CompanyProfileCard({ data }: CompanyProfileCardProps) {
             keyFacts.company_revenue_year) && (
             <p>
               <span className="font-medium">Revenue:</span>{" "}
-              {new Intl.NumberFormat("en-US", {
-                style: "decimal", // or 'currency'
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-              }).format(safe(keyFacts.company_revenue))}
-              {keyFacts.company_revenue && keyFacts.company_revenue_currency ? " " : ""}
-              {safe(keyFacts.company_revenue_currency, "")}
-              {keyFacts.company_revenue_year &&
-                (keyFacts.company_revenue || keyFacts.company_revenue_currency) &&
-                " "}
-              {keyFacts.company_revenue_year && `(${keyFacts.company_revenue_year})`}
+              {safe(keyFacts.company_revenue_currency, "EUR")}{" "}
+              {keyFacts.company_revenue
+                ? new Intl.NumberFormat("en-US", {
+                    minimumFractionDigits: 1,
+                    maximumFractionDigits: 1,
+                  }).format(keyFacts.company_revenue) + "m"
+                : ""}
+              {keyFacts.company_revenue_year && ` (${keyFacts.company_revenue_year})`}
             </p>
           )}
         </div>
